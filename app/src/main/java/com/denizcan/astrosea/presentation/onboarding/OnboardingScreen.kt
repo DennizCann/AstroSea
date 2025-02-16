@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.onboarding
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,13 @@ import com.denizcan.astrosea.model.OnboardingPage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.R
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -28,17 +36,17 @@ fun OnboardingScreen(
     val pages = listOf(
         OnboardingPage(
             title = "Tarot Falı",
-            description = "Kartların gizemli dünyasına hoş geldiniz",
+            description = "Kartların mistik dünyasında gizlenen mesajları keşfedin ve sorularınızın cevaplarını bulun",
             imageRes = 0
         ),
         OnboardingPage(
             title = "Burç Yorumları",
-            description = "Yıldızların size söylediklerini keşfedin",
+            description = "Yıldızların size özel mesajlarını okuyun ve günlük burç yorumlarınızı öğrenin",
             imageRes = 0
         ),
         OnboardingPage(
             title = "Rün Falı",
-            description = "Kadim rünlerin bilgeliğine kulak verin",
+            description = "Kadim rün sembollerinin bilgeliğiyle geleceğe ışık tutun ve yolunuzu aydınlatın",
             imageRes = 0
         )
     )
@@ -57,123 +65,147 @@ fun OnboardingScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // App name with large text
-        Text(
-            text = "Astro Sea",
-            style = MaterialTheme.typography.displayLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 64.dp, bottom = 32.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Arka plan görseli
+        Image(
+            painter = painterResource(id = R.drawable.background_onboarding),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-
-        Box(
+        
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) { page ->
-                OnboardingPage(pages[page])
+            // Sabit başlık kısmı
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(top = 48.dp)
+            ) {
+                Text(
+                    text = "ASTROSEA",
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                
+                Text(
+                    text = "Geçmiş, gelecek ve şimdi hakkında\nmerak ettiklerinizin cevabı...",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
 
-            // Navigation arrows
-            Row(
+            // Onboarding içeriği
+            Box(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage > 0) {
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                            }
-                        }
-                    }
-                ) {
-                    Icon(Icons.Default.KeyboardArrowLeft, "Previous")
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    OnboardingPage(pages[page])
                 }
 
-                IconButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage < pages.size - 1) {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
-                        }
-                    }
+                // Sayfa göstergeleri
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(Icons.Default.KeyboardArrowRight, "Next")
+                    repeat(pages.size) { iteration ->
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(8.dp)
+                                .background(
+                                    color = if (pagerState.currentPage == iteration) {
+                                        Color.White
+                                    } else {
+                                        Color.White.copy(alpha = 0.3f)
+                                    },
+                                    shape = CircleShape
+                                )
+                        )
+                    }
                 }
             }
 
-            // Page indicators
-            Row(
+            // Atla butonu
+            Button(
+                onClick = onFinishOnboarding,
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp),
-                horizontalArrangement = Arrangement.Center
+                    .padding(bottom = 32.dp)
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(alpha = 0.7f)
+                ),
+                shape = MaterialTheme.shapes.medium,
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp
+                )
             ) {
-                repeat(pages.size) { iteration ->
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(8.dp)
-                            .background(
-                                color = if (pagerState.currentPage == iteration) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                                },
-                                shape = CircleShape
-                            )
-                    )
-                }
+                Text(
+                    "ATLA",
+                    color = Color.Black,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
-        }
-
-        // Skip button
-        Button(
-            onClick = onFinishOnboarding,
-            modifier = Modifier
-                .padding(32.dp)
-                .fillMaxWidth()
-        ) {
-            Text("Atla")
         }
     }
 }
 
 @Composable
 private fun OnboardingPage(page: OnboardingPage) {
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .padding(horizontal = 32.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.6f)
+        ),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color.White.copy(alpha = 0.3f)
+        )
     ) {
-        Text(
-            text = page.title,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        
-        Text(
-            text = page.description,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = page.title,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            
+            Text(
+                text = page.description,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = Color.White.copy(alpha = 0.9f)
+            )
+        }
     }
 } 
