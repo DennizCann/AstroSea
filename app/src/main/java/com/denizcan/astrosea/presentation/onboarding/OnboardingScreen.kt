@@ -36,18 +36,23 @@ fun OnboardingScreen(
     val pages = listOf(
         OnboardingPage(
             title = "Tarot Falı",
-            description = "Kartların mistik dünyasında gizlenen mesajları keşfedin ve sorularınızın cevaplarını bulun",
-            imageRes = 0
+            description = "Tarot ile sorularınızın cevaplarını\nve bilmeniz gerekenleri öğrenin",
+            imageRes = R.drawable.tarot
         ),
         OnboardingPage(
             title = "Burç Yorumları",
-            description = "Yıldızların size özel mesajlarını okuyun ve günlük burç yorumlarınızı öğrenin",
-            imageRes = 0
+            description = "Yıldızların yazdığı öykünüzü\nburçlarınızla yorumlayalım",
+            imageRes = R.drawable.zodiac
         ),
         OnboardingPage(
             title = "Rün Falı",
-            description = "Kadim rün sembollerinin bilgeliğiyle geleceğe ışık tutun ve yolunuzu aydınlatın",
-            imageRes = 0
+            description = "Antik rünlerin gücü,\nyaşamının gizli mesajlarını ortaya çıkarır",
+            imageRes = R.drawable.rune
+        ),
+        OnboardingPage(
+            title = "Doğum Haritası",
+            description = "Hayatının kozmik öyküsü,\ndoğum haritanın çizgilerinde gizli",
+            imageRes = R.drawable.birthchart
         )
     )
 
@@ -84,13 +89,15 @@ fun OnboardingScreen(
             // Sabit başlık kısmı
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 48.dp)
+                modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text(
-                    text = "ASTROSEA",
-                    style = MaterialTheme.typography.displayMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                Image(
+                    painter = painterResource(id = R.drawable.astrosea_logo),
+                    contentDescription = "AstroSea Logo",
+                    modifier = Modifier
+                        .size(280.dp)
+                        .padding(bottom = 16.dp),
+                    contentScale = ContentScale.Fit
                 )
                 
                 Text(
@@ -98,7 +105,7 @@ fun OnboardingScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
 
@@ -107,6 +114,7 @@ fun OnboardingScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .padding(top = 0.dp, bottom = 32.dp)
             ) {
                 HorizontalPager(
                     state = pagerState,
@@ -114,29 +122,28 @@ fun OnboardingScreen(
                 ) { page ->
                     OnboardingPage(pages[page])
                 }
+            }
 
-                // Sayfa göstergeleri
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 32.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    repeat(pages.size) { iteration ->
-                        Box(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .size(8.dp)
-                                .background(
-                                    color = if (pagerState.currentPage == iteration) {
-                                        Color.White
-                                    } else {
-                                        Color.White.copy(alpha = 0.3f)
-                                    },
-                                    shape = CircleShape
-                                )
-                        )
-                    }
+            // Sayfa göstergeleri
+            Row(
+                modifier = Modifier
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                repeat(pages.size) { iteration ->
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(8.dp)
+                            .background(
+                                color = if (pagerState.currentPage == iteration) {
+                                    Color.White
+                                } else {
+                                    Color.White.copy(alpha = 0.3f)
+                                },
+                                shape = CircleShape
+                            )
+                    )
                 }
             }
 
@@ -144,22 +151,23 @@ fun OnboardingScreen(
             Button(
                 onClick = onFinishOnboarding,
                 modifier = Modifier
-                    .padding(bottom = 32.dp)
+                    .padding(start = 32.dp, end = 32.dp, bottom = 24.dp)
                     .fillMaxWidth()
                     .height(48.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White.copy(alpha = 0.7f)
+                    containerColor = Color.White.copy(alpha = 0.2f)
                 ),
                 shape = MaterialTheme.shapes.medium,
                 elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 4.dp
+                    defaultElevation = 0.dp
                 )
             ) {
                 Text(
                     "ATLA",
-                    color = Color.Black,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             }
         }
@@ -171,7 +179,8 @@ private fun OnboardingPage(page: OnboardingPage) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = 32.dp)
+            .height(280.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Black.copy(alpha = 0.6f)
         ),
@@ -186,14 +195,25 @@ private fun OnboardingPage(page: OnboardingPage) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            if (page.imageRes != 0) {
+                Image(
+                    painter = painterResource(id = page.imageRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(bottom = 16.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+            
             Text(
                 text = page.title,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = Color.White,
