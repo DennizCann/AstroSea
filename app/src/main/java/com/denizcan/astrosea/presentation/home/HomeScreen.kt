@@ -104,12 +104,27 @@ fun HomeScreen(
                             textAlign = TextAlign.Center
                         )
 
-                        if (profileData?.name?.isBlank() != false) {
+                        if (profileData == null || 
+                            profileData?.name.isNullOrBlank() || 
+                            profileData?.surname.isNullOrBlank() || 
+                            profileData?.birthDate.isNullOrBlank() || 
+                            profileData?.birthTime.isNullOrBlank() || 
+                            profileData?.country.isNullOrBlank() || 
+                            profileData?.city.isNullOrBlank()
+                        ) {
+                            Text(
+                                text = "Profil bilgilerinizi eksiksiz doldurun",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center
+                            )
+                            
                             Button(
                                 onClick = onNavigateToProfile,
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.secondary
-                                )
+                                ),
+                                modifier = Modifier.padding(top = 8.dp)
                             ) {
                                 Text("Profil Bilgilerini Gir")
                             }

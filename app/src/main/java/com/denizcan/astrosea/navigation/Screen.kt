@@ -9,4 +9,8 @@ sealed class Screen(val route: String) {
     object Tarot : Screen("tarot")
     object Runes : Screen("runes")
     object BirthChart : Screen("birth_chart")
+    object TarotCards : Screen("tarot_cards")
+    object YesNo : Screen("yes_no")
+    object TarotSpreads : Screen("tarot_spreads")
+    object CustomSpread : Screen("custom_spread")
 } 

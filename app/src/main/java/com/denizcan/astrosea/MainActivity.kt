@@ -32,6 +32,10 @@ import com.denizcan.astrosea.presentation.horoscope.HoroscopeScreen
 import com.denizcan.astrosea.presentation.tarot.TarotScreen
 import com.denizcan.astrosea.presentation.runes.RunesScreen
 import com.denizcan.astrosea.presentation.birthchart.BirthChartScreen
+import com.denizcan.astrosea.presentation.tarot.screens.TarotCardsScreen
+import com.denizcan.astrosea.presentation.tarot.screens.YesNoScreen
+import com.denizcan.astrosea.presentation.tarot.screens.TarotSpreadsScreen
+import com.denizcan.astrosea.presentation.tarot.screens.CustomSpreadScreen
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -165,6 +169,26 @@ class MainActivity : ComponentActivity() {
                             TarotScreen(
                                 onNavigateBack = {
                                     navController.popBackStack()
+                                },
+                                onNavigateToTarotCards = {
+                                    navController.navigate(Screen.TarotCards.route)
+                                },
+                                onNavigateToYesNo = {
+                                    navController.navigate(Screen.YesNo.route)
+                                },
+                                onNavigateToTarotSpreads = {
+                                    navController.navigate(Screen.TarotSpreads.route)
+                                },
+                                onNavigateToCustomSpread = {
+                                    navController.navigate(Screen.CustomSpread.route)
+                                }
+                            )
+                        }
+
+                        composable(Screen.TarotCards.route) {
+                            TarotCardsScreen(
+                                onNavigateBack = {
+                                    navController.popBackStack()
                                 }
                             )
                         }
@@ -179,6 +203,30 @@ class MainActivity : ComponentActivity() {
 
                         composable(Screen.BirthChart.route) {
                             BirthChartScreen(
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        composable(Screen.YesNo.route) {
+                            YesNoScreen(
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        composable(Screen.TarotSpreads.route) {
+                            TarotSpreadsScreen(
+                                onNavigateBack = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+
+                        composable(Screen.CustomSpread.route) {
+                            CustomSpreadScreen(
                                 onNavigateBack = {
                                     navController.popBackStack()
                                 }
