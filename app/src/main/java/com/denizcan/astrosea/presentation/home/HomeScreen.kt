@@ -16,32 +16,35 @@ import com.denizcan.astrosea.presentation.components.AstroDrawer
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import com.denizcan.astrosea.presentation.profile.ProfileData
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import com.denizcan.astrosea.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onSignOut: () -> Unit,
-    onNavigateToProfile: () -> Unit,
     onNavigateToHoroscope: () -> Unit,
     onNavigateToTarot: () -> Unit,
     onNavigateToRunes: () -> Unit,
-    onNavigateToBirthChart: () -> Unit
+    onNavigateToBirthChart: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onSignOut: () -> Unit
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    var selectedCard by remember { mutableStateOf<Int?>(null) }
     var profileData by remember { mutableStateOf<ProfileData?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-
-    // Kullanıcı bilgilerini yükle
-    LaunchedEffect(Unit) {
-        currentUser?.uid?.let { uid ->
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    
+    // Profil bilgilerini yükle
+    LaunchedEffect(userId) {
+        userId?.let { uid ->
             FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(uid)
@@ -56,151 +59,219 @@ fun HomeScreen(
         }
     }
 
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
     AstroDrawer(
         drawerState = drawerState,
         scope = scope,
         onSignOut = onSignOut,
         onNavigateToProfile = onNavigateToProfile
     ) {
-        Scaffold(
-            topBar = {
-                AstroTopBar(
-                    title = "Ana Sayfa",
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.open()
-                            }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-            }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Hoş Geldin Yazısı
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                    } else {
-                        Text(
-                            text = if (profileData?.name?.isNotBlank() == true) {
-                                "Hoş Geldin, ${profileData?.name}!"
-                            } else {
-                                "Hoş Geldin!"
-                            },
-                            style = MaterialTheme.typography.headlineMedium,
-                            textAlign = TextAlign.Center
-                        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Arka plan görseli
+            Image(
+                painter = painterResource(id = R.drawable.background_onboarding),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
-                        if (profileData == null || 
-                            profileData?.name.isNullOrBlank() || 
-                            profileData?.surname.isNullOrBlank() || 
-                            profileData?.birthDate.isNullOrBlank() || 
-                            profileData?.birthTime.isNullOrBlank() || 
-                            profileData?.country.isNullOrBlank() || 
-                            profileData?.city.isNullOrBlank()
-                        ) {
-                            Text(
-                                text = "Profil bilgilerinizi eksiksiz doldurun",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.error,
-                                textAlign = TextAlign.Center
-                            )
-                            
-                            Button(
-                                onClick = onNavigateToProfile,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondary
-                                ),
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                Text("Profil Bilgilerini Gir")
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text("AstroSea", color = Color.White) },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menü",
+                                    tint = Color.White
+                                )
                             }
-                        }
-                    }
-                }
-
-                // Günün Kartı Seçimi
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    modifier = Modifier.padding(vertical = 24.dp)
-                ) {
-                    Text(
-                        text = "Günün Kartı",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent
                         )
                     )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
+                },
+                containerColor = Color.Transparent
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Hoş geldin kartı
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(90.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Black.copy(alpha = 0.6f)
+                        ),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
                     ) {
-                        repeat(3) { index ->
-                            TarotCard(
-                                number = index + 1,
-                                isSelected = selectedCard == index,
-                                onClick = { selectedCard = index }
-                            )
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
+                            } else {
+                                if (profileData?.name.isNullOrEmpty()) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Text(
+                                            "Profilinizi Tamamlayın",
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            color = Color.White
+                                        )
+                                        Text(
+                                            "Kişiselleştirilmiş deneyim için lütfen profil bilgilerinizi doldurun.",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = Color.White.copy(alpha = 0.9f)
+                                        )
+                                        Button(
+                                            onClick = onNavigateToProfile,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 8.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.White.copy(alpha = 0.2f)
+                                            )
+                                        ) {
+                                            Text(
+                                                "Profile Git",
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Text(
+                                        "Hoş Geldin, ${profileData?.name}",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = Color.White
+                                    )
+                                    Text(
+                                        "Yıldızların ve kadim bilgeliğin dünyasına hoş geldin.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.White.copy(alpha = 0.9f)
+                                    )
+                                }
+                            }
                         }
                     }
 
-                    if (selectedCard != null) {
-                        Text(
-                            text = "${selectedCard!! + 1}. kart seçildi",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary
+                    // Arama kısmı
+                    var searchQuery by remember { mutableStateOf("") }
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Black.copy(alpha = 0.6f)
+                        ),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                    ) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 4.dp),
+                            placeholder = {
+                                Text(
+                                    "Aklındaki sorunun cevabını hemen gör...",
+                                    color = Color.White.copy(alpha = 0.6f),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.Transparent,
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                cursorColor = Color.White
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                            singleLine = true
                         )
                     }
-                }
 
-                // Menu Cards
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    // Günün Kartları
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Black.copy(alpha = 0.6f)
+                        ),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
                     ) {
-                        MenuCard(
-                            title = "Burç\nYorumu",
-                            modifier = Modifier.weight(1f).padding(end = 8.dp),
-                            onClick = onNavigateToHoroscope
-                        )
-                        MenuCard(
-                            title = "Tarot\nFalı",
-                            modifier = Modifier.weight(1f).padding(start = 8.dp),
-                            onClick = onNavigateToTarot
-                        )
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                "Günün Kartları",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.White
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                DailyCard(title = "1")
+                                DailyCard(title = "2")
+                                DailyCard(title = "3")
+                            }
+                        }
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+
+                    // Alt kartlar için grid
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        MenuCard(
-                            title = "Rün\nFalı",
-                            modifier = Modifier.weight(1f).padding(end = 8.dp),
-                            onClick = onNavigateToRunes
-                        )
-                        MenuCard(
-                            title = "Doğum\nHaritası",
-                            modifier = Modifier.weight(1f).padding(start = 8.dp),
-                            onClick = onNavigateToBirthChart
-                        )
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            ServiceCard(
+                                title = "Burç\nYorumu",
+                                onClick = onNavigateToHoroscope,
+                                modifier = Modifier.weight(1f)
+                            )
+                            ServiceCard(
+                                title = "Tarot\nFalı",
+                                onClick = onNavigateToTarot,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            ServiceCard(
+                                title = "Rün\nFalı",
+                                onClick = onNavigateToRunes,
+                                modifier = Modifier.weight(1f)
+                            )
+                            ServiceCard(
+                                title = "Doğum\nHaritası",
+                                onClick = onNavigateToBirthChart,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
             }
@@ -209,77 +280,64 @@ fun HomeScreen(
 }
 
 @Composable
-private fun MenuCard(
+private fun ServiceCard(
     title: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
-            .height(100.dp)
+            .fillMaxSize()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.6f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
         }
     }
 }
 
 @Composable
-private fun TarotCard(
-    number: Int,
-    isSelected: Boolean,
-    onClick: () -> Unit
+private fun DailyCard(
+    title: String,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
-            .width(80.dp)
-            .height(140.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(8.dp),
+        modifier = modifier
+            .height(160.dp)
+            .width(100.dp)
+            .clickable { /* Kart seçme işlemi gelecek */ },
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.tertiaryContainer
+            containerColor = Color.Black.copy(alpha = 0.7f)
         ),
-        border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected)
-                MaterialTheme.colorScheme.primary
-            else
-                MaterialTheme.colorScheme.tertiary
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) 8.dp else 4.dp
-        )
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+        shape = RoundedCornerShape(8.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.tertiaryContainer,
-                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
-                        )
-                    )
-                )
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "★",
+                text = title,
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
+                color = Color.White,
+                fontWeight = FontWeight.Bold
             )
         }
     }
