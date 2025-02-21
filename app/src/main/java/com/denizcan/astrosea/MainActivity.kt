@@ -27,6 +27,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
 import com.denizcan.astrosea.presentation.horoscope.HoroscopeScreen
 import com.denizcan.astrosea.presentation.tarot.TarotScreen
@@ -36,6 +37,8 @@ import com.denizcan.astrosea.presentation.tarot.screens.TarotCardsScreen
 import com.denizcan.astrosea.presentation.tarot.screens.YesNoScreen
 import com.denizcan.astrosea.presentation.tarot.screens.TarotSpreadsScreen
 import com.denizcan.astrosea.presentation.tarot.screens.CustomSpreadScreen
+import androidx.navigation.navArgument
+import com.denizcan.astrosea.presentation.tarot.screens.TarotCardDetailScreen
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -187,8 +190,9 @@ class MainActivity : ComponentActivity() {
 
                         composable(Screen.TarotCards.route) {
                             TarotCardsScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
+                                onNavigateBack = { navController.popBackStack() },
+                                onCardClick = { card -> 
+                                    navController.navigate(Screen.TarotCardDetail.createRoute(card.id))
                                 }
                             )
                         }
@@ -230,6 +234,17 @@ class MainActivity : ComponentActivity() {
                                 onNavigateBack = {
                                     navController.popBackStack()
                                 }
+                            )
+                        }
+
+                        composable(
+                            route = Screen.TarotCardDetail.route,
+                            arguments = listOf(navArgument("cardId") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val cardId = backStackEntry.arguments?.getString("cardId") ?: return@composable
+                            TarotCardDetailScreen(
+                                cardId = cardId,
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
 

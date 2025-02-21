@@ -1,1 +1,71 @@
- 
+{
+  "major_arcana": [
+    {
+      "id": "fool",
+      "name": "Deli",
+      "number": "0",
+      "type": "major",
+      "imageResName": "fool_card",
+      "meaningUpright": "Yeni başlangıçlar, özgürlük, saf inanç",
+      "meaningReversed": "Düşüncesizlik, risk alma, naiflik",
+      "description": "Deli kartı yeni başlangıçları ve maceraları temsil eder...",
+      "keywords": ["başlangıç", "özgürlük", "macera", "saflık"]
+    }
+    // Diğer Major Arkana kartları...
+  ],
+  "minor_arcana": {
+    "wands": [
+      {
+        "id": "ace_of_wands",
+        "name": "Asaların Ası",
+        "type": "minor",
+        "suit": "wands",
+        "imageResName": "wands_ace",
+        "meaningUpright": "İlham, yaratıcılık, yeni başlangıçlar",
+        "meaningReversed": "Gecikme, yaratıcı blokaj",
+        "description": "Asaların Ası yeni fırsatları temsil eder...",
+        "keywords": ["başlangıç", "ilham", "yaratıcılık"]
+      }
+      // Diğer Asa kartları...
+    ],
+    "cups": [
+      {
+        "id": "ace_of_cups",
+        "name": "Kupaların Ası",
+        "type": "minor",
+        "suit": "cups",
+        "imageResName": "cups_ace",
+        "meaningUpright": "Duygusal yeni başlangıçlar, sezgi",
+        "meaningReversed": "Duygusal blokaj, içe kapanma",
+        "description": "Kupaların Ası duygusal başlangıçları temsil eder...",
+        "keywords": ["duygu", "sezgi", "sevgi"]
+      }
+    ],
+    "swords": [
+      {
+        "id": "ace_of_swords",
+        "name": "Kılıçların Ası",
+        "type": "minor",
+        "suit": "swords",
+        "imageResName": "swords_ace",
+        "meaningUpright": "Zihinsel netlik, yeni fikirler",
+        "meaningReversed": "Karmaşa, belirsizlik",
+        "description": "Kılıçların Ası zihinsel berraklığı temsil eder...",
+        "keywords": ["netlik", "zeka", "düşünce"]
+      }
+    ],
+    "pentacles": [
+      {
+        "id": "ace_of_pentacles",
+        "name": "Pentakllerin Ası",
+        "type": "minor",
+        "suit": "pentacles",
+        "imageResName": "pentacles_ace",
+        "meaningUpright": "Maddi fırsatlar, refah",
+        "meaningReversed": "Maddi kayıp, fırsatları kaçırma",
+        "description": "Pentakllerin Ası maddi fırsatları temsil eder...",
+        "keywords": ["para", "refah", "maddi"]
+      }
+    ]
+  }
+} 

@@ -13,4 +13,7 @@ sealed class Screen(val route: String) {
     object YesNo : Screen("yes_no")
     object TarotSpreads : Screen("tarot_spreads")
     object CustomSpread : Screen("custom_spread")
+    object TarotCardDetail : Screen("tarot_card_detail/{cardId}") {
+        fun createRoute(cardId: String) = "tarot_card_detail/$cardId"
+    }
 } 
