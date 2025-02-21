@@ -1,5 +1,7 @@
 package com.denizcan.astrosea.presentation.tarot
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,9 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,103 +27,102 @@ fun TarotScreen(
     onNavigateToTarotSpreads: () -> Unit,
     onNavigateToCustomSpread: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            AstroTopBar(
-                title = "Tarot Falı",
-                onBackClick = onNavigateBack
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            // Bilgilendirme Kartı
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Tarot Falı Hakkında",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                    Text(
-                        text = "Tarot kartları, yüzyıllardır insanların geleceği yorumlamak ve hayatlarındaki önemli konularda rehberlik almak için kullandıkları mistik bir araçtır. Her kart, farklı anlamlar ve mesajlar taşır. Sizin için en uygun tarot falı seçeneğini aşağıdan seçebilirsiniz.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            }
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Arka plan görseli
+        Image(
+            painter = painterResource(id = R.drawable.anamenu),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-            // Tarot Seçenekleri
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                AstroTopBar(
+                    title = "Tarot Falı",
+                    onBackClick = onNavigateBack
+                )
+            }
+        ) { paddingValues ->
             Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Row(
+                // Bilgilendirme Kartı
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
                 ) {
-                    TarotOptionCard(
-                        title = "Tarot\nKartları",
-                        description = "Tarot kartlarının anlamları",
-                        modifier = Modifier.weight(1f),
-                        onClick = onNavigateToTarotCards
-                    )
-                    TarotOptionCard(
-                        title = "Evet/Hayır",
-                        description = "Tek soru için hızlı cevap",
-                        modifier = Modifier.weight(1f),
-                        onClick = onNavigateToYesNo
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Tarot Falı Hakkında",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "Tarot kartları, yüzyıllardır insanların geleceği yorumlamak ve hayatlarındaki önemli konularda rehberlik almak için kullandıkları mistik bir araçtır. Her kart, farklı anlamlar ve mesajlar taşır. Sizin için en uygun tarot falı seçeneğini aşağıdan seçebilirsiniz.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    TarotOptionCard(
-                        title = "Tarot\nAçılımları",
-                        description = "Hazır tarot dizilimleri",
-                        modifier = Modifier.weight(1f),
-                        onClick = onNavigateToTarotSpreads
-                    )
-                    TarotOptionCard(
-                        title = "Özel\nAçılım",
-                        description = "Kendi açılımını oluştur",
-                        modifier = Modifier.weight(1f),
-                        onClick = onNavigateToCustomSpread
-                    )
-                }
-            }
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // Yakında notu
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                )
-            ) {
-                Text(
-                    text = "Bu özellikler çok yakında aktif olacak!",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
-                )
+                // Grid yapısı için kartlar
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // İlk sıra
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        TarotOptionCard(
+                            title = "Tarot Kartları",
+                            description = "Tüm Major ve Minor Arkana kartlarını ve anlamlarını keşfedin",
+                            onClick = onNavigateToTarotCards,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TarotOptionCard(
+                            title = "Evet/Hayır Falı",
+                            description = "Tek kart çekerek sorularınıza hızlı cevaplar alın",
+                            onClick = onNavigateToYesNo,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    // İkinci sıra
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        TarotOptionCard(
+                            title = "Tarot Açılımları",
+                            description = "Farklı konular için hazırlanmış özel açılımları deneyin",
+                            onClick = onNavigateToTarotSpreads,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TarotOptionCard(
+                            title = "Özel Açılım",
+                            description = "Kendi tarot açılımınızı oluşturun",
+                            onClick = onNavigateToCustomSpread,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
         }
     }
@@ -127,33 +132,37 @@ fun TarotScreen(
 private fun TarotOptionCard(
     title: String,
     description: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
-            .height(120.dp)
+            .aspectRatio(1f) // Kare şeklinde olması için
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.6f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Color.White.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center
             )
         }
     }

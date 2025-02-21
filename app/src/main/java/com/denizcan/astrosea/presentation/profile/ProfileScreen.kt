@@ -1,17 +1,25 @@
 package com.denizcan.astrosea.presentation.profile
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,130 +29,174 @@ fun ProfileScreen(
 ) {
     val state = viewModel.profileState
 
-    Scaffold(
-        topBar = {
-            AstroTopBar(
-                title = "Profil",
-                onBackClick = onNavigateBack,
-                actions = {
-                    if (!state.isLoading) {
-                        IconButton(
-                            onClick = {
-                                if (state.isEditing) {
-                                    viewModel.saveProfile(onSuccess = {})
-                                } else {
-                                    viewModel.toggleEditing()
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Arka plan görseli
+        Image(
+            painter = painterResource(id = R.drawable.anamenu),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                AstroTopBar(
+                    title = "Profil",
+                    onBackClick = onNavigateBack,
+                    actions = {
+                        if (!state.isLoading) {
+                            IconButton(
+                                onClick = {
+                                    if (state.isEditing) {
+                                        viewModel.saveProfile(onSuccess = {})
+                                    } else {
+                                        viewModel.toggleEditing()
+                                    }
                                 }
+                            ) {
+                                Icon(
+                                    imageVector = if (state.isEditing) Icons.Default.Done else Icons.Default.Edit,
+                                    contentDescription = if (state.isEditing) "Kaydet" else "Düzenle",
+                                    tint = Color.White
+                                )
                             }
-                        ) {
-                            Icon(
-                                imageVector = if (state.isEditing) Icons.Default.Done else Icons.Default.Edit,
-                                contentDescription = if (state.isEditing) "Kaydet" else "Düzenle"
-                            )
                         }
                     }
-                }
-            )
-        }
-    ) { paddingValues ->
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+                )
             }
-        } else {
-            if (state.error != null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text(
-                            text = "Hata oluştu:",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.error
+                        OutlinedTextField(
+                            value = state.profileData.name,
+                            onValueChange = { if (state.isEditing) viewModel.onNameChange(it) },
+                            label = { Text("Ad", color = Color.White) },
+                            enabled = state.isEditing,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                focusedBorderColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        Text(
-                            text = state.error,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
+
+                        OutlinedTextField(
+                            value = state.profileData.surname,
+                            onValueChange = { if (state.isEditing) viewModel.onSurnameChange(it) },
+                            label = { Text("Soyad", color = Color.White) },
+                            enabled = state.isEditing,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                focusedBorderColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
                         )
-                        Button(onClick = { viewModel.loadProfile() }) {
-                            Text("Tekrar Dene")
-                        }
+
+                        OutlinedTextField(
+                            value = state.profileData.birthDate,
+                            onValueChange = { if (state.isEditing) viewModel.onBirthDateChange(it) },
+                            label = { Text("Doğum Tarihi", color = Color.White) },
+                            enabled = state.isEditing,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                focusedBorderColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = state.profileData.birthTime,
+                            onValueChange = { if (state.isEditing) viewModel.onBirthTimeChange(it) },
+                            label = { Text("Doğum Saati", color = Color.White) },
+                            enabled = state.isEditing,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                focusedBorderColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = state.profileData.country,
+                            onValueChange = { if (state.isEditing) viewModel.onCountryChange(it) },
+                            label = { Text("Ülke", color = Color.White) },
+                            enabled = state.isEditing,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                focusedBorderColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        OutlinedTextField(
+                            value = state.profileData.city,
+                            onValueChange = { if (state.isEditing) viewModel.onCityChange(it) },
+                            label = { Text("Şehir", color = Color.White) },
+                            enabled = state.isEditing,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                focusedBorderColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedTextColor = Color.White,
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    OutlinedTextField(
-                        value = state.profileData.name,
-                        onValueChange = viewModel::onNameChange,
-                        label = { Text("Adınız") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = state.isEditing
-                    )
 
-                    OutlinedTextField(
-                        value = state.profileData.surname,
-                        onValueChange = viewModel::onSurnameChange,
-                        label = { Text("Soyadınız") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = state.isEditing
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = Color.White
                     )
+                }
 
-                    OutlinedTextField(
-                        value = state.profileData.birthDate,
-                        onValueChange = viewModel::onBirthDateChange,
-                        label = { Text("Doğum Tarihi (GG/AA/YYYY)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = state.isEditing
+                state.error?.let { error ->
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
-
-                    OutlinedTextField(
-                        value = state.profileData.birthTime,
-                        onValueChange = viewModel::onBirthTimeChange,
-                        label = { Text("Doğum Saati (SS:DD)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = state.isEditing
-                    )
-
-                    OutlinedTextField(
-                        value = state.profileData.country,
-                        onValueChange = viewModel::onCountryChange,
-                        label = { Text("Doğduğunuz Ülke") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = state.isEditing
-                    )
-
-                    OutlinedTextField(
-                        value = state.profileData.city,
-                        onValueChange = viewModel::onCityChange,
-                        label = { Text("Doğduğunuz Şehir") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = state.isEditing
-                    )
-
-                    if (state.isEditing) {
-                        Button(
-                            onClick = { viewModel.saveProfile(onSuccess = {}) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                        ) {
-                            Text("Kaydet")
-                        }
-                    }
                 }
             }
         }

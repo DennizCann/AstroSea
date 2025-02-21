@@ -11,21 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
-import com.denizcan.astrosea.presentation.components.AstroTopBar
 import com.denizcan.astrosea.presentation.components.AstroDrawer
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.graphics.Brush
 import com.denizcan.astrosea.presentation.profile.ProfileData
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +67,7 @@ fun HomeScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             // Arka plan görseli
             Image(
-                painter = painterResource(id = R.drawable.background_onboarding),
+                painter = painterResource(id = R.drawable.anamenu),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -297,13 +293,29 @@ private fun ServiceCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
+            Image(
+                painter = painterResource(
+                    id = when (title) {
+                        "Burç\nYorumu" -> R.drawable.zodiac
+                        "Tarot\nFalı" -> R.drawable.tarot
+                        "Rün\nFalı" -> R.drawable.rune
+                        else -> R.drawable.birthchart
+                    }
+                ),
+                contentDescription = title,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(4.dp),
+                contentScale = ContentScale.Fit
+            )
+            
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = Color.White
             )
@@ -322,22 +334,20 @@ private fun DailyCard(
             .width(100.dp)
             .clickable { /* Kart seçme işlemi gelecek */ },
         colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.7f)
+            containerColor = Color.Transparent
         ),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+        border = BorderStroke(0.dp, Color.Transparent),
         shape = RoundedCornerShape(8.dp)
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
+            Image(
+                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                contentDescription = "Tarot kartı $title",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
             )
         }
     }
