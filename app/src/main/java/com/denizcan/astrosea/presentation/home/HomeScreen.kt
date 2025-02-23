@@ -34,6 +34,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,7 +118,8 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                         .padding(horizontal = 16.dp)
-                        .padding(top = 4.dp),
+                        .padding(top = 4.dp)
+                        .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Profil Uyarı Kartı
@@ -236,14 +239,6 @@ fun HomeScreen(
                                     color = Color.White,
                                     thickness = 2.dp
                                 )
-                                
-                                Text(
-                                    text = java.time.LocalDate.now().format(
-                                        java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy", java.util.Locale("tr"))
-                                    ),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = Color.White.copy(alpha = 0.7f)
-                                )
                             }
                         }
                     }
@@ -269,7 +264,9 @@ fun HomeScreen(
                                 Text(
                                     "Aklındaki sorunun cevabını hemen gör...",
                                     color = Color.White.copy(alpha = 0.6f),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = 18.sp
+                                    )
                                 )
                             },
                             colors = OutlinedTextFieldDefaults.colors(
@@ -279,66 +276,108 @@ fun HomeScreen(
                                 focusedTextColor = Color.White,
                                 cursorColor = Color.White
                             ),
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                color = Color.White,
+                                fontSize = 18.sp
+                            ),
                             singleLine = true
                         )
                     }
 
-                    // Günün Kartları
+                    // Günlük Açılım başlığı
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(180.dp),
+                            .padding(horizontal = 48.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.Black.copy(alpha = 0.6f)
+                            containerColor = Color.White
                         ),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "Günün Kartları",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = Color.White
+                            Image(
+                                painter = painterResource(id = R.drawable.varlik2),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
                             )
                             
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                DailyCard(title = "1")
-                                DailyCard(title = "2")
-                                DailyCard(title = "3")
-                            }
+                            Text(
+                                "Günlük Açılım",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                    fontSize = 24.sp
+                                ),
+                                color = Color.Black,
+                                textAlign = TextAlign.Center
+                            )
+                            
+                            Image(
+                                painter = painterResource(id = R.drawable.varlik2),
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
+                    }
+
+                    // Tarot kartları
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        DailyCard(
+                            title = "1",
+                            modifier = Modifier
+                                .height(160.dp)
+                                .width(95.dp)
+                        )
+                        DailyCard(
+                            title = "2",
+                            modifier = Modifier
+                                .height(160.dp)
+                                .width(95.dp)
+                        )
+                        DailyCard(
+                            title = "3",
+                            modifier = Modifier
+                                .height(160.dp)
+                                .width(95.dp)
+                        )
                     }
 
                     // Alt kartlar için grid
                     Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.weight(0.8f),  // height yerine weight kullanıyoruz
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // İlk sıra
                         Row(
                             modifier = Modifier.weight(1f),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            ServiceCard(
+                                title = "Evet / Hayır",
+                                onClick = onNavigateToTarot,
+                                modifier = Modifier.weight(1f)
+                            )
                             ServiceCard(
                                 title = "Burç\nYorumu",
                                 onClick = onNavigateToHoroscope,
                                 modifier = Modifier.weight(1f)
                             )
-                            ServiceCard(
-                                title = "Tarot\nFalı",
-                                onClick = onNavigateToTarot,
-                                modifier = Modifier.weight(1f)
-                            )
                         }
                         
+                        // İkinci sıra
                         Row(
                             modifier = Modifier.weight(1f),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
                                 title = "Rün\nFalı",
@@ -362,14 +401,16 @@ fun HomeScreen(
 private fun ServiceCard(
     title: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable(onClick = onClick),
+            .clickable(enabled = enabled, onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.6f)
+            containerColor = if (enabled) Color.Black.copy(alpha = 0.6f) 
+                           else Color.Gray.copy(alpha = 0.3f)
         ),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
     ) {
@@ -380,27 +421,44 @@ private fun ServiceCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Image(
-                painter = painterResource(
-                    id = when (title) {
-                        "Burç\nYorumu" -> R.drawable.zodiac
-                        "Tarot\nFalı" -> R.drawable.tarot
-                        "Rün\nFalı" -> R.drawable.rune
-                        else -> R.drawable.birthchart
-                    }
-                ),
-                contentDescription = title,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(4.dp),
-                contentScale = ContentScale.Fit
-            )
+            if (enabled) {
+                Image(
+                    painter = painterResource(
+                        id = when (title) {
+                            "Burç\nYorumu" -> R.drawable.zodiac
+                            "Evet / Hayır" -> R.drawable.tarot
+                            "Rün\nFalı" -> R.drawable.rune
+                            else -> R.drawable.birthchart
+                        }
+                    ),
+                    contentDescription = title,
+                    modifier = Modifier
+                        .weight(0.6f)
+                        .padding(8.dp),
+                    contentScale = ContentScale.Fit
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .weight(0.6f)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "Yakında",
+                        color = Color.White.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
             
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 18.sp
+                ),
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f)
             )
         }
     }
@@ -412,10 +470,7 @@ private fun DailyCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .height(160.dp)
-            .width(100.dp)
-            .clickable { /* Kart seçme işlemi gelecek */ },
+        modifier = modifier.clickable { /* Kart seçme işlemi gelecek */ },  // Boyutları Row'dan alacak
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         ),
