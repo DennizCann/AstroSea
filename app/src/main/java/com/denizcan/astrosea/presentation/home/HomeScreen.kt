@@ -354,12 +354,12 @@ fun HomeScreen(
 
                     // Alt kartlar için grid
                     Column(
-                        modifier = Modifier.weight(0.8f),  // height yerine weight kullanıyoruz
+                        modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         // İlk sıra
                         Row(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.height(160.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
@@ -376,7 +376,7 @@ fun HomeScreen(
                         
                         // İkinci sıra
                         Row(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.height(160.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
@@ -388,6 +388,25 @@ fun HomeScreen(
                                 title = "Doğum\nHaritası",
                                 onClick = onNavigateToBirthChart,
                                 modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        // Üçüncü sıra
+                        Row(
+                            modifier = Modifier.height(160.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            ServiceCard(
+                                title = "Yakında",
+                                onClick = { },
+                                modifier = Modifier.weight(1f),
+                                enabled = false
+                            )
+                            ServiceCard(
+                                title = "Yakında",
+                                onClick = { },
+                                modifier = Modifier.weight(1f),
+                                enabled = false
                             )
                         }
                     }
