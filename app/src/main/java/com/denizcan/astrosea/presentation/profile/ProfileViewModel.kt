@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.profile
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,36 +14,33 @@ class ProfileViewModel : ViewModel() {
 
     init {
         loadProfile()
+        startListeningToProfileChanges()
     }
 
-    fun loadProfile() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    private fun loadProfile() {
         profileState = profileState.copy(isLoading = true)
-
-        try {
+        
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
             FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(userId)
                 .get()
                 .addOnSuccessListener { document ->
-                    val data = document.toObject(ProfileData::class.java) ?: ProfileData()
+                    val profileData = document.toObject(ProfileData::class.java) ?: ProfileData()
                     profileState = profileState.copy(
-                        profileData = data,
-                        isLoading = false,
-                        isEditing = !document.exists()
-                    )
-                }
-                .addOnFailureListener { exception ->
-                    profileState = profileState.copy(
-                        error = exception.localizedMessage,
+                        profileData = profileData,
                         isLoading = false
                     )
+                    Log.d("ProfileViewModel", "Profile loaded: $profileData")
                 }
-        } catch (e: Exception) {
-            profileState = profileState.copy(
-                error = e.localizedMessage,
-                isLoading = false
-            )
+                .addOnFailureListener { e ->
+                    profileState = profileState.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                    Log.e("ProfileViewModel", "Error loading profile", e)
+                }
         }
     }
 
@@ -95,17 +93,38 @@ class ProfileViewModel : ViewModel() {
             .document(userId)
             .set(profileState.profileData)
             .addOnSuccessListener {
-                profileState = profileState.copy(
-                    isLoading = false,
-                    isEditing = false
-                )
+                loadProfile()
                 onSuccess()
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
                 profileState = profileState.copy(
-                    error = it.localizedMessage,
+                    error = e.localizedMessage,
                     isLoading = false
                 )
+                Log.e("ProfileViewModel", "Error saving profile", e)
+            }
+    }
+
+    fun startListeningToProfileChanges() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e("ProfileViewModel", "Error listening to profile changes", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val profileData = snapshot.toObject(ProfileData::class.java) ?: ProfileData()
+                    profileState = profileState.copy(
+                        profileData = profileData,
+                        isLoading = false
+                    )
+                    Log.d("ProfileViewModel", "Profile updated: $profileData")
+                }
             }
     }
 }
@@ -113,6 +132,6 @@ class ProfileViewModel : ViewModel() {
 data class ProfileState(
     val profileData: ProfileData = ProfileData(),
     val isLoading: Boolean = false,
-    val isEditing: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val isEditing: Boolean = false
 ) 

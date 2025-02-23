@@ -17,16 +17,28 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Warning
 import com.denizcan.astrosea.presentation.profile.ProfileData
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
+import com.denizcan.astrosea.presentation.profile.ProfileViewModel
+import java.util.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    viewModel: ProfileViewModel = viewModel(),
     onNavigateToHoroscope: () -> Unit,
     onNavigateToTarot: () -> Unit,
     onNavigateToRunes: () -> Unit,
@@ -34,29 +46,13 @@ fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onSignOut: () -> Unit
 ) {
-    var profileData by remember { mutableStateOf<ProfileData?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
-    
-    // Profil bilgilerini yükle
-    LaunchedEffect(userId) {
-        userId?.let { uid ->
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(uid)
-                .get()
-                .addOnSuccessListener { document ->
-                    profileData = document.toObject(ProfileData::class.java)
-                    isLoading = false
-                }
-                .addOnFailureListener {
-                    isLoading = false
-                }
-        }
-    }
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val profileState = viewModel.profileState
+
+    LaunchedEffect(Unit) {
+        // viewModel init bloğunda loadProfile() çağrılıyor
+    }
 
     AstroDrawer(
         drawerState = drawerState,
@@ -76,19 +72,41 @@ fun HomeScreen(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("AstroSea", color = Color.White) },
+                        title = { },
                         navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            IconButton(
+                                onClick = { scope.launch { drawerState.open() } },
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .size(48.dp)
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
                                     contentDescription = "Menü",
-                                    tint = Color.White
+                                    tint = Color.White,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        },
+                        actions = {
+                            IconButton(
+                                onClick = { /* Bildirimler için tıklama işlemi */ },
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Bildirimler",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(32.dp)
                                 )
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = Color.Transparent
-                        )
+                        ),
+                        modifier = Modifier.height(64.dp)
                     )
                 },
                 containerColor = Color.Transparent
@@ -97,70 +115,135 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Hoş geldin kartı
-                    Card(
+                    // Profil Uyarı Kartı
+                    if (!profileState.isLoading && profileState.profileData.hasIncompleteFields()) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                                .clickable { onNavigateToProfile() },
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Black.copy(alpha = 0.6f)
+                            ),
+                            border = BorderStroke(1.dp, Color(0xFFFFD700))  // Altın sarısı border
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = "Uyarı",
+                                    tint = Color(0xFFFFD700)
+                                )
+                                Text(
+                                    text = "Profil bilgilerinizi tamamlayarak daha doğru astrolojik yorumlar alabilirsiniz.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White
+                                )
+                            }
+                        }
+                    }
+
+                    // Hoş geldin kartı yerine basit bir layout
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(90.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Black.copy(alpha = 0.6f)
-                        ),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                            .padding(vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            if (isLoading) {
-                                CircularProgressIndicator(
-                                    color = Color.White,
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                                )
-                            } else {
-                                if (profileData?.name.isNullOrEmpty()) {
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Text(
-                                            "Profilinizi Tamamlayın",
-                                            style = MaterialTheme.typography.headlineMedium,
-                                            color = Color.White
-                                        )
-                                        Text(
-                                            "Kişiselleştirilmiş deneyim için lütfen profil bilgilerinizi doldurun.",
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            color = Color.White.copy(alpha = 0.9f)
-                                        )
-                                        Button(
-                                            onClick = onNavigateToProfile,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(top = 8.dp),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.White.copy(alpha = 0.2f)
-                                            )
-                                        ) {
-                                            Text(
-                                                "Profile Git",
-                                                color = Color.White
-                                            )
-                                        }
-                                    }
-                                } else {
+                        if (profileState.isLoading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        } else {
+                            if (profileState.profileData.name.isNullOrEmpty()) {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
                                     Text(
-                                        "Hoş Geldin, ${profileData?.name}",
-                                        style = MaterialTheme.typography.titleLarge,
+                                        "Profilinizi Tamamlayın",
+                                        style = MaterialTheme.typography.headlineMedium,
                                         color = Color.White
                                     )
                                     Text(
-                                        "Yıldızların ve kadim bilgeliğin dünyasına hoş geldin.",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        "Kişiselleştirilmiş deneyim için lütfen profil bilgilerinizi doldurun.",
+                                        style = MaterialTheme.typography.bodyLarge,
                                         color = Color.White.copy(alpha = 0.9f)
                                     )
+                                    Button(
+                                        onClick = onNavigateToProfile,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.White.copy(alpha = 0.2f)
+                                        )
+                                    ) {
+                                        Text(
+                                            "Profile Git",
+                                            color = Color.White
+                                        )
+                                    }
                                 }
+                            } else {
+                                Text(
+                                    text = buildAnnotatedString {
+                                        append("H")
+                                        withStyle(SpanStyle(
+                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                            fontSize = 32.sp
+                                        )) { append("oş ") }
+                                        append("G")
+                                        withStyle(SpanStyle(
+                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                            fontSize = 32.sp
+                                        )) { append("eldin, ") }
+                                        profileState.profileData.name?.split(" ")?.forEach { word ->
+                                            withStyle(SpanStyle(
+                                                fontFamily = FontFamily(Font(R.font.cinzel_black)),
+                                                fontSize = 32.sp
+                                            )) { append(word.first().uppercase()) }
+                                            withStyle(SpanStyle(
+                                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                                fontWeight = FontWeight.Black,
+                                                fontSize = 32.sp
+                                            )) { 
+                                                append(word.substring(1).lowercase())
+                                                append(" ")
+                                            }
+                                        }
+                                    },
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontSize = 32.sp
+                                    ),
+                                    color = Color.White,
+                                    modifier = Modifier.padding(bottom = 0.dp)
+                                )
+                                
+                                Divider(
+                                    modifier = Modifier
+                                        .offset(y = (-4).dp)
+                                        .padding(vertical = 0.dp),
+                                    color = Color.White,
+                                    thickness = 2.dp
+                                )
+                                
+                                Text(
+                                    text = java.time.LocalDate.now().format(
+                                        java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy", java.util.Locale("tr"))
+                                    ),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color.White.copy(alpha = 0.7f)
+                                )
                             }
                         }
                     }
