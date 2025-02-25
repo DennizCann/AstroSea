@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.graphics.ColorFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -368,9 +369,10 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f)
                             )
                             ServiceCard(
-                                title = "Burç\nYorumu",
-                                onClick = onNavigateToHoroscope,
-                                modifier = Modifier.weight(1f)
+                                title = "Günün Kartı",
+                                onClick = { /* Günün kartı için tıklama işlemi */ },
+                                modifier = Modifier.weight(1f),
+                                imageResId = R.drawable.gununkartiimaji
                             )
                         }
                         
@@ -380,12 +382,13 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
-                                title = "Rün\nFalı",
-                                onClick = onNavigateToRunes,
-                                modifier = Modifier.weight(1f)
+                                title = "Tarot Açılımları",
+                                onClick = { /* Tarot açılımları için tıklama işlemi */ },
+                                modifier = Modifier.weight(1f),
+                                imageResId = R.drawable.tarotacilimlariimage
                             )
                             ServiceCard(
-                                title = "Doğum\nHaritası",
+                                title = "Doğum Haritası",
                                 onClick = onNavigateToBirthChart,
                                 modifier = Modifier.weight(1f)
                             )
@@ -397,16 +400,16 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
-                                title = "Yakında",
-                                onClick = { },
+                                title = "Motivasyon",
+                                onClick = { /* Motivasyon için tıklama işlemi */ },
                                 modifier = Modifier.weight(1f),
-                                enabled = false
+                                imageResId = R.drawable.motivasyongorseli,
+                                imageColor = Color.White
                             )
                             ServiceCard(
-                                title = "Yakında",
-                                onClick = { },
-                                modifier = Modifier.weight(1f),
-                                enabled = false
+                                title = "Burç Yorumu",
+                                onClick = onNavigateToHoroscope,
+                                modifier = Modifier.weight(1f)
                             )
                         }
                     }
@@ -421,7 +424,9 @@ private fun ServiceCard(
     title: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    imageResId: Int? = null,
+    imageColor: Color? = null
 ) {
     Card(
         modifier = modifier
@@ -443,10 +448,10 @@ private fun ServiceCard(
             if (enabled) {
                 Image(
                     painter = painterResource(
-                        id = when (title) {
-                            "Burç\nYorumu" -> R.drawable.zodiac
+                        id = imageResId ?: when (title) {
+                            "Burç Yorumu" -> R.drawable.zodiac
                             "Evet / Hayır" -> R.drawable.tarot
-                            "Rün\nFalı" -> R.drawable.rune
+                            "Doğum Haritası" -> R.drawable.birthchart
                             else -> R.drawable.birthchart
                         }
                     ),
@@ -454,7 +459,8 @@ private fun ServiceCard(
                     modifier = Modifier
                         .weight(0.6f)
                         .padding(8.dp),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Fit,
+                    colorFilter = imageColor?.let { ColorFilter.tint(it) }
                 )
             } else {
                 Box(

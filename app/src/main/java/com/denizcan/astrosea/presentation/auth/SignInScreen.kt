@@ -30,7 +30,7 @@ fun SignInScreen(
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    
+
     val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
 
@@ -53,52 +53,46 @@ fun SignInScreen(
             containerColor = Color.Transparent,  // Scaffold'ı tamamen saydam yap
             contentColor = Color.White  // İçerik rengini beyaz yap
         ) { paddingValues ->
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
+                Card(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .fillMaxHeight(0.55f),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
                 ) {
-                    Card(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .fillMaxHeight(0.55f),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Black.copy(alpha = 0.6f)
-                        ),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Column(
+                        // Hata mesajı için sabit yükseklikte bir alan
+                        Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(24.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                .fillMaxWidth()
+                                .height(if (errorMessage != null) 80.dp else 0.dp)
                         ) {
                             if (errorMessage != null) {
                                 Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 16.dp),
+                                    modifier = Modifier.fillMaxWidth(),
                                     colors = CardDefaults.cardColors(
                                         containerColor = Color.Red.copy(alpha = 0.3f)
                                     ),
                                     border = BorderStroke(1.dp, Color.Red.copy(alpha = 0.5f))
                                 ) {
                                     Text(
-                                        text = when {
-                                            email.isEmpty() -> "E-posta alanı boş bırakılamaz"
-                                            password.isEmpty() -> "Şifre alanı boş bırakılamaz"
-                                            errorMessage!!.contains("password") -> "Şifre hatalı"
-                                            errorMessage!!.contains("user") -> "Bu e-posta adresi kayıtlı değil"
-                                            else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
-                                        },
+                                        text = errorMessage!!,
                                         modifier = Modifier.padding(16.dp),
                                         color = Color.White,
                                         style = MaterialTheme.typography.bodyLarge,
@@ -106,12 +100,16 @@ fun SignInScreen(
                                     )
                                 }
                             }
+                        }
 
-                            Spacer(modifier = Modifier.weight(1f))
-
+                        // Input alanları
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             OutlinedTextField(
                                 value = email,
-                                onValueChange = { 
+                                onValueChange = {
                                     email = it
                                     errorMessage = null  // Input değişince hata mesajını temizle
                                 },
@@ -129,7 +127,7 @@ fun SignInScreen(
 
                             OutlinedTextField(
                                 value = password,
-                                onValueChange = { 
+                                onValueChange = {
                                     password = it
                                     errorMessage = null  // Input değişince hata mesajını temizle
                                 },
@@ -145,65 +143,51 @@ fun SignInScreen(
                                     focusedLabelColor = Color.White
                                 )
                             )
+                        }
 
-                            Button(
-                                onClick = {
-                                    when {
-                                        email.isEmpty() -> errorMessage = "E-posta alanı boş bırakılamaz"
-                                        password.isEmpty() -> errorMessage = "Şifre alanı boş bırakılamaz"
-                                        !email.contains("@") -> errorMessage = "Geçerli bir e-posta adresi giriniz"
-                                        password.length < 6 -> errorMessage = "Şifre en az 6 karakter olmalıdır"
-                                        else -> {
-                                            scope.launch {
-                                                isLoading = true
-                                                errorMessage = null
-                                                try {
-                                                    auth.signInWithEmailAndPassword(email, password).await()
-                                                    onSignInSuccess()
-                                                } catch (e: Exception) {
-                                                    errorMessage = when {
-                                                        e.message?.contains("password") == true -> "Şifre hatalı"
-                                                        e.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
-                                                        else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
-                                                    }
-                                                } finally {
-                                                    isLoading = false
+                        // Buton
+                        Button(
+                            onClick = {
+                                when {
+                                    email.isEmpty() -> errorMessage = "E-posta alanı boş bırakılamaz"
+                                    password.isEmpty() -> errorMessage = "Şifre alanı boş bırakılamaz"
+                                    !email.contains("@") -> errorMessage = "Geçerli bir e-posta adresi giriniz"
+                                    password.length < 6 -> errorMessage = "Şifre en az 6 karakter olmalıdır"
+                                    else -> {
+                                        scope.launch {
+                                            isLoading = true
+                                            errorMessage = null
+                                            try {
+                                                auth.signInWithEmailAndPassword(email, password).await()
+                                                onSignInSuccess()
+                                            } catch (e: Exception) {
+                                                errorMessage = when {
+                                                    e.message?.contains("password") == true -> "Şifre hatalı"
+                                                    e.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
+                                                    else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
                                                 }
+                                            } finally {
+                                                isLoading = false
                                             }
                                         }
                                     }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp)
-                                    .padding(top = 16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.White.copy(alpha = 0.2f)
-                                ),
-                                enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty()
-                            ) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
-                                } else {
-                                    Text(
-                                        "Giriş Yap",
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
                                 }
-                            }
-
-                            TextButton(
-                                onClick = onNavigateToSignUp,
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.textButtonColors(
-                                    contentColor = Color.White
-                                )
-                            ) {
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .padding(top = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White.copy(alpha = 0.15f)
+                            )
+                        ) {
+                            if (isLoading) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
+                            } else {
                                 Text(
-                                    "Hesabın yok mu? Kayıt ol",
+                                    "Giriş Yap",
                                     color = Color.White,
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.titleLarge
                                 )
                             }
                         }

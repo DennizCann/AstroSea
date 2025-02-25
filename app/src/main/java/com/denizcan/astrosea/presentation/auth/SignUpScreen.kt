@@ -31,7 +31,7 @@ fun SignUpScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    
+
     val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
 
@@ -66,7 +66,7 @@ fun SignUpScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .fillMaxHeight(0.55f),
+                        .fillMaxHeight(0.65f),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Black.copy(alpha = 0.6f)
                     ),
@@ -78,84 +78,96 @@ fun SignUpScreen(
                             .padding(24.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        if (errorMessage != null) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.Red.copy(alpha = 0.3f)
-                                ),
-                                border = BorderStroke(1.dp, Color.Red.copy(alpha = 0.5f))
-                            ) {
-                                Text(
-                                    text = errorMessage!!,
-                                    modifier = Modifier.padding(16.dp),
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    textAlign = TextAlign.Center
-                                )
+                        // Hata mesajı için sabit yükseklikte bir alan
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(if (errorMessage != null) 80.dp else 0.dp)
+                        ) {
+                            if (errorMessage != null) {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color.Red.copy(alpha = 0.3f)
+                                    ),
+                                    border = BorderStroke(1.dp, Color.Red.copy(alpha = 0.5f))
+                                ) {
+                                    Text(
+                                        text = errorMessage!!,
+                                        modifier = Modifier.padding(16.dp),
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
 
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = { 
-                                email = it
-                                errorMessage = null
-                            },
-                            label = { Text("E-posta", color = Color.White) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                                focusedBorderColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedTextColor = Color.White,
-                                unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                                focusedLabelColor = Color.White
+                        // Input alanları
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            OutlinedTextField(
+                                value = email,
+                                onValueChange = {
+                                    email = it
+                                    errorMessage = null
+                                },
+                                label = { Text("E-posta", color = Color.White) },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                    focusedBorderColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                    focusedTextColor = Color.White,
+                                    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                                    focusedLabelColor = Color.White
+                                )
                             )
-                        )
 
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { 
-                                password = it
-                                errorMessage = null
-                            },
-                            label = { Text("Şifre", color = Color.White) },
-                            visualTransformation = PasswordVisualTransformation(),
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                                focusedBorderColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedTextColor = Color.White,
-                                unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                                focusedLabelColor = Color.White
+                            OutlinedTextField(
+                                value = password,
+                                onValueChange = {
+                                    password = it
+                                    errorMessage = null
+                                },
+                                label = { Text("Şifre", color = Color.White) },
+                                visualTransformation = PasswordVisualTransformation(),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                    focusedBorderColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                    focusedTextColor = Color.White,
+                                    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                                    focusedLabelColor = Color.White
+                                )
                             )
-                        )
 
-                        OutlinedTextField(
-                            value = confirmPassword,
-                            onValueChange = { 
-                                confirmPassword = it
-                                errorMessage = null
-                            },
-                            label = { Text("Şifre Tekrar", color = Color.White) },
-                            visualTransformation = PasswordVisualTransformation(),
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                                focusedBorderColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedTextColor = Color.White,
-                                unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
-                                focusedLabelColor = Color.White
+                            OutlinedTextField(
+                                value = confirmPassword,
+                                onValueChange = {
+                                    confirmPassword = it
+                                    errorMessage = null
+                                },
+                                label = { Text("Şifre Tekrar", color = Color.White) },
+                                visualTransformation = PasswordVisualTransformation(),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                    focusedBorderColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+                                    focusedTextColor = Color.White,
+                                    unfocusedLabelColor = Color.White.copy(alpha = 0.7f),
+                                    focusedLabelColor = Color.White
+                                )
                             )
-                        )
 
+                            Spacer(modifier = Modifier.weight(1f))  // Esnek boşluk ekledik
+                        }
+
+                        // Buton
                         Button(
                             onClick = {
                                 when {
@@ -189,9 +201,8 @@ fun SignUpScreen(
                                 .height(56.dp)
                                 .padding(top = 16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.White.copy(alpha = 0.2f)
-                            ),
-                            enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()
+                                containerColor = Color.White.copy(alpha = 0.15f)
+                            )
                         ) {
                             if (isLoading) {
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
@@ -202,20 +213,6 @@ fun SignUpScreen(
                                     style = MaterialTheme.typography.titleLarge
                                 )
                             }
-                        }
-
-                        TextButton(
-                            onClick = onNavigateToSignIn,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Text(
-                                "Zaten hesabın var mı? Giriş yap",
-                                color = Color.White,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
                         }
                     }
                 }
