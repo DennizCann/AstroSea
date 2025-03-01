@@ -141,10 +141,10 @@ fun AuthOptionsScreen(
                 // Sosyal medya butonları
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Google butonu
+                    // Sadece Google butonu
                     IconButton(
                         onClick = onGoogleSignIn,
                         modifier = Modifier
@@ -160,46 +160,6 @@ fun AuthOptionsScreen(
                             modifier = Modifier
                                 .size(32.dp)
                                 .padding(4.dp)
-                        )
-                    }
-
-                    // Facebook butonu
-                    IconButton(
-                        onClick = { /* Facebook girişi */ },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(
-                                color = Color(0xFF1877F2), // Facebook mavi
-                                shape = CircleShape
-                            )
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.facebook_icon),
-                            contentDescription = "Facebook ile giriş yap",
-                            modifier = Modifier
-                                .size(32.dp)
-                                .padding(4.dp),
-                            colorFilter = ColorFilter.tint(Color.White)
-                        )
-                    }
-
-                    // Twitter butonu
-                    IconButton(
-                        onClick = { /* Twitter girişi */ },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(
-                                color = Color.Black,
-                                shape = CircleShape
-                            )
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.twitter_icon),
-                            contentDescription = "X ile giriş yap",
-                            modifier = Modifier
-                                .size(32.dp)
-                                .padding(4.dp),
-                            colorFilter = ColorFilter.tint(Color.White)
                         )
                     }
                 }

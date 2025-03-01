@@ -26,18 +26,18 @@ fun AstroDrawer(
     drawerState: DrawerState,
     scope: CoroutineScope,
     onSignOut: () -> Unit,
-    onNavigateToProfile: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val drawerWidth = screenWidth * 0.5f
-
+    
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                modifier = Modifier.width(drawerWidth),
-                drawerContainerColor = Color.Transparent
+                drawerContainerColor = Color.Transparent,
+                modifier = Modifier
+                    .width(screenWidth / 2)  // Ekran genişliğinin yarısı
+                    .fillMaxHeight()
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Image(
@@ -50,69 +50,68 @@ fun AstroDrawer(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(vertical = 24.dp, horizontal = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        NavigationDrawerItem(
-                            modifier = Modifier.height(48.dp),
-                            icon = { 
-                                Icon(
-                                    Icons.Default.Person,
-                                    contentDescription = "Profil",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            NavigationDrawerItem(
+                                modifier = Modifier.height(48.dp),
+                                icon = { 
+                                    Icon(
+                                        Icons.Default.Person,
+                                        contentDescription = "Profil",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                label = { 
+                                    Text(
+                                        "Profil",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                selected = false,
+                                onClick = { /* */ },
+                                colors = NavigationDrawerItemDefaults.colors(
+                                    unselectedContainerColor = Color.Black.copy(alpha = 0.6f),
+                                    selectedContainerColor = Color.Black.copy(alpha = 0.8f)
                                 )
-                            },
-                            label = { 
-                                Text(
-                                    "Profil",
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            },
-                            selected = false,
-                            onClick = {
-                                scope.launch {
-                                    drawerState.close()
-                                }
-                                onNavigateToProfile()
-                            },
-                            colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = Color.Black.copy(alpha = 0.6f),
-                                selectedContainerColor = Color.Black.copy(alpha = 0.8f)
                             )
-                        )
-                        
-                        NavigationDrawerItem(
-                            modifier = Modifier.height(48.dp),
-                            icon = { 
-                                Icon(
-                                    Icons.Default.ExitToApp,
-                                    contentDescription = "Çıkış Yap",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
+
+                            NavigationDrawerItem(
+                                modifier = Modifier.height(48.dp),
+                                icon = { 
+                                    Icon(
+                                        Icons.Default.ExitToApp,
+                                        contentDescription = "Çıkış Yap",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                label = { 
+                                    Text(
+                                        "Çıkış Yap",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                selected = false,
+                                onClick = {
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                    onSignOut()
+                                },
+                                colors = NavigationDrawerItemDefaults.colors(
+                                    unselectedContainerColor = Color.Black.copy(alpha = 0.6f),
+                                    selectedContainerColor = Color.Black.copy(alpha = 0.8f)
                                 )
-                            },
-                            label = { 
-                                Text(
-                                    "Çıkış Yap",
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            },
-                            selected = false,
-                            onClick = {
-                                scope.launch {
-                                    drawerState.close()
-                                }
-                                FirebaseAuth.getInstance().signOut()
-                                onSignOut()
-                            },
-                            colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = Color.Black.copy(alpha = 0.6f),
-                                selectedContainerColor = Color.Black.copy(alpha = 0.8f)
                             )
-                        )
+                        }
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.denizcan.astrosea.presentation.tarot.screens
+package com.denizcan.astrosea.presentation.motivation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -6,17 +6,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YesNoScreen(
+fun MotivationScreen(
     onNavigateBack: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -31,7 +31,7 @@ fun YesNoScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Evet/Hayır",
+                    title = "Motivasyon",
                     onBackClick = onNavigateBack
                 )
             }
@@ -54,7 +54,7 @@ fun YesNoScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Tek bir kart çekerek sorularınıza hızlı cevaplar alabileceksiniz.",
+                    text = "Günlük motivasyon mesajları ve özel tavsiyeler çok yakında burada olacak.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.8f)

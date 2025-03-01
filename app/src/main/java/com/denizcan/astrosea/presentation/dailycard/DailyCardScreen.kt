@@ -1,4 +1,4 @@
-package com.denizcan.astrosea.presentation.birthchart
+package com.denizcan.astrosea.presentation.dailycard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -6,21 +6,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BirthChartScreen(
+fun DailyCardScreen(
     onNavigateBack: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Arka plan görseli
         Image(
             painter = painterResource(id = R.drawable.anamenu),
             contentDescription = null,
@@ -32,7 +31,7 @@ fun BirthChartScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Doğum Haritası",
+                    title = "Günün Kartı",
                     onBackClick = onNavigateBack
                 )
             }
@@ -46,7 +45,7 @@ fun BirthChartScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Geliyor!",
+                    text = "Çok Yakında!",
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = Color.White
@@ -55,7 +54,7 @@ fun BirthChartScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Doğum haritası analizi özelliğimiz son rötuşlarını yapıyor. Çok yakında hizmetinizde olacak!",
+                    text = "Her gün sizin için seçilen özel tarot kartı ve yorumu burada olacak.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.8f)

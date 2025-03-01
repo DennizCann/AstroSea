@@ -20,25 +20,19 @@ import com.denizcan.astrosea.navigation.Screen
 import com.denizcan.astrosea.presentation.auth.AuthScreen
 import com.denizcan.astrosea.presentation.home.HomeScreen
 import com.denizcan.astrosea.presentation.onboarding.OnboardingScreen
-import com.denizcan.astrosea.presentation.profile.ProfileScreen
 import com.denizcan.astrosea.ui.theme.AstroSeaTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
 import com.denizcan.astrosea.presentation.horoscope.HoroscopeScreen
-import com.denizcan.astrosea.presentation.tarot.TarotScreen
-import com.denizcan.astrosea.presentation.runes.RunesScreen
-import com.denizcan.astrosea.presentation.birthchart.BirthChartScreen
-import com.denizcan.astrosea.presentation.tarot.screens.TarotCardsScreen
-import com.denizcan.astrosea.presentation.tarot.screens.YesNoScreen
-import com.denizcan.astrosea.presentation.tarot.screens.TarotSpreadsScreen
-import com.denizcan.astrosea.presentation.tarot.screens.CustomSpreadScreen
-import androidx.navigation.navArgument
-import com.denizcan.astrosea.presentation.tarot.screens.TarotCardDetailScreen
+import com.denizcan.astrosea.presentation.tarotSpreads.TarotSpreadsScreen
+import com.denizcan.astrosea.presentation.birthChart.BirthChartScreen
+import com.denizcan.astrosea.presentation.dailycard.DailyCardScreen
+import com.denizcan.astrosea.presentation.motivation.MotivationScreen
+import com.denizcan.astrosea.presentation.yesNo.YesNoScreen
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -61,6 +55,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val scope = rememberCoroutineScope()
                     val currentUser = FirebaseAuth.getInstance().currentUser
+                    val viewModel: ProfileViewModel = viewModel()
                     
                     val startDestination = if (currentUser != null) {
                         Screen.Home.route
@@ -126,128 +121,72 @@ class MainActivity : ComponentActivity() {
                         
                         composable(Screen.Home.route) {
                             HomeScreen(
-                                onSignOut = {
-                                    FirebaseAuth.getInstance().signOut()
-                                    navController.navigate(Screen.Auth.route) {
-                                        popUpTo(Screen.Home.route) { inclusive = true }
-                                    }
-                                },
-                                onNavigateToProfile = {
-                                    navController.navigate(Screen.Profile.route)
-                                },
+                                viewModel = viewModel,
                                 onNavigateToHoroscope = {
                                     navController.navigate(Screen.Horoscope.route)
                                 },
-                                onNavigateToTarot = {
-                                    navController.navigate(Screen.Tarot.route)
+                                onNavigateToDailyCard = {
+                                    navController.navigate(Screen.DailyCard.route)
                                 },
-                                onNavigateToRunes = {
-                                    navController.navigate(Screen.Runes.route)
+                                onNavigateToTarotSpreads = {
+                                    navController.navigate(Screen.TarotSpreads.route)
                                 },
                                 onNavigateToBirthChart = {
                                     navController.navigate(Screen.BirthChart.route)
-                                }
-                            )
-                        }
-                        
-                        composable(Screen.Profile.route) {
-                            val profileViewModel: ProfileViewModel = viewModel()
-                            ProfileScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
                                 },
-                                viewModel = profileViewModel
+                                onNavigateToMotivation = {
+                                    navController.navigate(Screen.Motivation.route)
+                                },
+                                onNavigateToYesNo = {
+                                    navController.navigate(Screen.YesNo.route)
+                                },
+                                onSignOut = {
+                                    scope.launch {
+                                        googleAuthUiClient.signOut()
+                                        FirebaseAuth.getInstance().signOut()
+                                        navController.navigate(Screen.Auth.route) {
+                                            popUpTo(Screen.Home.route) { inclusive = true }
+                                        }
+                                    }
+                                }
                             )
                         }
 
                         composable(Screen.Horoscope.route) {
                             HoroscopeScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                }
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
-                        composable(Screen.Tarot.route) {
-                            TarotScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                },
-                                onNavigateToTarotCards = {
-                                    navController.navigate(Screen.TarotCards.route)
-                                },
-                                onNavigateToYesNo = {
-                                    navController.navigate(Screen.YesNo.route)
-                                },
-                                onNavigateToTarotSpreads = {
-                                    navController.navigate(Screen.TarotSpreads.route)
-                                },
-                                onNavigateToCustomSpread = {
-                                    navController.navigate(Screen.CustomSpread.route)
-                                }
-                            )
-                        }
-
-                        composable(Screen.TarotCards.route) {
-                            TarotCardsScreen(
-                                onNavigateBack = { navController.popBackStack() },
-                                onCardClick = { card -> 
-                                    navController.navigate(Screen.TarotCardDetail.createRoute(card.id))
-                                }
-                            )
-                        }
-
-                        composable(Screen.Runes.route) {
-                            RunesScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-
-                        composable(Screen.BirthChart.route) {
-                            BirthChartScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-
-                        composable(Screen.YesNo.route) {
-                            YesNoScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                }
+                        composable(Screen.DailyCard.route) {
+                            DailyCardScreen(
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
                         composable(Screen.TarotSpreads.route) {
                             TarotSpreadsScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-
-                        composable(Screen.CustomSpread.route) {
-                            CustomSpreadScreen(
-                                onNavigateBack = {
-                                    navController.popBackStack()
-                                }
-                            )
-                        }
-
-                        composable(
-                            route = Screen.TarotCardDetail.route,
-                            arguments = listOf(navArgument("cardId") { type = NavType.StringType })
-                        ) { backStackEntry ->
-                            val cardId = backStackEntry.arguments?.getString("cardId") ?: return@composable
-                            TarotCardDetailScreen(
-                                cardId = cardId,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
+                        composable(Screen.BirthChart.route) {
+                            BirthChartScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable(Screen.Motivation.route) {
+                            MotivationScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable(Screen.YesNo.route) {
+                            YesNoScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                 }
             }

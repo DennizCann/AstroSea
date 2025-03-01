@@ -1,4 +1,4 @@
-package com.denizcan.astrosea.presentation.horoscope
+package com.denizcan.astrosea.presentation.birthChart
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -16,7 +16,7 @@ import com.denizcan.astrosea.presentation.components.AstroTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HoroscopeScreen(
+fun BirthChartScreen(
     onNavigateBack: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -31,7 +31,7 @@ fun HoroscopeScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Burç Yorumları",
+                    title = "Doğum Haritası",
                     onBackClick = onNavigateBack
                 )
             }
@@ -50,11 +50,11 @@ fun HoroscopeScreen(
                     textAlign = TextAlign.Center,
                     color = Color.White
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
-                    text = "Günlük, haftalık ve aylık burç yorumlarınız çok yakında burada olacak.",
+                    text = "Detaylı doğum haritası analiziniz çok yakında burada olacak.",
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.8f)
@@ -62,4 +62,4 @@ fun HoroscopeScreen(
             }
         }
     }
-} 
+}

@@ -43,10 +43,11 @@ import androidx.compose.ui.graphics.ColorFilter
 fun HomeScreen(
     viewModel: ProfileViewModel = viewModel(),
     onNavigateToHoroscope: () -> Unit,
-    onNavigateToTarot: () -> Unit,
-    onNavigateToRunes: () -> Unit,
+    onNavigateToDailyCard: () -> Unit,
+    onNavigateToTarotSpreads: () -> Unit,
     onNavigateToBirthChart: () -> Unit,
-    onNavigateToProfile: () -> Unit,
+    onNavigateToMotivation: () -> Unit,
+    onNavigateToYesNo: () -> Unit,
     onSignOut: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -60,8 +61,7 @@ fun HomeScreen(
     AstroDrawer(
         drawerState = drawerState,
         scope = scope,
-        onSignOut = onSignOut,
-        onNavigateToProfile = onNavigateToProfile
+        onSignOut = onSignOut
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Arka plan görseli
@@ -129,7 +129,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp)
-                                .clickable { onNavigateToProfile() },
+                                .clickable { /* */ },
                             colors = CardDefaults.cardColors(
                                 containerColor = Color.Black.copy(alpha = 0.6f)
                             ),
@@ -184,7 +184,7 @@ fun HomeScreen(
                                         color = Color.White.copy(alpha = 0.9f)
                                     )
                                     Button(
-                                        onClick = onNavigateToProfile,
+                                        onClick = { /* */ },
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(top = 8.dp),
@@ -220,7 +220,7 @@ fun HomeScreen(
                                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
                                                 fontWeight = FontWeight.Black,
                                                 fontSize = 32.sp
-                                            )) { 
+                                            )) {
                                                 append(word.substring(1).lowercase())
                                                 append(" ")
                                             }
@@ -232,7 +232,7 @@ fun HomeScreen(
                                     color = Color.White,
                                     modifier = Modifier.padding(bottom = 0.dp)
                                 )
-                                
+
                                 Divider(
                                     modifier = Modifier
                                         .offset(y = (-4).dp)
@@ -307,7 +307,7 @@ fun HomeScreen(
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp)
                             )
-                            
+
                             Text(
                                 "Günlük Açılım",
                                 style = MaterialTheme.typography.titleMedium.copy(
@@ -317,7 +317,7 @@ fun HomeScreen(
                                 color = Color.Black,
                                 textAlign = TextAlign.Center
                             )
-                            
+
                             Image(
                                 painter = painterResource(id = R.drawable.varlik2),
                                 contentDescription = null,
@@ -365,17 +365,17 @@ fun HomeScreen(
                         ) {
                             ServiceCard(
                                 title = "Evet / Hayır",
-                                onClick = onNavigateToTarot,
+                                onClick = onNavigateToYesNo,
                                 modifier = Modifier.weight(1f)
                             )
                             ServiceCard(
                                 title = "Günün Kartı",
-                                onClick = { /* Günün kartı için tıklama işlemi */ },
+                                onClick = onNavigateToDailyCard,
                                 modifier = Modifier.weight(1f),
                                 imageResId = R.drawable.gununkartiimaji
                             )
                         }
-                        
+
                         // İkinci sıra
                         Row(
                             modifier = Modifier.height(160.dp),
@@ -383,7 +383,7 @@ fun HomeScreen(
                         ) {
                             ServiceCard(
                                 title = "Tarot Açılımları",
-                                onClick = { /* Tarot açılımları için tıklama işlemi */ },
+                                onClick = onNavigateToTarotSpreads,
                                 modifier = Modifier.weight(1f),
                                 imageResId = R.drawable.tarotacilimlariimage
                             )
@@ -401,7 +401,7 @@ fun HomeScreen(
                         ) {
                             ServiceCard(
                                 title = "Motivasyon",
-                                onClick = { /* Motivasyon için tıklama işlemi */ },
+                                onClick = onNavigateToMotivation,
                                 modifier = Modifier.weight(1f),
                                 imageResId = R.drawable.motivasyongorseli,
                                 imageColor = Color.White
@@ -433,8 +433,8 @@ private fun ServiceCard(
             .fillMaxSize()
             .clickable(enabled = enabled, onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = if (enabled) Color.Black.copy(alpha = 0.6f) 
-                           else Color.Gray.copy(alpha = 0.3f)
+            containerColor = if (enabled) Color.Black.copy(alpha = 0.6f)
+            else Color.Gray.copy(alpha = 0.3f)
         ),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
     ) {
@@ -476,7 +476,7 @@ private fun ServiceCard(
                     )
                 }
             }
-            
+
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -514,4 +514,4 @@ private fun DailyCard(
             )
         }
     }
-} 
+}
