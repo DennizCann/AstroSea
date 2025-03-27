@@ -251,7 +251,7 @@ fun TarotMeaningsScreen(
 
             // Grid görünümü
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -261,7 +261,7 @@ fun TarotMeaningsScreen(
                         card = item,
                         onClick = { viewModel.onCardClick(item) },
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(0.85f)
                             .padding(2.dp)
                     )
                 }
