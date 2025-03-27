@@ -20,12 +20,45 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@Composable
+private fun DrawerItem(
+    icon: Int,
+    text: String,
+    onClick: () -> Unit
+) {
+    NavigationDrawerItem(
+        modifier = Modifier.height(48.dp),
+        icon = { 
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = text,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        },
+        label = { 
+            Text(
+                text = text,
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        selected = false,
+        onClick = onClick,
+        colors = NavigationDrawerItemDefaults.colors(
+            unselectedContainerColor = Color.Black.copy(alpha = 0.6f),
+            selectedContainerColor = Color.Black.copy(alpha = 0.8f)
+        )
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AstroDrawer(
     drawerState: DrawerState,
     scope: CoroutineScope,
     onSignOut: () -> Unit,
+    onNavigateToProfile: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -34,10 +67,8 @@ fun AstroDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color.Transparent,
-                modifier = Modifier
-                    .width(screenWidth / 2)  // Ekran genişliğinin yarısı
-                    .fillMaxHeight()
+                drawerContainerColor = Color.Black.copy(alpha = 0.8f),
+                modifier = Modifier.width(screenWidth / 2)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Image(
@@ -75,7 +106,12 @@ fun AstroDrawer(
                                     )
                                 },
                                 selected = false,
-                                onClick = { /* */ },
+                                onClick = {
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                    onNavigateToProfile()
+                                },
                                 colors = NavigationDrawerItemDefaults.colors(
                                     unselectedContainerColor = Color.Black.copy(alpha = 0.6f),
                                     selectedContainerColor = Color.Black.copy(alpha = 0.8f)

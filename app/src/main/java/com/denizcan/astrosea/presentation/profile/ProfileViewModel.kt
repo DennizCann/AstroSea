@@ -44,39 +44,47 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun onNameChange(name: String) {
+    fun startEditing() {
+        profileState = profileState.copy(isEditing = true)
+    }
+
+    fun stopEditing() {
+        profileState = profileState.copy(isEditing = false)
+    }
+
+    fun onNameChange(newName: String) {
         profileState = profileState.copy(
-            profileData = profileState.profileData.copy(name = name)
+            profileData = profileState.profileData.copy(name = newName)
         )
     }
 
-    fun onSurnameChange(surname: String) {
+    fun onSurnameChange(newSurname: String) {
         profileState = profileState.copy(
-            profileData = profileState.profileData.copy(surname = surname)
+            profileData = profileState.profileData.copy(surname = newSurname)
         )
     }
 
-    fun onBirthDateChange(birthDate: String) {
+    fun onBirthDateChange(newBirthDate: String) {
         profileState = profileState.copy(
-            profileData = profileState.profileData.copy(birthDate = birthDate)
+            profileData = profileState.profileData.copy(birthDate = newBirthDate)
         )
     }
 
-    fun onBirthTimeChange(birthTime: String) {
+    fun onBirthTimeChange(newBirthTime: String) {
         profileState = profileState.copy(
-            profileData = profileState.profileData.copy(birthTime = birthTime)
+            profileData = profileState.profileData.copy(birthTime = newBirthTime)
         )
     }
 
-    fun onCountryChange(country: String) {
+    fun onCountryChange(newCountry: String) {
         profileState = profileState.copy(
-            profileData = profileState.profileData.copy(country = country)
+            profileData = profileState.profileData.copy(country = newCountry)
         )
     }
 
-    fun onCityChange(city: String) {
+    fun onCityChange(newCity: String) {
         profileState = profileState.copy(
-            profileData = profileState.profileData.copy(city = city)
+            profileData = profileState.profileData.copy(city = newCity)
         )
     }
 

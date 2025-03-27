@@ -40,10 +40,10 @@ fun AuthScreen(
                     onGoogleSignIn = onGoogleSignIn
                 )
             }
-            
+
             composable("sign_in") {
                 SignInScreen(
-                    onNavigateToSignUp = { 
+                    onNavigateToSignUp = {
                         navController.navigate("sign_up") {
                             popUpTo("auth_options")
                         }
@@ -52,10 +52,10 @@ fun AuthScreen(
                     onBackClick = { navController.popBackStack() }
                 )
             }
-            
+
             composable("sign_up") {
                 SignUpScreen(
-                    onNavigateToSignIn = { 
+                    onNavigateToSignIn = {
                         navController.navigate("sign_in") {
                             popUpTo("auth_options")
                         }

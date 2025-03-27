@@ -25,7 +25,7 @@ fun AstroTopBar(
     )
 ) {
     TopAppBar(
-        title = { 
+        title = {
             Text(
                 text = title,
                 textAlign = TextAlign.Center,

@@ -50,9 +50,9 @@ fun HoroscopeScreen(
                     textAlign = TextAlign.Center,
                     color = Color.White
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = "Günlük, haftalık ve aylık burç yorumlarınız çok yakında burada olacak.",
                     style = MaterialTheme.typography.bodyLarge,

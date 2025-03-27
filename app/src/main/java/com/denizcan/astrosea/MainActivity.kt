@@ -25,14 +25,28 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import androidx.activity.result.IntentSenderRequest
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
 import com.denizcan.astrosea.presentation.horoscope.HoroscopeScreen
-import com.denizcan.astrosea.presentation.tarotSpreads.TarotSpreadsScreen
-import com.denizcan.astrosea.presentation.birthChart.BirthChartScreen
-import com.denizcan.astrosea.presentation.dailycard.DailyCardScreen
+import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsScreen
 import com.denizcan.astrosea.presentation.motivation.MotivationScreen
+import com.denizcan.astrosea.presentation.profile.ProfileScreen
+import com.denizcan.astrosea.presentation.tarotSpreads.TarotSpreadsScreen
 import com.denizcan.astrosea.presentation.yesNo.YesNoScreen
+import com.denizcan.astrosea.presentation.relationship.RelationshipReadingsScreen
+import com.denizcan.astrosea.presentation.general.GeneralReadingsScreen
+import com.denizcan.astrosea.presentation.career.CareerReadingScreen
+import com.denizcan.astrosea.presentation.more.MoreScreen
+import android.graphics.Color
+import androidx.core.view.WindowCompat
+import androidx.navigation.NavController
+import com.denizcan.astrosea.presentation.auth.SignInScreen
+import com.denizcan.astrosea.presentation.birthChart.BirthChartScreen
+import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsViewModel
+import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsViewModelFactory
+import androidx.compose.ui.platform.LocalContext
+import com.denizcan.astrosea.util.JsonLoader
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -46,17 +60,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         
+        // Sistem çubuklarını şeffaf yap
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        
         setContent {
             AstroSeaTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = androidx.compose.ui.graphics.Color.Transparent
                 ) {
                     val navController = rememberNavController()
                     val scope = rememberCoroutineScope()
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     val viewModel: ProfileViewModel = viewModel()
-                    
+
                     val startDestination = if (currentUser != null) {
                         Screen.Home.route
                     } else {
@@ -98,7 +117,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        
+
                         composable(Screen.Auth.route) {
                             AuthScreen(
                                 onNavigateToHome = {
@@ -118,18 +137,18 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        
+
                         composable(Screen.Home.route) {
                             HomeScreen(
                                 viewModel = viewModel,
+                                onNavigateToProfile = {
+                                    navController.navigate(Screen.Profile.route)
+                                },
                                 onNavigateToHoroscope = {
                                     navController.navigate(Screen.Horoscope.route)
                                 },
-                                onNavigateToDailyCard = {
-                                    navController.navigate(Screen.DailyCard.route)
-                                },
-                                onNavigateToTarotSpreads = {
-                                    navController.navigate(Screen.TarotSpreads.route)
+                                onNavigateToTarotMeanings = {
+                                    navController.navigate(Screen.TarotMeanings.route)
                                 },
                                 onNavigateToBirthChart = {
                                     navController.navigate(Screen.BirthChart.route)
@@ -139,6 +158,18 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onNavigateToYesNo = {
                                     navController.navigate(Screen.YesNo.route)
+                                },
+                                onNavigateToRelationshipReadings = { 
+                                    navController.navigate("relationship_readings") 
+                                },
+                                onNavigateToCareerReading = { 
+                                    navController.navigate("career_reading") 
+                                },
+                                onNavigateToMore = { 
+                                    navController.navigate("more") 
+                                },
+                                onNavigateToGeneralReadings = { 
+                                    navController.navigate("general_readings")
                                 },
                                 onSignOut = {
                                     scope.launch {
@@ -158,18 +189,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable(Screen.DailyCard.route) {
-                            DailyCardScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-
-                        composable(Screen.TarotSpreads.route) {
-                            TarotSpreadsScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
-                        }
-
                         composable(Screen.BirthChart.route) {
                             BirthChartScreen(
                                 onNavigateBack = { navController.popBackStack() }
@@ -182,8 +201,42 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        composable(Screen.Profile.route) {
+                            ProfileScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable(route = Screen.TarotMeanings.route) {
+                            TarotMeaningsRoute(
+                                onNavigateBack = { navController.navigateUp() }
+                            )
+                        }
+
                         composable(Screen.YesNo.route) {
                             YesNoScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("relationship_readings") {
+                            RelationshipReadingsScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("career_reading") {
+                            CareerReadingScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("more") {
+                            MoreScreen(
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+
+                        composable("general_readings") {
+                            GeneralReadingsScreen(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
@@ -192,4 +245,19 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@Composable
+fun TarotMeaningsRoute(
+    onNavigateBack: () -> Unit
+) {
+    val context = LocalContext.current
+    val viewModel: TarotMeaningsViewModel = viewModel(
+        factory = TarotMeaningsViewModelFactory(JsonLoader(context))
+    )
+    
+    TarotMeaningsScreen(
+        onNavigateBack = onNavigateBack,
+        viewModel = viewModel
+    )
 }

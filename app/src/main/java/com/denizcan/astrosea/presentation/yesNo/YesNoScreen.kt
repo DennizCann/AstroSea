@@ -50,9 +50,9 @@ fun YesNoScreen(
                     textAlign = TextAlign.Center,
                     color = Color.White
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = "Tek bir kart çekerek sorularınıza hızlı cevaplar alabileceksiniz.",
                     style = MaterialTheme.typography.bodyLarge,

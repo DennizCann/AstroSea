@@ -50,9 +50,9 @@ fun TarotSpreadsScreen(
                     textAlign = TextAlign.Center,
                     color = Color.White
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = "Farklı konular için hazırlanmış tarot açılımlarını yakında burada bulabileceksiniz.",
                     style = MaterialTheme.typography.bodyLarge,

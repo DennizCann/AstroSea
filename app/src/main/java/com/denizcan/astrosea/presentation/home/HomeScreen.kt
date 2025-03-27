@@ -3,7 +3,6 @@ package com.denizcan.astrosea.presentation.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,18 +35,30 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.ColorFilter
+
+// MenuItem data class'ını ekle
+data class MenuItem(
+    val title: String,
+    val icon: Int,
+    val route: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: ProfileViewModel = viewModel(),
+    onNavigateToProfile: () -> Unit,
     onNavigateToHoroscope: () -> Unit,
-    onNavigateToDailyCard: () -> Unit,
-    onNavigateToTarotSpreads: () -> Unit,
+    onNavigateToTarotMeanings: () -> Unit,
     onNavigateToBirthChart: () -> Unit,
     onNavigateToMotivation: () -> Unit,
     onNavigateToYesNo: () -> Unit,
+    onNavigateToRelationshipReadings: () -> Unit,
+    onNavigateToCareerReading: () -> Unit,
+    onNavigateToMore: () -> Unit,
+    onNavigateToGeneralReadings: () -> Unit,
     onSignOut: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -58,10 +69,45 @@ fun HomeScreen(
         // viewModel init bloğunda loadProfile() çağrılıyor
     }
 
+    // Menü seçeneklerini güncelliyoruz
+    val menuItems = listOf(
+        MenuItem(
+            title = "Tüm Anlamlar",
+            icon = R.drawable.tarotacilimlariimage,
+            route = "tarot_meanings"
+        ),
+        MenuItem(
+            title = "İlişki Açılımları",
+            icon = R.drawable.gununkartiimaji,
+            route = "relationship_readings"
+        ),
+        MenuItem(
+            title = "Genel Açılımlar",
+            icon = R.drawable.tarot,
+            route = "general_readings"
+        ),
+        MenuItem(
+            title = "Kariyer Açılımı",
+            icon = R.drawable.kariyer,
+            route = "career_reading"
+        ),
+        MenuItem(
+            title = "Evet - Hayır",
+            icon = R.drawable.evet_hayir,
+            route = "yes_no"
+        ),
+        MenuItem(
+            title = "Daha Fazlası",
+            icon = R.drawable.zodiac,
+            route = "more"
+        )
+    )
+
     AstroDrawer(
         drawerState = drawerState,
         scope = scope,
-        onSignOut = onSignOut
+        onSignOut = onSignOut,
+        onNavigateToProfile = onNavigateToProfile,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Arka plan görseli
@@ -129,7 +175,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp)
-                                .clickable { /* */ },
+                                .clickable { onNavigateToProfile() },
                             colors = CardDefaults.cardColors(
                                 containerColor = Color.Black.copy(alpha = 0.6f)
                             ),
@@ -184,7 +230,7 @@ fun HomeScreen(
                                         color = Color.White.copy(alpha = 0.9f)
                                     )
                                     Button(
-                                        onClick = { /* */ },
+                                        onClick = { onNavigateToProfile() },
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(top = 8.dp),
@@ -364,15 +410,16 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
-                                title = "Evet / Hayır",
-                                onClick = onNavigateToYesNo,
-                                modifier = Modifier.weight(1f)
+                                title = menuItems[0].title,
+                                onClick = onNavigateToTarotMeanings,
+                                modifier = Modifier.weight(1f),
+                                imageResId = menuItems[0].icon
                             )
                             ServiceCard(
-                                title = "Günün Kartı",
-                                onClick = onNavigateToDailyCard,
+                                title = menuItems[1].title,
+                                onClick = onNavigateToRelationshipReadings,
                                 modifier = Modifier.weight(1f),
-                                imageResId = R.drawable.gununkartiimaji
+                                imageResId = menuItems[1].icon
                             )
                         }
 
@@ -382,15 +429,16 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
-                                title = "Tarot Açılımları",
-                                onClick = onNavigateToTarotSpreads,
+                                title = menuItems[2].title,
+                                onClick = onNavigateToGeneralReadings,
                                 modifier = Modifier.weight(1f),
-                                imageResId = R.drawable.tarotacilimlariimage
+                                imageResId = menuItems[2].icon
                             )
                             ServiceCard(
-                                title = "Doğum Haritası",
-                                onClick = onNavigateToBirthChart,
-                                modifier = Modifier.weight(1f)
+                                title = menuItems[3].title,
+                                onClick = onNavigateToCareerReading,
+                                modifier = Modifier.weight(1f),
+                                imageResId = menuItems[3].icon
                             )
                         }
 
@@ -400,16 +448,16 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             ServiceCard(
-                                title = "Motivasyon",
-                                onClick = onNavigateToMotivation,
+                                title = menuItems[4].title,
+                                onClick = onNavigateToYesNo,
                                 modifier = Modifier.weight(1f),
-                                imageResId = R.drawable.motivasyongorseli,
-                                imageColor = Color.White
+                                imageResId = menuItems[4].icon
                             )
                             ServiceCard(
-                                title = "Burç Yorumu",
-                                onClick = onNavigateToHoroscope,
-                                modifier = Modifier.weight(1f)
+                                title = menuItems[5].title,
+                                onClick = onNavigateToMore,
+                                modifier = Modifier.weight(1f),
+                                imageResId = menuItems[5].icon
                             )
                         }
                     }
