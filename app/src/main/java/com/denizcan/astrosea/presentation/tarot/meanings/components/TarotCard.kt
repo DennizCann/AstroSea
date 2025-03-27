@@ -43,7 +43,7 @@ fun TarotCard(
 
     Card(
         modifier = modifier
-            .aspectRatio(0.6f)
+            .aspectRatio(0.5f)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = Color.Black.copy(alpha = 0.6f)
@@ -51,49 +51,35 @@ fun TarotCard(
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.DarkGray.copy(alpha = 0.5f))
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color.DarkGray.copy(alpha = 0.5f))
-            ) {
-                if (imageResId != 0) {
-                    Image(
-                        painter = painterResource(id = imageResId),
-                        contentDescription = card.name,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+            if (imageResId != 0) {
+                Image(
+                    painter = painterResource(id = imageResId),
+                    contentDescription = card.name,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+            } else {
+                // Resim bulunamadığında gösterilecek içerik
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = card.name,
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center
                     )
-                } else {
-                    // Resim bulunamadığında gösterilecek içerik
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = card.name,
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
                 }
             }
-            
-            Text(
-                text = card.name,
-                color = Color.White,
-                style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.padding(8.dp),
-                textAlign = TextAlign.Center
-            )
         }
     }
 } 

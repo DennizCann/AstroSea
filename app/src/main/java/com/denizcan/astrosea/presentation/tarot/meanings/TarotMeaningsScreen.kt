@@ -1,7 +1,6 @@
 package com.denizcan.astrosea.presentation.tarot.meanings
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,29 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
-import com.denizcan.astrosea.presentation.components.AstroTopBar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
-import com.denizcan.astrosea.util.TarotCard
 import com.denizcan.astrosea.presentation.tarot.meanings.components.TarotCard
-import com.denizcan.astrosea.util.JsonLoader
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -44,6 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.sp
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 
 
 
@@ -53,17 +40,45 @@ fun TarotMeaningsScreen(
     onNavigateBack: () -> Unit,
     viewModel: TarotMeaningsViewModel
 ) {
+    var selectedType by remember { mutableStateOf("tarot") } // tarot veya rune
     var selectedSuit by remember { mutableStateOf("all") }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Arka plan görseli
+        Image(
+            painter = painterResource(id = R.drawable.kartanlamlariarkaplan),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(Color.Black.copy(alpha = 0.3f))
         ) {
             // Üst Bar
             TopAppBar(
-                title = { Text("Tarot Anlamları", color = Color.White) },
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Surface(
+                            modifier = Modifier.padding(start = 32.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color.Black.copy(alpha = 0.5f),
+                            shadowElevation = 8.dp
+                        ) {
+                            Text(
+                                text = "Tüm Anlamlar",
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -78,127 +93,176 @@ fun TarotMeaningsScreen(
                 )
             )
 
-            // Filtre seçenekleri
+            // Tarot/Rün seçimi
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // Sadece metin içeren "Hepsi" sekmesi
-                FilterChip(
-                    selected = selectedSuit == "all",
-                    onClick = { selectedSuit = "all" },
-                    label = { Text("Hepsi", fontSize = 12.sp) },
-                    modifier = Modifier.height(32.dp)
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Tarot",
+                        fontSize = 26.sp,
+                        color = if (selectedType == "tarot") Color.White else Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.clickable { selectedType = "tarot" }
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(if (selectedType == "tarot") 60.dp else 15.dp)
+                            .height(2.dp)
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(1.dp)
+                            )
+                    )
+                }
 
-                // Sadece ikon içeren diğer sekmeler
-                FilterChip(
-                    selected = selectedSuit == "major",
-                    onClick = { selectedSuit = "major" },
-                    label = { }, // Boş label
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_crown),
-                            contentDescription = "Major",
-                            tint = if (selectedSuit == "major") Color.Black else Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    modifier = Modifier.height(32.dp)
-                )
-
-                FilterChip(
-                    selected = selectedSuit == "cups",
-                    onClick = { selectedSuit = "cups" },
-                    label = { }, // Boş label
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_cup),
-                            contentDescription = "Kupalar",
-                            tint = if (selectedSuit == "cups") Color.Black else Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    modifier = Modifier.height(32.dp)
-                )
-
-                FilterChip(
-                    selected = selectedSuit == "swords",
-                    onClick = { selectedSuit = "swords" },
-                    label = { }, // Boş label
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_sword),
-                            contentDescription = "Kılıçlar",
-                            tint = if (selectedSuit == "swords") Color.Black else Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    modifier = Modifier.height(32.dp)
-                )
-
-                FilterChip(
-                    selected = selectedSuit == "pentacles",
-                    onClick = { selectedSuit = "pentacles" },
-                    label = { }, // Boş label
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_pentacle),
-                            contentDescription = "Tılsımlar",
-                            tint = if (selectedSuit == "pentacles") Color.Black else Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    modifier = Modifier.height(32.dp)
-                )
-
-                FilterChip(
-                    selected = selectedSuit == "wands",
-                    onClick = { selectedSuit = "wands" },
-                    label = { }, // Boş label
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_wand),
-                            contentDescription = "Değnekler",
-                            tint = if (selectedSuit == "wands") Color.Black else Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    modifier = Modifier.height(32.dp)
-                )
-            }
-
-            // Filtrelenmiş kartlar
-            val filteredCards = viewModel.cards.filter { card ->
-                when (selectedSuit) {
-                    "all" -> true
-                    "major" -> card.type == "major"
-                    "cups" -> {
-                        // Debug için
-                        if (card.type == "minor") {
-                            Log.d("TarotFilter", "Card: ${card.name}, Suit: ${card.suit}, Type: ${card.type}")
-                        }
-                        card.type == "minor" && card.suit == "cups"
-                    }
-                    "swords" -> card.type == "minor" && card.suit == "swords"
-                    "pentacles" -> card.type == "minor" && card.suit == "pentacles"
-                    "wands" -> card.type == "minor" && card.suit == "wands"
-                    else -> true
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Rün",
+                        fontSize = 26.sp,
+                        color = if (selectedType == "rune") Color.White else Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.clickable { selectedType = "rune" }
+                    )
+                    Box(
+                        modifier = Modifier
+                            .width(if (selectedType == "rune") 45.dp else 12.dp)
+                            .height(2.dp)
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(1.dp)
+                            )
+                    )
                 }
             }
 
+            // Tarot kartları için filtre seçenekleri
+            if (selectedType == "tarot") {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = Color.White,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        // Hepsi seçeneği
+                        Text(
+                            text = "Hepsi",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (selectedSuit == "all") Color.Black else Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier.clickable { selectedSuit = "all" }
+                        )
+
+                        // Major ikonu
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_crown),
+                            contentDescription = "Major",
+                            tint = if (selectedSuit == "major") Color.Black else Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { selectedSuit = "major" }
+                        )
+
+                        // Kupa ikonu
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_cup),
+                            contentDescription = "Kupalar",
+                            tint = if (selectedSuit == "cups") Color.Black else Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { selectedSuit = "cups" }
+                        )
+
+                        // Kılıç ikonu
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_sword),
+                            contentDescription = "Kılıçlar",
+                            tint = if (selectedSuit == "swords") Color.Black else Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { selectedSuit = "swords" }
+                        )
+
+                        // Tılsım ikonu
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_pentacle),
+                            contentDescription = "Tılsımlar",
+                            tint = if (selectedSuit == "pentacles") Color.Black else Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { selectedSuit = "pentacles" }
+                        )
+
+                        // Değnek ikonu
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_wand),
+                            contentDescription = "Değnekler",
+                            tint = if (selectedSuit == "wands") Color.Black else Color.Black.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { selectedSuit = "wands" }
+                        )
+                    }
+                }
+            } else {
+                // Rün filtreleri
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = "Tüm Rünler",
+                        fontSize = 16.sp,
+                        color = if (selectedSuit == "all") Color.White else Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.clickable { selectedSuit = "all" }
+                    )
+                }
+            }
+
+            // Filtrelenmiş kartlar/rünler
+            val filteredItems = when (selectedType) {
+                "tarot" -> viewModel.cards.filter { card ->
+                    when (selectedSuit) {
+                        "all" -> true
+                        "major" -> card.type == "major"
+                        "cups" -> card.type == "minor" && card.suit == "cups"
+                        "swords" -> card.type == "minor" && card.suit == "swords"
+                        "pentacles" -> card.type == "minor" && card.suit == "pentacles"
+                        "wands" -> card.type == "minor" && card.suit == "wands"
+                        else -> true
+                    }
+                }
+                "rune" -> emptyList() // Rünler için ayrı bir liste oluşturulacak
+                else -> emptyList()
+            }
+
+            // Grid görünümü
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(filteredCards) { card ->
+                items(filteredItems) { item ->
                     TarotCard(
-                        card = card,
-                        onClick = { viewModel.onCardClick(card) }
+                        card = item,
+                        onClick = { viewModel.onCardClick(item) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp)
                     )
                 }
             }
