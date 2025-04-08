@@ -158,16 +158,25 @@ fun SignInScreen(
                                             isLoading = true
                                             errorMessage = null
                                             try {
-                                                auth.signInWithEmailAndPassword(email, password).await()
-                                                onSignInSuccess()
+                                                auth.signInWithEmailAndPassword(email, password)
+                                                    .addOnCompleteListener { task ->
+                                                        if (task.isSuccessful) {
+                                                            onSignInSuccess()
+                                                        } else {
+                                                            errorMessage = when {
+                                                                task.exception?.message?.contains("password") == true -> "Şifre hatalı"
+                                                                task.exception?.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
+                                                                else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
+                                                            }
+                                                        }
+                                                        isLoading = false
+                                                    }
                                             } catch (e: Exception) {
                                                 errorMessage = when {
                                                     e.message?.contains("password") == true -> "Şifre hatalı"
                                                     e.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
                                                     else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
                                                 }
-                                            } finally {
-                                                isLoading = false
                                             }
                                         }
                                     }

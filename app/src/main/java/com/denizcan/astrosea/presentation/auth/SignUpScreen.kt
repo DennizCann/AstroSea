@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 
@@ -183,7 +185,21 @@ fun SignUpScreen(
                                             errorMessage = null
                                             try {
                                                 auth.createUserWithEmailAndPassword(email, password).await()
-                                                onSignUpSuccess()
+                                                val userId = auth.currentUser?.uid ?: return@launch
+                                                
+                                                // Firestore'da kullanıcı belgesi oluştur
+                                                FirebaseFirestore.getInstance().collection("users")
+                                                    .document(userId)
+                                                    .set(
+                                                        mapOf(
+                                                            "email" to email,
+                                                            "created_at" to FieldValue.serverTimestamp(),
+                                                            "auth_type" to "email"  // Bu kullanıcının email ile giriş yaptığını belirt
+                                                        )
+                                                    )
+                                                    .addOnSuccessListener {
+                                                        onSignUpSuccess()  // Ana sayfaya yönlendir
+                                                    }
                                             } catch (e: Exception) {
                                                 errorMessage = when {
                                                     e.message?.contains("email") == true -> "Bu e-posta adresi zaten kullanımda"

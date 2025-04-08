@@ -37,6 +37,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 
 // MenuItem data class'ını ekle
 data class MenuItem(
@@ -64,6 +65,9 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val profileState = viewModel.profileState
+    var showNotifications by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val dailyTarotViewModel: DailyTarotViewModel = viewModel(factory = DailyTarotViewModel.Factory(context))
 
     LaunchedEffect(Unit) {
         // viewModel init bloğunda loadProfile() çağrılıyor
@@ -121,7 +125,13 @@ fun HomeScreen(
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { },
+                        title = {
+                            Text(
+                                text = "AstroSea",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = Color.White
+                            )
+                        },
                         navigationIcon = {
                             IconButton(
                                 onClick = { scope.launch { drawerState.open() } },
@@ -138,17 +148,11 @@ fun HomeScreen(
                             }
                         },
                         actions = {
-                            IconButton(
-                                onClick = { /* Bildirimler için tıklama işlemi */ },
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .size(48.dp)
-                            ) {
+                            IconButton(onClick = { showNotifications = true }) {
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
                                     contentDescription = "Bildirimler",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(32.dp)
+                                    tint = Color.White
                                 )
                             }
                         },
@@ -379,24 +383,24 @@ fun HomeScreen(
                             .padding(horizontal = 12.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        DailyCard(
-                            title = "1",
-                            modifier = Modifier
-                                .height(160.dp)
-                                .width(95.dp)
-                        )
-                        DailyCard(
-                            title = "2",
-                            modifier = Modifier
-                                .height(160.dp)
-                                .width(95.dp)
-                        )
-                        DailyCard(
-                            title = "3",
-                            modifier = Modifier
-                                .height(160.dp)
-                                .width(95.dp)
-                        )
+                        dailyTarotViewModel.dailyCards.forEach { cardState ->
+                            FlippableCard(
+                                cardState = cardState,
+                                onCardClick = {
+                                    if (!cardState.isRevealed) {
+                                        // Eğer kart daha önce çekilmediyse, önce çekelim
+                                        if (!dailyTarotViewModel.hasDrawnToday) {
+                                            dailyTarotViewModel.drawDailyCards()
+                                        }
+                                        // Sonra kartı açalım
+                                        dailyTarotViewModel.revealCard(cardState.index)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .height(160.dp)
+                                    .width(95.dp)
+                            )
+                        }
                     }
 
                     // Alt kartlar için grid
@@ -465,6 +469,12 @@ fun HomeScreen(
             }
         }
     }
+
+    if (showNotifications) {
+        NotificationsPopup(
+            onDismiss = { showNotifications = false }
+        )
+    }
 }
 
 @Composable
@@ -532,33 +542,6 @@ private fun ServiceCard(
                 ),
                 textAlign = TextAlign.Center,
                 color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun DailyCard(
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.clickable { /* Kart seçme işlemi gelecek */ },  // Boyutları Row'dan alacak
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
-        ),
-        border = BorderStroke(0.dp, Color.Transparent),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                contentDescription = "Tarot kartı $title",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
             )
         }
     }

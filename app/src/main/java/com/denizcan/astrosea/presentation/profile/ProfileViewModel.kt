@@ -7,41 +7,61 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class ProfileViewModel : ViewModel() {
     var profileState by mutableStateOf(ProfileState())
         private set
 
+    private val auth = FirebaseAuth.getInstance()
+    private var authStateListener: FirebaseAuth.AuthStateListener? = null
+    private var profileListener: ListenerRegistration? = null
+
     init {
-        loadProfile()
-        startListeningToProfileChanges()
+        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                Log.d("ProfileViewModel", "Auth state changed: User ${user.uid} logged in")
+                loadProfile(user.uid)
+                startListeningToProfileChanges(user.uid)
+            } else {
+                Log.d("ProfileViewModel", "Auth state changed: User logged out")
+                profileState = ProfileState()
+                stopListeningToProfileChanges()
+            }
+        }
+        
+        auth.addAuthStateListener(authStateListener!!)
     }
 
-    private fun loadProfile() {
+    override fun onCleared() {
+        super.onCleared()
+        authStateListener?.let { auth.removeAuthStateListener(it) }
+        stopListeningToProfileChanges()
+    }
+
+    private fun loadProfile(userId: String) {
         profileState = profileState.copy(isLoading = true)
         
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(userId)
-                .get()
-                .addOnSuccessListener { document ->
-                    val profileData = document.toObject(ProfileData::class.java) ?: ProfileData()
-                    profileState = profileState.copy(
-                        profileData = profileData,
-                        isLoading = false
-                    )
-                    Log.d("ProfileViewModel", "Profile loaded: $profileData")
-                }
-                .addOnFailureListener { e ->
-                    profileState = profileState.copy(
-                        error = e.message,
-                        isLoading = false
-                    )
-                    Log.e("ProfileViewModel", "Error loading profile", e)
-                }
-        }
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val profileData = document.toObject(ProfileData::class.java) ?: ProfileData()
+                profileState = profileState.copy(
+                    profileData = profileData,
+                    isLoading = false
+                )
+                Log.d("ProfileViewModel", "Profile loaded: $profileData")
+            }
+            .addOnFailureListener { e ->
+                profileState = profileState.copy(
+                    error = e.message,
+                    isLoading = false
+                )
+                Log.e("ProfileViewModel", "Error loading profile", e)
+            }
     }
 
     fun startEditing() {
@@ -101,7 +121,7 @@ class ProfileViewModel : ViewModel() {
             .document(userId)
             .set(profileState.profileData)
             .addOnSuccessListener {
-                loadProfile()
+                loadProfile(userId)
                 onSuccess()
             }
             .addOnFailureListener { e ->
@@ -113,10 +133,10 @@ class ProfileViewModel : ViewModel() {
             }
     }
 
-    fun startListeningToProfileChanges() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    fun startListeningToProfileChanges(userId: String) {
+        stopListeningToProfileChanges()
         
-        FirebaseFirestore.getInstance()
+        profileListener = FirebaseFirestore.getInstance()
             .collection("users")
             .document(userId)
             .addSnapshotListener { snapshot, e ->
@@ -134,6 +154,11 @@ class ProfileViewModel : ViewModel() {
                     Log.d("ProfileViewModel", "Profile updated: $profileData")
                 }
             }
+    }
+
+    private fun stopListeningToProfileChanges() {
+        profileListener?.remove()
+        profileListener = null
     }
 }
 

@@ -47,6 +47,7 @@ import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsViewModel
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsViewModelFactory
 import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.util.JsonLoader
+import android.content.Context
 
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
@@ -55,6 +56,8 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+
+    private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +68,18 @@ class MainActivity : ComponentActivity() {
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
         
+        // Auth state listener oluşturalım
+        authStateListener = FirebaseAuth.AuthStateListener { auth ->
+            val user = auth.currentUser
+            // Kullanıcı değiştiğinde uygulama durumunu güncelle
+            if (user != null) {
+                // Log işlemi ekleyelim - hata ayıklama için
+                Log.d("Auth", "User logged in: ${user.uid}, email: ${user.email}")
+            } else {
+                Log.d("Auth", "User logged out")
+            }
+        }
+        
         setContent {
             AstroSeaTheme {
                 Surface(
@@ -73,13 +88,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val scope = rememberCoroutineScope()
-                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    var startDestination by remember {
+                        mutableStateOf<String>(Screen.Onboarding.route)
+                    }
+                    val currentUser = remember { FirebaseAuth.getInstance().currentUser }
                     val viewModel: ProfileViewModel = viewModel()
+                    val context = LocalContext.current
 
-                    val startDestination = if (currentUser != null) {
-                        Screen.Home.route
-                    } else {
-                        Screen.Onboarding.route
+                    LaunchedEffect(key1 = currentUser) {
+                        if (currentUser != null) {
+                            startDestination = Screen.Home.route
+                        } else {
+                            // SharedPreferences'ten onboarding durumunu kontrol et
+                            val hasSeenOnboarding = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                .getBoolean("has_seen_onboarding", false)
+                            startDestination = if (hasSeenOnboarding) Screen.Auth.route else Screen.Onboarding.route
+                        }
                     }
 
                     val launcher = rememberLauncherForActivityResult(
@@ -244,6 +268,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
     }
 }
 

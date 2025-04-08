@@ -11,6 +11,9 @@ import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.SetOptions
 
 class GoogleAuthUiClient(
     private val context: Context,
@@ -45,6 +48,8 @@ class GoogleAuthUiClient(
             if(e is CancellationException) throw e
             null
         }
+        
+        // Sadece IntentSender döndürüyoruz, şu anda kullanıcı bilgilerine erişim yok
         return result?.pendingIntent?.intentSender
     }
 
@@ -55,12 +60,29 @@ class GoogleAuthUiClient(
         
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
+            
+            // Kullanıcı giriş yaptığında Firestore'a bilgileri kaydet
+            user?.let { firebaseUser ->
+                FirebaseFirestore.getInstance().collection("users")
+                    .document(firebaseUser.uid)
+                    .set(
+                        mapOf(
+                            "email" to firebaseUser.email,
+                            "displayName" to firebaseUser.displayName,
+                            "photoUrl" to (firebaseUser.photoUrl?.toString() ?: ""),
+                            "auth_type" to "google",
+                            "last_login" to FieldValue.serverTimestamp()
+                        ),
+                        SetOptions.merge()
+                    )
+            }
+            
             SignInResult(
                 data = user?.run {
                     UserData(
                         userId = uid,
                         username = displayName,
-                        email = email
+                        email = this.email
                     )
                 },
                 errorMessage = null
