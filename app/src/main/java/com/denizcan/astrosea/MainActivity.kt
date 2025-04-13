@@ -62,12 +62,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         // Sistem çubuklarını şeffaf yap
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
-        
+
         // Auth state listener oluşturalım
         authStateListener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 Log.d("Auth", "User logged out")
             }
         }
-        
+
         setContent {
             AstroSeaTheme {
                 Surface(
@@ -183,16 +183,16 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToYesNo = {
                                     navController.navigate(Screen.YesNo.route)
                                 },
-                                onNavigateToRelationshipReadings = { 
-                                    navController.navigate("relationship_readings") 
+                                onNavigateToRelationshipReadings = {
+                                    navController.navigate("relationship_readings")
                                 },
-                                onNavigateToCareerReading = { 
-                                    navController.navigate("career_reading") 
+                                onNavigateToCareerReading = {
+                                    navController.navigate("career_reading")
                                 },
-                                onNavigateToMore = { 
-                                    navController.navigate("more") 
+                                onNavigateToMore = {
+                                    navController.navigate("more")
                                 },
-                                onNavigateToGeneralReadings = { 
+                                onNavigateToGeneralReadings = {
                                     navController.navigate("general_readings")
                                 },
                                 onSignOut = {
@@ -289,7 +289,7 @@ fun TarotMeaningsRoute(
     val viewModel: TarotMeaningsViewModel = viewModel(
         factory = TarotMeaningsViewModelFactory(JsonLoader(context))
     )
-    
+
     TarotMeaningsScreen(
         onNavigateBack = onNavigateBack,
         viewModel = viewModel

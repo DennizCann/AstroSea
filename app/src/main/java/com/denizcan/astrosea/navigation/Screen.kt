@@ -11,4 +11,4 @@ sealed class Screen(val route: String) {
     object BirthChart : Screen("birth_chart")
     object Motivation : Screen("motivation")
     object YesNo : Screen("yes_no")
-} 
+}
