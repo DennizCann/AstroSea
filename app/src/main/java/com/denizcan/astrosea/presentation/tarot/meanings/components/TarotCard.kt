@@ -30,8 +30,13 @@ fun TarotCard(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val imageName = card.imageResName
+        .replace("ace", "one")
+        .replace("_of_", "of")
+        .replace("_", "")
+        .lowercase()
     val imageResId = context.resources.getIdentifier(
-        card.imageResName,
+        imageName,
         "drawable",
         context.packageName
     )

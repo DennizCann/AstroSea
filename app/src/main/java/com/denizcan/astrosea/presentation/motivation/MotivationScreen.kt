@@ -32,6 +32,7 @@ fun MotivationScreen(
             topBar = {
                 AstroTopBar(
                     title = "Motivasyon",
+                    onBackClick = onNavigateBack
                 )
             }
         ) { paddingValues ->

@@ -29,6 +29,7 @@ fun GeneralReadingsScreen(
             topBar = {
                 AstroTopBar(
                     title = "Genel Açılımlar",
+                    onBackClick = onNavigateBack
                 )
             },
             containerColor = Color.Transparent

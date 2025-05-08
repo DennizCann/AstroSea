@@ -238,10 +238,10 @@ fun TarotMeaningsScreen(
                     when (selectedSuit) {
                         "all" -> true
                         "major" -> card.type == "major"
-                        "cups" -> card.type == "minor" && card.suit == "cups"
-                        "swords" -> card.type == "minor" && card.suit == "swords"
-                        "pentacles" -> card.type == "minor" && card.suit == "pentacles"
-                        "wands" -> card.type == "minor" && card.suit == "wands"
+                        "cups" -> card.type.contains("Cups", ignoreCase = true)
+                        "swords" -> card.type.contains("Swords", ignoreCase = true)
+                        "pentacles" -> card.type.contains("Pentacles", ignoreCase = true)
+                        "wands" -> card.type.contains("Wands", ignoreCase = true)
                         else -> true
                     }
                 }

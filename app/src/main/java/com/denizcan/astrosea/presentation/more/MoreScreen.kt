@@ -31,6 +31,7 @@ fun MoreScreen(
             topBar = {
                 AstroTopBar(
                     title = "Daha Fazla",
+                    onBackClick = onNavigateBack
                 )
             },
             containerColor = Color.Transparent

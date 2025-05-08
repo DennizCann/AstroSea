@@ -28,6 +28,7 @@ fun RelationshipReadingsScreen(
             topBar = {
                 AstroTopBar(
                     title = "İlişki Açılımları",
+                    onBackClick = onNavigateBack
                 )
             },
             containerColor = androidx.compose.ui.graphics.Color.Transparent

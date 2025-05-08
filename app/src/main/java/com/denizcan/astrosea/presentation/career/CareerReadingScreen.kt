@@ -29,6 +29,7 @@ fun CareerReadingScreen(
             topBar = {
                 AstroTopBar(
                     title = "Kariyer Açılımı",
+                    onBackClick = onNavigateBack
                 )
             },
             containerColor = Color.Transparent

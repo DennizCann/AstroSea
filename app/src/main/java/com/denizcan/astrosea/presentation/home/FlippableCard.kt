@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.home
 
+import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -82,11 +83,17 @@ fun FlippableCard(
                 Box(modifier = Modifier.fillMaxSize()) {
                     // Kart çekildiyse ve geçerli bir kart varsa
                     if (cardState.card != null) {
+                        val imageName = cardState.card.imageResName
+                            .replace("ace", "one")
+                            .replace("_of_", "of")
+                            .replace("_", "")
+                            .lowercase()
                         val imageResId = context.resources.getIdentifier(
-                            cardState.card.imageResName,
+                            imageName,
                             "drawable",
                             context.packageName
                         )
+                        Log.d("FlippableCard", "imageName: $imageName, imageResId: $imageResId")
                         
                         if (imageResId != 0) {
                             Image(
