@@ -4,10 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModelProvider
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.util.JsonLoader
-import com.denizcan.astrosea.util.TarotCard
+import com.denizcan.astrosea.model.TarotCard
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.util.JsonLoader
 import android.content.Context
 import androidx.compose.foundation.layout.Box
+import androidx.navigation.NavController
+import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -222,9 +224,29 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(route = Screen.TarotMeanings.route) {
-                        TarotMeaningsRoute(
-                            onNavigateBack = { navController.navigateUp() }
+                        val context = LocalContext.current
+                        val viewModel: TarotMeaningsViewModel = viewModel(
+                            factory = TarotMeaningsViewModelFactory(JsonLoader(context))
                         )
+                        TarotMeaningsScreen(
+                            onNavigateBack = { navController.navigateUp() },
+                            viewModel = viewModel,
+                            navController = navController
+                        )
+                    }
+                    composable("tarot_detail/{cardId}") { backStackEntry ->
+                        val cardId = backStackEntry.arguments?.getString("cardId")
+                        if (cardId != null) {
+                            val context = LocalContext.current
+                            val viewModel: TarotMeaningsViewModel = viewModel(
+                                factory = TarotMeaningsViewModelFactory(JsonLoader(context))
+                            )
+                            TarotDetailScreen(
+                                onNavigateBack = { navController.navigateUp() },
+                                cardId = cardId,
+                                viewModel = viewModel
+                            )
+                        }
                     }
                     composable(Screen.YesNo.route) {
                         YesNoScreen(
@@ -267,17 +289,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun TarotMeaningsRoute(
-    onNavigateBack: () -> Unit
-) {
-    val context = LocalContext.current
-    val viewModel: TarotMeaningsViewModel = viewModel(
-        factory = TarotMeaningsViewModelFactory(JsonLoader(context))
-    )
-
-    TarotMeaningsScreen(
-        onNavigateBack = onNavigateBack,
-        viewModel = viewModel
-    )
-}

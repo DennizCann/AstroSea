@@ -1,8 +1,8 @@
 package com.denizcan.astrosea.util
 
-import TarotCard
 import android.content.Context
 import org.json.JSONObject
+import com.denizcan.astrosea.model.TarotCard
 
 class JsonParser(private val context: Context) {
     fun loadTarotCards(): List<TarotCard> {
@@ -44,7 +44,13 @@ class JsonParser(private val context: Context) {
             description = json.getString("description"),
             keywords = json.getJSONArray("keywords").let { array ->
                 List(array.length()) { array.getString(it) }
-            }
+            },
+            zodiacSigns = json.optString("zodiacSigns", null),
+            predictions = if (json.has("predictions")) {
+                json.getJSONArray("predictions").let { array ->
+                    List(array.length()) { array.getString(it) }
+                }
+            } else null
         )
     }
 } 

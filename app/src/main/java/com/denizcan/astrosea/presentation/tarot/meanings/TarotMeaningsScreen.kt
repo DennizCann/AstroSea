@@ -31,14 +31,15 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-
-
+import androidx.navigation.NavController
+import com.denizcan.astrosea.model.TarotCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TarotMeaningsScreen(
     onNavigateBack: () -> Unit,
-    viewModel: TarotMeaningsViewModel
+    viewModel: TarotMeaningsViewModel,
+    navController: NavController
 ) {
     var selectedType by remember { mutableStateOf("tarot") } // tarot veya rune
     var selectedSuit by remember { mutableStateOf("all") }
@@ -259,7 +260,9 @@ fun TarotMeaningsScreen(
                 items(filteredItems) { item ->
                     TarotCard(
                         card = item,
-                        onClick = { viewModel.onCardClick(item) },
+                        onClick = {
+                            navController.navigate("tarot_detail/${item.id}")
+                        },
                         modifier = Modifier
                             .fillMaxWidth(0.85f)
                             .padding(2.dp)

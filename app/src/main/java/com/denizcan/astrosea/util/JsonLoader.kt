@@ -3,6 +3,7 @@ package com.denizcan.astrosea.util
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.denizcan.astrosea.model.TarotCard
 
 class JsonLoader(private val context: Context) {
     fun loadTarotCards(): List<TarotCard> {

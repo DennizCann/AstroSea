@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
-import com.denizcan.astrosea.util.TarotCard
+import com.denizcan.astrosea.model.TarotCard
 
 @Composable
 fun TarotCard(

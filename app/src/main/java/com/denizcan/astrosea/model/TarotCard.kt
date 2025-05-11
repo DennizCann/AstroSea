@@ -1,3 +1,5 @@
+package com.denizcan.astrosea.model
+
 data class TarotCard(
     val id: String,
     val name: String,
@@ -8,5 +10,7 @@ data class TarotCard(
     val meaningUpright: String,
     val meaningReversed: String,
     val description: String,
-    val keywords: List<String>
+    val keywords: List<String>,
+    val zodiacSigns: String?,
+    val predictions: List<String>?
 ) 
