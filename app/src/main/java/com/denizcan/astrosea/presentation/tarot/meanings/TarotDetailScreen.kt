@@ -71,27 +71,33 @@ fun TarotDetailScreen(
                         .matchParentSize(),
                     contentScale = ContentScale.FillWidth
                 )
-                // Kart görseli, tag'ın içini daha çok dolduracak şekilde büyütülür
-                val context = LocalContext.current
-                val imageName = card.imageResName
-                    .replace("ace", "one")
-                    .replace("_of_", "of")
-                    .replace("_", "")
-                    .lowercase()
-                val imageResId = remember(card.imageResName) {
-                    context.resources.getIdentifier(imageName, "drawable", context.packageName)
-                }
-                if (imageResId != 0) {
-                    Image(
-                        painter = painterResource(id = imageResId),
-                        contentDescription = card.name,
-                        modifier = Modifier
-                            .fillMaxWidth(0.52f)
-                            .aspectRatio(140f / 220f)
-                            .align(Alignment.Center)
-                            .padding(top = 16.dp),
-                        contentScale = ContentScale.Fit
-                    )
+                // Kart görselini tam ortalamak için iç Box
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.52f)
+                        .fillMaxHeight(0.80f)
+                        .align(Alignment.Center),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val context = LocalContext.current
+                    val imageName = card.imageResName
+                        .replace("ace", "one")
+                        .replace("_of_", "of")
+                        .replace("_", "")
+                        .lowercase()
+                    val imageResId = remember(card.imageResName) {
+                        context.resources.getIdentifier(imageName, "drawable", context.packageName)
+                    }
+                    if (imageResId != 0) {
+                        Image(
+                            painter = painterResource(id = imageResId),
+                            contentDescription = card.name,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .aspectRatio(140f / 220f),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
