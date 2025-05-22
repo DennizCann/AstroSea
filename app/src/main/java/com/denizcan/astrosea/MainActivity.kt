@@ -241,11 +241,13 @@ class MainActivity : ComponentActivity() {
                             val viewModel: TarotMeaningsViewModel = viewModel(
                                 factory = TarotMeaningsViewModelFactory(JsonLoader(context))
                             )
-                            TarotDetailScreen(
-                                onNavigateBack = { navController.navigateUp() },
-                                cardId = cardId,
-                                viewModel = viewModel
-                            )
+                            val card = viewModel.cards.find { it.id == cardId }
+                            if (card != null) {
+                                TarotDetailScreen(
+                                    onNavigateBack = { navController.navigateUp() },
+                                    card = card
+                                )
+                            }
                         }
                     }
                     composable(Screen.YesNo.route) {
