@@ -3,6 +3,10 @@ package com.denizcan.astrosea.presentation.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,12 +20,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Warning
-import com.denizcan.astrosea.presentation.profile.ProfileData
-import com.google.firebase.firestore.FirebaseFirestore
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
@@ -37,7 +36,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 
 // MenuItem data class'ını ekle
 data class MenuItem(
@@ -62,8 +63,6 @@ fun HomeScreen(
     onNavigateToGeneralReadings: () -> Unit,
     onSignOut: () -> Unit
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     val profileState = viewModel.profileState
     var showNotifications by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -107,363 +106,364 @@ fun HomeScreen(
         )
     )
 
-    AstroDrawer(
-        drawerState = drawerState,
-        scope = scope,
-        onSignOut = onSignOut,
-        onNavigateToProfile = onNavigateToProfile,
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Arka plan görseli
-            Image(
-                painter = painterResource(id = R.drawable.anamenu),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Arka plan görseli
+        Image(
+            painter = painterResource(id = R.drawable.anamenu),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = "AstroSea",
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = Color.White
-                            )
-                        },
-                        navigationIcon = {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { },
+                    actions = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
                             IconButton(
-                                onClick = { scope.launch { drawerState.open() } },
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .size(48.dp)
+                                onClick = onNavigateToProfile,
+                                modifier = Modifier.weight(1f)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Menü",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(32.dp)
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Profil",
+                                    tint = Color.White
                                 )
                             }
-                        },
-                        actions = {
-                            IconButton(onClick = { showNotifications = true }) {
+                            IconButton(
+                                onClick = { showNotifications = true },
+                                modifier = Modifier.weight(1f)
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
                                     contentDescription = "Bildirimler",
                                     tint = Color.White
                                 )
                             }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Transparent
-                        ),
-                        modifier = Modifier.height(64.dp)
-                    )
-                },
-                containerColor = Color.Transparent
-            ) { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 4.dp)
-                        .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Profil Uyarı Kartı
-                    if (!profileState.isLoading && profileState.profileData.hasIncompleteFields()) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
-                                .clickable { onNavigateToProfile() },
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.Black.copy(alpha = 0.6f)
-                            ),
-                            border = BorderStroke(1.dp, Color(0xFFFFD700))  // Altın sarısı border
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                            IconButton(
+                                onClick = onSignOut,
+                                modifier = Modifier.weight(1f)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Warning,
-                                    contentDescription = "Uyarı",
-                                    tint = Color(0xFFFFD700)
-                                )
-                                Text(
-                                    text = "Profil bilgilerinizi tamamlayarak daha doğru astrolojik yorumlar alabilirsiniz.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White
+                                    imageVector = Icons.Default.ExitToApp,
+                                    contentDescription = "Çıkış Yap",
+                                    tint = Color.White
                                 )
                             }
                         }
-                    }
-
-                    // Hoş geldin kartı yerine basit bir layout
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        if (profileState.isLoading) {
-                            CircularProgressIndicator(
-                                color = Color.White,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-                        } else {
-                            if (profileState.profileData.name.isNullOrEmpty()) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text(
-                                        "Profilinizi Tamamlayın",
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        "Kişiselleştirilmiş deneyim için lütfen profil bilgilerinizi doldurun.",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = Color.White.copy(alpha = 0.9f)
-                                    )
-                                    Button(
-                                        onClick = { onNavigateToProfile() },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color.White.copy(alpha = 0.2f)
-                                        )
-                                    ) {
-                                        Text(
-                                            "Profile Git",
-                                            color = Color.White
-                                        )
-                                    }
-                                }
-                            } else {
-                                Text(
-                                    text = buildAnnotatedString {
-                                        append("H")
-                                        withStyle(SpanStyle(
-                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                            fontSize = 32.sp
-                                        )) { append("oş ") }
-                                        append("G")
-                                        withStyle(SpanStyle(
-                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                            fontSize = 32.sp
-                                        )) { append("eldin, ") }
-                                        profileState.profileData.name?.split(" ")?.forEach { word ->
-                                            withStyle(SpanStyle(
-                                                fontFamily = FontFamily(Font(R.font.cinzel_black)),
-                                                fontSize = 32.sp
-                                            )) { append(word.first().uppercase()) }
-                                            withStyle(SpanStyle(
-                                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                                fontWeight = FontWeight.Black,
-                                                fontSize = 32.sp
-                                            )) {
-                                                append(word.substring(1).lowercase())
-                                                append(" ")
-                                            }
-                                        }
-                                    },
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontSize = 32.sp
-                                    ),
-                                    color = Color.White,
-                                    modifier = Modifier.padding(bottom = 0.dp)
-                                )
-
-                                Divider(
-                                    modifier = Modifier
-                                        .offset(y = (-4).dp)
-                                        .padding(vertical = 0.dp),
-                                    color = Color.White,
-                                    thickness = 2.dp
-                                )
-                            }
-                        }
-                    }
-
-                    // Arama kısmı
-                    var searchQuery by remember { mutableStateOf("") }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    ),
+                    modifier = Modifier.height(64.dp)
+                )
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 4.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Profil Uyarı Kartı
+                if (!profileState.isLoading && profileState.profileData.hasIncompleteFields()) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .padding(bottom = 16.dp)
+                            .clickable { onNavigateToProfile() },
                         colors = CardDefaults.cardColors(
                             containerColor = Color.Black.copy(alpha = 0.6f)
                         ),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
-                    ) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 4.dp),
-                            placeholder = {
-                                Text(
-                                    "Aklındaki sorunun cevabını hemen gör...",
-                                    color = Color.White.copy(alpha = 0.6f),
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontSize = 18.sp
-                                    )
-                                )
-                            },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.Transparent,
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedTextColor = Color.White,
-                                focusedTextColor = Color.White,
-                                cursorColor = Color.White
-                            ),
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                color = Color.White,
-                                fontSize = 18.sp
-                            ),
-                            singleLine = true
-                        )
-                    }
-
-                    // Günlük Açılım başlığı
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 48.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        border = BorderStroke(1.dp, Color(0xFFFFD700))  // Altın sarısı border
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.varlik2),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = "Uyarı",
+                                tint = Color(0xFFFFD700)
                             )
-
                             Text(
-                                "Günlük Açılım",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                    fontSize = 24.sp
-                                ),
-                                color = Color.Black,
-                                textAlign = TextAlign.Center
-                            )
-
-                            Image(
-                                painter = painterResource(id = R.drawable.varlik2),
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                text = "Profil bilgilerinizi tamamlayarak daha doğru astrolojik yorumlar alabilirsiniz.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White
                             )
                         }
                     }
+                }
 
-                    // Tarot kartları
+                // Hoş geldin kartı yerine basit bir layout
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (profileState.isLoading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    } else {
+                        if (profileState.profileData.name.isNullOrEmpty()) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    "Profilinizi Tamamlayın",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = Color.White
+                                )
+                                Text(
+                                    "Kişiselleştirilmiş deneyim için lütfen profil bilgilerinizi doldurun.",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.White.copy(alpha = 0.9f)
+                                )
+                                Button(
+                                    onClick = { onNavigateToProfile() },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.White.copy(alpha = 0.2f)
+                                    )
+                                ) {
+                                    Text(
+                                        "Profile Git",
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = buildAnnotatedString {
+                                    append("H")
+                                    withStyle(SpanStyle(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                        fontSize = 32.sp
+                                    )) { append("oş ") }
+                                    append("G")
+                                    withStyle(SpanStyle(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                        fontSize = 32.sp
+                                    )) { append("eldin, ") }
+                                    profileState.profileData.name?.split(" ")?.forEach { word ->
+                                        withStyle(SpanStyle(
+                                            fontFamily = FontFamily(Font(R.font.cinzel_black)),
+                                            fontSize = 32.sp
+                                        )) { append(word.first().uppercase()) }
+                                        withStyle(SpanStyle(
+                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = 32.sp
+                                        )) {
+                                            append(word.substring(1).lowercase())
+                                            append(" ")
+                                        }
+                                    }
+                                },
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontSize = 32.sp
+                                ),
+                                color = Color.White,
+                                modifier = Modifier.padding(bottom = 0.dp)
+                            )
+
+                            Divider(
+                                modifier = Modifier
+                                    .offset(y = (-4).dp)
+                                    .padding(vertical = 0.dp),
+                                color = Color.White,
+                                thickness = 2.dp
+                            )
+                        }
+                    }
+                }
+
+                // Arama kısmı
+                var searchQuery by remember { mutableStateOf("") }
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 4.dp),
+                        placeholder = {
+                            Text(
+                                "Aklındaki sorunun cevabını hemen gör...",
+                                color = Color.White.copy(alpha = 0.6f),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontSize = 18.sp,
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                )
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedTextColor = Color.White,
+                            focusedTextColor = Color.White,
+                            cursorColor = Color.White
+                        ),
+                        textStyle = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White,
+                            fontSize = 18.sp
+                        ),
+                        singleLine = true
+                    )
+                }
+
+                // Günlük Açılım başlığı
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 48.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        dailyTarotViewModel.dailyCards.forEach { cardState ->
-                            FlippableCard(
-                                cardState = cardState,
-                                onCardClick = {
-                                    if (!cardState.isRevealed) {
-                                        // Eğer kart daha önce çekilmediyse, önce çekelim
-                                        if (!dailyTarotViewModel.hasDrawnToday) {
-                                            dailyTarotViewModel.drawDailyCards()
-                                        }
-                                        // Sonra kartı açalım
-                                        dailyTarotViewModel.revealCard(cardState.index)
+                        Image(
+                            painter = painterResource(id = R.drawable.varlik2),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+
+                        Text(
+                            "Günlük Açılım",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                fontSize = 24.sp
+                            ),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Image(
+                            painter = painterResource(id = R.drawable.varlik2),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                // Tarot kartları
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    dailyTarotViewModel.dailyCards.forEach { cardState ->
+                        FlippableCard(
+                            cardState = cardState,
+                            onCardClick = {
+                                if (!cardState.isRevealed) {
+                                    // Eğer kart daha önce çekilmediyse, önce çekelim
+                                    if (!dailyTarotViewModel.hasDrawnToday) {
+                                        dailyTarotViewModel.drawDailyCards()
                                     }
-                                },
-                                modifier = Modifier
-                                    .height(160.dp)
-                                    .width(95.dp)
-                            )
-                        }
+                                    // Sonra kartı açalım
+                                    dailyTarotViewModel.revealCard(cardState.index)
+                                }
+                            },
+                            modifier = Modifier
+                                .height(160.dp)
+                                .width(95.dp)
+                        )
+                    }
+                }
+
+                // Alt kartlar için grid
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // İlk sıra
+                    Row(
+                        modifier = Modifier.height(160.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ServiceCard(
+                            title = menuItems[0].title,
+                            onClick = onNavigateToTarotMeanings,
+                            modifier = Modifier.weight(1f),
+                            imageResId = menuItems[0].icon
+                        )
+                        ServiceCard(
+                            title = menuItems[1].title,
+                            onClick = onNavigateToRelationshipReadings,
+                            modifier = Modifier.weight(1f),
+                            imageResId = menuItems[1].icon
+                        )
                     }
 
-                    // Alt kartlar için grid
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    // İkinci sıra
+                    Row(
+                        modifier = Modifier.height(160.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // İlk sıra
-                        Row(
-                            modifier = Modifier.height(160.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            ServiceCard(
-                                title = menuItems[0].title,
-                                onClick = onNavigateToTarotMeanings,
-                                modifier = Modifier.weight(1f),
-                                imageResId = menuItems[0].icon
-                            )
-                            ServiceCard(
-                                title = menuItems[1].title,
-                                onClick = onNavigateToRelationshipReadings,
-                                modifier = Modifier.weight(1f),
-                                imageResId = menuItems[1].icon
-                            )
-                        }
+                        ServiceCard(
+                            title = menuItems[2].title,
+                            onClick = onNavigateToGeneralReadings,
+                            modifier = Modifier.weight(1f),
+                            imageResId = menuItems[2].icon
+                        )
+                        ServiceCard(
+                            title = menuItems[3].title,
+                            onClick = onNavigateToCareerReading,
+                            modifier = Modifier.weight(1f),
+                            imageResId = menuItems[3].icon
+                        )
+                    }
 
-                        // İkinci sıra
-                        Row(
-                            modifier = Modifier.height(160.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            ServiceCard(
-                                title = menuItems[2].title,
-                                onClick = onNavigateToGeneralReadings,
-                                modifier = Modifier.weight(1f),
-                                imageResId = menuItems[2].icon
-                            )
-                            ServiceCard(
-                                title = menuItems[3].title,
-                                onClick = onNavigateToCareerReading,
-                                modifier = Modifier.weight(1f),
-                                imageResId = menuItems[3].icon
-                            )
-                        }
-
-                        // Üçüncü sıra
-                        Row(
-                            modifier = Modifier.height(160.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            ServiceCard(
-                                title = menuItems[4].title,
-                                onClick = onNavigateToYesNo,
-                                modifier = Modifier.weight(1f),
-                                imageResId = menuItems[4].icon
-                            )
-                            ServiceCard(
-                                title = menuItems[5].title,
-                                onClick = onNavigateToMore,
-                                modifier = Modifier.weight(1f),
-                                imageResId = menuItems[5].icon
-                            )
-                        }
+                    // Üçüncü sıra
+                    Row(
+                        modifier = Modifier.height(160.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ServiceCard(
+                            title = menuItems[4].title,
+                            onClick = onNavigateToYesNo,
+                            modifier = Modifier.weight(1f),
+                            imageResId = menuItems[4].icon
+                        )
+                        ServiceCard(
+                            title = menuItems[5].title,
+                            onClick = onNavigateToMore,
+                            modifier = Modifier.weight(1f),
+                            imageResId = menuItems[5].icon
+                        )
                     }
                 }
             }
@@ -538,7 +538,8 @@ private fun ServiceCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                 ),
                 textAlign = TextAlign.Center,
                 color = if (enabled) Color.White else Color.White.copy(alpha = 0.5f)

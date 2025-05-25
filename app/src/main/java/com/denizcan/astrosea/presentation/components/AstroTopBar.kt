@@ -9,44 +9,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AstroTopBar(
     title: String,
-    onBackClick: (() -> Unit)? = null,
-    navigationIcon: @Composable (() -> Unit)? = null,
-    actions: @Composable (RowScope.() -> Unit) = {},
-    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = Color.Transparent,
-        titleContentColor = Color.White,
-        navigationIconContentColor = Color.White,
-        actionIconContentColor = Color.White
-    )
+    onBackClick: () -> Unit,
+    titleStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         title = {
             Text(
                 text = title,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleLarge,
+                style = titleStyle,
                 color = Color.White
             )
         },
         navigationIcon = {
-            if (onBackClick != null) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Geri",
-                        tint = Color.White
-                    )
-                }
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Geri",
+                    tint = Color.White
+                )
             }
-            navigationIcon?.invoke()
         },
         actions = actions,
-        colors = colors
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent
+        )
     )
 } 

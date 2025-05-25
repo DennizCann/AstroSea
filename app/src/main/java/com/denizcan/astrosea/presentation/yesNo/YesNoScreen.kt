@@ -21,7 +21,7 @@ fun YesNoScreen(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.anamenu),
+            painter = painterResource(id = R.drawable.acilimlararkaplan),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

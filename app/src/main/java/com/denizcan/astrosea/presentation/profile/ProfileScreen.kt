@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +46,9 @@ fun ProfileScreen(
                 AstroTopBar(
                     title = "Profil",
                     onBackClick = onNavigateBack,
+                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                    ),
                     actions = {
                         if (!state.isLoading) {
                             IconButton(
@@ -89,7 +94,15 @@ fun ProfileScreen(
                         OutlinedTextField(
                             value = state.profileData.name,
                             onValueChange = { if (state.isEditing) viewModel.onNameChange(it) },
-                            label = { Text("Ad", color = Color.White) },
+                            label = { 
+                                Text(
+                                    "Ad",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                    )
+                                )
+                            },
                             enabled = state.isEditing,
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -98,6 +111,9 @@ fun ProfileScreen(
                                 focusedTextColor = Color.White,
                                 disabledTextColor = Color.White,
                                 disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -105,7 +121,15 @@ fun ProfileScreen(
                         OutlinedTextField(
                             value = state.profileData.surname,
                             onValueChange = { if (state.isEditing) viewModel.onSurnameChange(it) },
-                            label = { Text("Soyad", color = Color.White) },
+                            label = { 
+                                Text(
+                                    "Soyad",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                    )
+                                )
+                            },
                             enabled = state.isEditing,
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -114,6 +138,9 @@ fun ProfileScreen(
                                 focusedTextColor = Color.White,
                                 disabledTextColor = Color.White,
                                 disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -121,7 +148,15 @@ fun ProfileScreen(
                         OutlinedTextField(
                             value = state.profileData.birthDate,
                             onValueChange = { if (state.isEditing) viewModel.onBirthDateChange(it) },
-                            label = { Text("Doğum Tarihi", color = Color.White) },
+                            label = { 
+                                Text(
+                                    "Doğum Tarihi",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                    )
+                                )
+                            },
                             enabled = state.isEditing,
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -130,6 +165,9 @@ fun ProfileScreen(
                                 focusedTextColor = Color.White,
                                 disabledTextColor = Color.White,
                                 disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -137,7 +175,15 @@ fun ProfileScreen(
                         OutlinedTextField(
                             value = state.profileData.birthTime,
                             onValueChange = { if (state.isEditing) viewModel.onBirthTimeChange(it) },
-                            label = { Text("Doğum Saati", color = Color.White) },
+                            label = { 
+                                Text(
+                                    "Doğum Saati",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                    )
+                                )
+                            },
                             enabled = state.isEditing,
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -146,6 +192,9 @@ fun ProfileScreen(
                                 focusedTextColor = Color.White,
                                 disabledTextColor = Color.White,
                                 disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -153,7 +202,15 @@ fun ProfileScreen(
                         OutlinedTextField(
                             value = state.profileData.country,
                             onValueChange = { if (state.isEditing) viewModel.onCountryChange(it) },
-                            label = { Text("Ülke", color = Color.White) },
+                            label = { 
+                                Text(
+                                    "Ülke",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                    )
+                                )
+                            },
                             enabled = state.isEditing,
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -163,13 +220,24 @@ fun ProfileScreen(
                                 disabledTextColor = Color.White,
                                 disabledBorderColor = Color.White.copy(alpha = 0.3f)
                             ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         OutlinedTextField(
                             value = state.profileData.city,
                             onValueChange = { if (state.isEditing) viewModel.onCityChange(it) },
-                            label = { Text("Şehir", color = Color.White) },
+                            label = { 
+                                Text(
+                                    "Şehir",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                    )
+                                )
+                            },
                             enabled = state.isEditing,
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -178,6 +246,9 @@ fun ProfileScreen(
                                 focusedTextColor = Color.White,
                                 disabledTextColor = Color.White,
                                 disabledBorderColor = Color.White.copy(alpha = 0.3f)
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )

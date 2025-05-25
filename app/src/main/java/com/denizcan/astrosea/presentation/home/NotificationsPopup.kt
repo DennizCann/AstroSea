@@ -11,9 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.denizcan.astrosea.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -56,7 +59,9 @@ fun NotificationsPopup(
                 ) {
                     Text(
                         text = "Bildirimler",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                        ),
                         color = Color.White
                     )
                     
@@ -85,7 +90,9 @@ fun NotificationsPopup(
                         Text(
                             text = "Hiç bildirim yok",
                             color = Color.White,
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                            )
                         )
                     }
                 } else {
@@ -122,7 +129,9 @@ fun NotificationItem(notification: Notification) {
         ) {
             Text(
                 text = notification.title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                ),
                 color = Color.White
             )
             
@@ -130,7 +139,9 @@ fun NotificationItem(notification: Notification) {
             
             Text(
                 text = notification.message,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                ),
                 color = Color.White.copy(alpha = 0.8f)
             )
             
@@ -138,7 +149,9 @@ fun NotificationItem(notification: Notification) {
             
             Text(
                 text = formatTimestamp(notification.timestamp),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                ),
                 color = Color.White.copy(alpha = 0.6f)
             )
         }

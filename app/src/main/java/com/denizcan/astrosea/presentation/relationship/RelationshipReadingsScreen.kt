@@ -18,7 +18,7 @@ fun RelationshipReadingsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
         Image(
-            painter = painterResource(id = R.drawable.anamenu),
+            painter = painterResource(id = R.drawable.acilimlararkaplan),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

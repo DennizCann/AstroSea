@@ -33,6 +33,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import com.denizcan.astrosea.model.TarotCard
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.Font
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +68,7 @@ fun TarotMeaningsScreen(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Surface(
-                            modifier = Modifier.padding(start = 32.dp),
+                            modifier = Modifier.padding(start = 12.dp),
                             shape = RoundedCornerShape(8.dp),
                             color = Color.Black.copy(alpha = 0.5f),
                             shadowElevation = 8.dp
@@ -74,8 +76,11 @@ fun TarotMeaningsScreen(
                             Text(
                                 text = "Tüm Anlamlar",
                                 color = Color.White,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.titleLarge
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 28.sp
+                                )
                             )
                         }
                     }
@@ -108,7 +113,10 @@ fun TarotMeaningsScreen(
                         text = "Tarot",
                         fontSize = 26.sp,
                         color = if (selectedType == "tarot") Color.White else Color.White.copy(alpha = 0.6f),
-                        modifier = Modifier.clickable { selectedType = "tarot" }
+                        modifier = Modifier.clickable { selectedType = "tarot" },
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                        )
                     )
                     Box(
                         modifier = Modifier
@@ -128,7 +136,10 @@ fun TarotMeaningsScreen(
                         text = "Rün",
                         fontSize = 26.sp,
                         color = if (selectedType == "rune") Color.White else Color.White.copy(alpha = 0.6f),
-                        modifier = Modifier.clickable { selectedType = "rune" }
+                        modifier = Modifier.clickable { selectedType = "rune" },
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                        )
                     )
                     Box(
                         modifier = Modifier
@@ -162,7 +173,10 @@ fun TarotMeaningsScreen(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (selectedSuit == "all") Color.Black else Color.Black.copy(alpha = 0.6f),
-                            modifier = Modifier.clickable { selectedSuit = "all" }
+                            modifier = Modifier.clickable { selectedSuit = "all" },
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                            )
                         )
 
                         // Major ikonu
@@ -228,7 +242,10 @@ fun TarotMeaningsScreen(
                         text = "Tüm Rünler",
                         fontSize = 16.sp,
                         color = if (selectedSuit == "all") Color.White else Color.White.copy(alpha = 0.6f),
-                        modifier = Modifier.clickable { selectedSuit = "all" }
+                        modifier = Modifier.clickable { selectedSuit = "all" },
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        )
                     )
                 }
             }
