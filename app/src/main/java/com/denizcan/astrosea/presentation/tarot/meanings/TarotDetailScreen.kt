@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -25,7 +24,6 @@ import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
-import com.denizcan.astrosea.presentation.components.AstroTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,10 +50,10 @@ fun TarotDetailScreen(
                 title = {
                     Box(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
+                        contentAlignment = Alignment.Center
                     ) {
                         Surface(
-                            modifier = Modifier.padding(start = 64.dp),
+                            modifier = Modifier.align(Alignment.Center),
                             shape = RoundedCornerShape(8.dp),
                             color = Color.Black.copy(alpha = 0.5f),
                             shadowElevation = 8.dp
@@ -67,7 +65,10 @@ fun TarotDetailScreen(
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 28.sp
-                                )
+                                ),
+                                maxLines = 2,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
                     }

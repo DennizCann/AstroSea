@@ -13,6 +13,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +48,9 @@ fun MotivationScreen(
             ) {
                 Text(
                     text = "Çok Yakında!",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                    ),
                     textAlign = TextAlign.Center,
                     color = Color.White
                 )
@@ -55,7 +59,9 @@ fun MotivationScreen(
                 
                 Text(
                     text = "Günlük motivasyon mesajları ve özel tavsiyeler çok yakında burada olacak.",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                    ),
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.8f)
                 )
