@@ -21,7 +21,9 @@ import com.denizcan.astrosea.presentation.components.AstroTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeneralReadingsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateToHome: () -> Unit,
+    onNavigateToRelationshipReadings: () -> Unit,
+    onNavigateToCareerReading: () -> Unit
 ) {
     val readings = listOf(
         Triple("GÜNLÜK AÇILIM", "Günlük düşünce, hissiyat ve sürecin/konunun gidişatını görmek için yapılan kısa açılım.", 3),
@@ -41,8 +43,8 @@ fun GeneralReadingsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Genel Açılımlar",
-                    onBackClick = onNavigateBack,
+                    title = "GENEL AÇILIMLAR",
+                    onBackClick = onNavigateToHome,
                     titleStyle = MaterialTheme.typography.headlineLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_regular))
                     )
@@ -108,6 +110,66 @@ fun GeneralReadingsScreen(
                                     color = Color.White
                                 )
                             }
+                        }
+                    }
+                }
+                
+                // Alt Tab Bar'lar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // İlişki Açılımları Tab
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = onNavigateToRelationshipReadings
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "İLİŞKİ AÇILIMLARI",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 16.sp
+                                ),
+                                color = Color.White
+                            )
+                        }
+                    }
+                    
+                    // Kariyer Açılımı Tab
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = onNavigateToCareerReading
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "KARİYER AÇILIMI",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 16.sp
+                                ),
+                                color = Color.White
+                            )
                         }
                     }
                 }

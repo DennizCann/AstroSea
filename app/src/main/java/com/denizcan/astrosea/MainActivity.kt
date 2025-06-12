@@ -257,12 +257,16 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("relationship_readings") {
                         RelationshipReadingsScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateToHome = { navController.navigate("home") },
+                            onNavigateToGeneralReadings = { navController.navigate("general_readings") },
+                            onNavigateToCareerReading = { navController.navigate("career_reading") }
                         )
                     }
                     composable("career_reading") {
                         CareerReadingScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateToHome = { navController.navigate("home") },
+                            onNavigateToGeneralReadings = { navController.navigate("general_readings") },
+                            onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") }
                         )
                     }
                     composable("more") {
@@ -272,7 +276,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("general_readings") {
                         GeneralReadingsScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateToHome = { navController.navigate("home") },
+                            onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
+                            onNavigateToCareerReading = { navController.navigate("career_reading") }
                         )
                     }
                 }

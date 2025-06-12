@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -18,7 +19,9 @@ import com.denizcan.astrosea.presentation.components.AstroTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelationshipReadingsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateToHome: () -> Unit,
+    onNavigateToGeneralReadings: () -> Unit,
+    onNavigateToCareerReading: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
@@ -32,11 +35,14 @@ fun RelationshipReadingsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "İlişki Açılımları",
-                    onBackClick = onNavigateBack
+                    title = "İLİŞKİ AÇILIMLARI",
+                    onBackClick = onNavigateToHome,
+                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                    )
                 )
             },
-            containerColor = androidx.compose.ui.graphics.Color.Transparent
+            containerColor = Color.Transparent
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -151,13 +157,19 @@ fun RelationshipReadingsScreen(
                         ) {
                             Text(
                                 text = "UYUMLULUK AÇILIMI",
-                                style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 18.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "Karşınızdaki insanla gerçekte ne kadar uyumlusunuz? Duygu, düşünce ve fiziksel uyumunuzu gösteren açılım.",
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 14.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                         }
@@ -223,13 +235,19 @@ fun RelationshipReadingsScreen(
                         ) {
                             Text(
                                 text = "DETAYLI İLİŞKİ AÇILIMI",
-                                style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 18.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "Kalp, düşünce ve aksiyon hanelerini içeren ve geçmiş, şimdi ve gelecek ekseninde yorumlanan detaylı açılım.",
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 14.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                         }
@@ -295,13 +313,19 @@ fun RelationshipReadingsScreen(
                         ) {
                             Text(
                                 text = "MÜCADELELER AÇILIMI",
-                                style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 18.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "İlişki içerisindeki tartışma ve zorlukları inceleyen ve çözümler öneren detaylı açılım.",
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 14.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                         }
@@ -363,13 +387,79 @@ fun RelationshipReadingsScreen(
                         ) {
                             Text(
                                 text = "TAMAM MI, DEVAM MI?",
-                                style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 18.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = "Bazı durumlar ve kişiler değişmez. Peki artık bu ilişki için çabalamalı mı, yoksa bitmesine izin mi vermeli?",
-                                style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 14.sp
+                                ),
+                                color = androidx.compose.ui.graphics.Color.White
+                            )
+                        }
+                    }
+                }
+                
+                // Alt Tab Bar'lar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Genel Açılımlar Tab
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
+                        ),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                        onClick = onNavigateToGeneralReadings
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "GENEL AÇILIMLAR",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 16.sp
+                                ),
+                                color = androidx.compose.ui.graphics.Color.White
+                            )
+                        }
+                    }
+                    
+                    // Kariyer Açılımı Tab
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
+                        ),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                        onClick = onNavigateToCareerReading
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "KARİYER AÇILIMI",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 16.sp
+                                ),
                                 color = androidx.compose.ui.graphics.Color.White
                             )
                         }
