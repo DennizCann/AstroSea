@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.denizcan.astrosea.R
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -223,4 +224,24 @@ private fun OnboardingPage(page: OnboardingPage) {
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun OnboardingScreenPreview() {
+    OnboardingScreen(
+        onFinishOnboarding = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OnboardingPagePreview() {
+    OnboardingPage(
+        page = OnboardingPage(
+            title = "Tarot Falı",
+            description = "Tarot ile sorularınızın cevaplarını\nve bilmeniz gerekenleri öğrenin",
+            imageRes = R.drawable.tarot
+        )
+    )
 } 
