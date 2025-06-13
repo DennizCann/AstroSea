@@ -65,22 +65,27 @@ fun RelationshipReadingsScreen(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Box(
+                            modifier = Modifier.width(80.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            repeat(3) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier
-                                        .width(14.dp)
-                                        .height(21.dp),
-                                    contentScale = ContentScale.Fit
-                                )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                repeat(3) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier
+                                            .width(14.dp)
+                                            .height(21.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(
                             modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {
@@ -118,84 +123,89 @@ fun RelationshipReadingsScreen(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.width(64.dp),
-                            verticalArrangement = Arrangement.spacedBy(0.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Box(
+                            modifier = Modifier.width(80.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            // 1. satır (ortada 1 kart)
-                            Row(horizontalArrangement = Arrangement.Center) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 2. satır (sağ ve sol, biraz aşağıda)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                            Column(
+                                modifier = Modifier.width(64.dp),
+                                verticalArrangement = Arrangement.spacedBy(0.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 3. satır (ortada 1 kart)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 4. satır (sağ ve sol, biraz aşağıda)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 5. satır (ortada 1 kart)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
+                                // 1. satır (ortada 1 kart)
+                                Row(horizontalArrangement = Arrangement.Center) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 2. satır (sağ ve sol, biraz aşağıda)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 3. satır (ortada 1 kart)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 4. satır (sağ ve sol, biraz aşağıda)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 5. satır (ortada 1 kart)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(
                             modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {
@@ -233,26 +243,31 @@ fun RelationshipReadingsScreen(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.width(56.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Box(
+                            modifier = Modifier.width(80.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            repeat(3) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    repeat(3) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(14.dp).height(21.dp),
-                                            contentScale = ContentScale.Fit
-                                        )
+                            Column(
+                                modifier = Modifier.width(56.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                repeat(3) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        repeat(3) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                                contentDescription = "Kart Arkası",
+                                                modifier = Modifier.width(14.dp).height(21.dp),
+                                                contentScale = ContentScale.Fit
+                                            )
+                                        }
                                     }
+                                    if (it < 2) Spacer(modifier = Modifier.height(2.dp))
                                 }
-                                if (it < 2) Spacer(modifier = Modifier.height(2.dp))
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(
                             modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {
@@ -290,84 +305,89 @@ fun RelationshipReadingsScreen(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.width(64.dp),
-                            verticalArrangement = Arrangement.spacedBy(0.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Box(
+                            modifier = Modifier.width(80.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            // 1. satır (ortada 1 kart)
-                            Row(horizontalArrangement = Arrangement.Center) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 2. satır (sağ ve sol, biraz aşağıda)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
+                            Column(
+                                modifier = Modifier.width(64.dp),
+                                verticalArrangement = Arrangement.spacedBy(0.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 3. satır (ortada 1 kart)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 4. satır (sağ ve sol, biraz aşağıda)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            // 5. satır (ortada 1 kart)
-                            Row(
-                                modifier = Modifier.padding(top = 0.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(10.dp).height(15.dp),
-                                    contentScale = ContentScale.Fit
-                                )
+                                // 1. satır (ortada 1 kart)
+                                Row(horizontalArrangement = Arrangement.Center) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 2. satır (sağ ve sol, biraz aşağıda)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 3. satır (ortada 1 kart)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 4. satır (sağ ve sol, biraz aşağıda)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                // 5. satır (ortada 1 kart)
+                                Row(
+                                    modifier = Modifier.padding(top = 0.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                        contentDescription = "Kart Arkası",
+                                        modifier = Modifier.width(10.dp).height(15.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(
                             modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {
@@ -405,24 +425,16 @@ fun RelationshipReadingsScreen(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            modifier = Modifier.width(56.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Box(
+                            modifier = Modifier.width(80.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            // 1. satır (1 kart)
-                            Row(horizontalArrangement = Arrangement.Center) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                    contentDescription = "Kart Arkası",
-                                    modifier = Modifier.width(14.dp).height(21.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            // 2. satır (2 kart)
-                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                repeat(2) {
+                            Column(
+                                modifier = Modifier.width(56.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                                     Image(
                                         painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                         contentDescription = "Kart Arkası",
@@ -430,21 +442,31 @@ fun RelationshipReadingsScreen(
                                         contentScale = ContentScale.Fit
                                     )
                                 }
-                            }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            // 3. satır (3 kart)
-                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                repeat(3) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                        contentDescription = "Kart Arkası",
-                                        modifier = Modifier.width(14.dp).height(21.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    repeat(2) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                            contentDescription = "Kart Arkası",
+                                            modifier = Modifier.width(14.dp).height(21.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    repeat(3) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                            contentDescription = "Kart Arkası",
+                                            modifier = Modifier.width(14.dp).height(21.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(
                             modifier = Modifier.weight(1f).padding(start = 8.dp)
                         ) {
