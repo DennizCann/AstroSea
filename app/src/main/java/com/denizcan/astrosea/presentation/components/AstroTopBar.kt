@@ -24,7 +24,9 @@ fun AstroTopBar(
             Text(
                 text = title,
                 style = titleStyle,
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
         },
         navigationIcon = {

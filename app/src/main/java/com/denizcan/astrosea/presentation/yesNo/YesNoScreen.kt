@@ -11,10 +11,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.denizcan.astrosea.R
-import com.denizcan.astrosea.presentation.components.AstroTopBar
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
+import com.denizcan.astrosea.R
+import com.denizcan.astrosea.presentation.components.AstroTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,8 +34,11 @@ fun YesNoScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Evet/Hayır",
-                    onBackClick = onNavigateBack
+                    title = "EVET / HAYIR",
+                    onBackClick = onNavigateBack,
+                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                    )
                 )
             }
         ) { paddingValues ->
@@ -47,8 +51,11 @@ fun YesNoScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Çok Yakında!",
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = "ÇOK YAKINDA!",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                        fontSize = 24.sp
+                    ),
                     textAlign = TextAlign.Center,
                     color = Color.White
                 )
@@ -57,8 +64,9 @@ fun YesNoScreen(
 
                 Text(
                     text = "Tek bir kart çekerek sorularınıza hızlı cevaplar alabileceksiniz.",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 18.sp
                     ),
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.8f)

@@ -32,6 +32,13 @@ fun GeneralReadingsScreen(
         Triple("GEÇMİŞ, ŞİMDİ, GELECEK", "Geçmişte nasıldı, şimdi nasıl ve gelecekte nasıl sorularının cevaplarını veren açılım.", 3),
         Triple("DURUM, AKSİYON, SONUÇ", "Bir durum hakkında sürecin; sürecin/konunun sonuçlarını gösteren kısa açılım.", 3)
     )
+    val cardArrangements = listOf(
+        listOf(3), // Günlük Açılım
+        listOf(1), // Tek Kart Açılımı
+        listOf(1), // Evet – Hayır Açılımı
+        listOf(3), // Geçmiş, Şimdi, Gelecek
+        listOf(3)  // Durum, Aksiyon, Sonuç
+    )
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
         Image(
@@ -59,7 +66,7 @@ fun GeneralReadingsScreen(
                     .padding(horizontal = 8.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                readings.forEach { (title, desc, cardCount) ->
+                readings.forEachIndexed { idx, (title, desc, cardCount) ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -74,23 +81,23 @@ fun GeneralReadingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(
-                                modifier = Modifier.width(80.dp),
-                                horizontalArrangement = Arrangement.spacedBy((-16).dp)
+                                modifier = Modifier.width(48.dp),
+                                horizontalArrangement = Arrangement.Center
                             ) {
-                                repeat(cardCount) {
+                                repeat(cardArrangements[idx][0]) {
                                     Image(
                                         painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                         contentDescription = "Kart Arkası",
                                         modifier = Modifier
-                                            .width(36.dp)
-                                            .height(54.dp),
+                                            .width(14.dp)
+                                            .height(21.dp),
                                         contentScale = ContentScale.Fit
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Column(
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f).padding(start = 8.dp)
                             ) {
                                 Text(
                                     text = title,

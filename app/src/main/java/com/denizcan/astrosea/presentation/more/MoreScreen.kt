@@ -3,13 +3,17 @@ package com.denizcan.astrosea.presentation.more
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 
@@ -19,35 +23,41 @@ fun MoreScreen(
     onNavigateBack: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Arka plan görseli
         Image(
-            painter = painterResource(id = R.drawable.anamenu),
+            painter = painterResource(id = R.drawable.acilimlararkaplan),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
 
         Scaffold(
+            containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Daha Fazla",
-                    onBackClick = onNavigateBack
+                    title = "DAHA FAZLASI",
+                    onBackClick = onNavigateBack,
+                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                    )
                 )
-            },
-            containerColor = Color.Transparent
+            }
         ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Geçici içerik
                 Text(
-                    text = "Yakında burada olacaklar:",
+                    text = "YAKINDA BURADA OLACAKLAR",
                     color = Color.White,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                        fontSize = 24.sp
+                    ),
+                    textAlign = TextAlign.Center
                 )
                 
                 Text(
@@ -57,8 +67,11 @@ fun MoreScreen(
                           "• Günlük Motivasyon\n" +
                           "• Ve daha fazlası...",
                     color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Start
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 18.sp
+                    ),
+                    textAlign = TextAlign.Center
                 )
             }
         }
