@@ -28,7 +28,6 @@ import com.denizcan.astrosea.presentation.horoscope.HoroscopeScreen
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsScreen
 import com.denizcan.astrosea.presentation.motivation.MotivationScreen
 import com.denizcan.astrosea.presentation.profile.ProfileScreen
-import com.denizcan.astrosea.presentation.yesNo.YesNoScreen
 import com.denizcan.astrosea.presentation.relationship.RelationshipReadingsScreen
 import com.denizcan.astrosea.presentation.general.GeneralReadingsScreen
 import com.denizcan.astrosea.presentation.career.CareerReadingScreen
@@ -184,7 +183,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.Motivation.route)
                             },
                             onNavigateToYesNo = {
-                                navController.navigate(Screen.YesNo.route)
+                                navController.navigate(Screen.GeneralReadingDetail.createRoute("EVET – HAYIR AÇILIMI"))
                             },
                             onNavigateToRelationshipReadings = {
                                 navController.navigate("relationship_readings")
@@ -252,11 +251,6 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-                    }
-                    composable(Screen.YesNo.route) {
-                        YesNoScreen(
-                            onNavigateBack = { navController.popBackStack() }
-                        )
                     }
                     composable("relationship_readings") {
                         RelationshipReadingsScreen(
