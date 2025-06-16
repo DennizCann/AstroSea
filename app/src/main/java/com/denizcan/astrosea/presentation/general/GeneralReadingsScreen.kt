@@ -23,7 +23,8 @@ import com.denizcan.astrosea.presentation.components.AstroTopBar
 fun GeneralReadingsScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToRelationshipReadings: () -> Unit,
-    onNavigateToCareerReading: () -> Unit
+    onNavigateToCareerReading: () -> Unit,
+    onNavigateToReadingDetail: (String) -> Unit
 ) {
     val readings = listOf(
         Triple("GÜNLÜK AÇILIM", "Günlük düşünce, hissiyat ve sürecin/konunun gidişatını görmek için yapılan kısa açılım.", 3),
@@ -74,7 +75,8 @@ fun GeneralReadingsScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = { onNavigateToReadingDetail(title) }
                     ) {
                         Row(
                             modifier = Modifier.fillMaxSize().padding(12.dp),

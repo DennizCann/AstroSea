@@ -23,7 +23,8 @@ import com.denizcan.astrosea.presentation.components.AstroTopBar
 fun CareerReadingScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToGeneralReadings: () -> Unit,
-    onNavigateToRelationshipReadings: () -> Unit
+    onNavigateToRelationshipReadings: () -> Unit,
+    onNavigateToReadingDetail: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
@@ -65,7 +66,8 @@ fun CareerReadingScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = { onNavigateToReadingDetail("GELECEĞİNE GİDEN YOL") }
                     ) {
                         Row(
                             modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -142,7 +144,8 @@ fun CareerReadingScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = { onNavigateToReadingDetail("İŞ YERİNDEKİ PROBLEMLER") }
                     ) {
                         Row(
                             modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -219,7 +222,8 @@ fun CareerReadingScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = { onNavigateToReadingDetail("FİNANSAL DURUM") }
                     ) {
                         Row(
                             modifier = Modifier.fillMaxSize().padding(12.dp),

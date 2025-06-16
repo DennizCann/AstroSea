@@ -43,7 +43,10 @@ import com.denizcan.astrosea.util.JsonLoader
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
+import androidx.navigation.navArgument
+import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -259,14 +262,20 @@ class MainActivity : ComponentActivity() {
                         RelationshipReadingsScreen(
                             onNavigateToHome = { navController.navigate("home") },
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
-                            onNavigateToCareerReading = { navController.navigate("career_reading") }
+                            onNavigateToCareerReading = { navController.navigate("career_reading") },
+                            onNavigateToReadingDetail = { readingType ->
+                                navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+                            }
                         )
                     }
                     composable("career_reading") {
                         CareerReadingScreen(
                             onNavigateToHome = { navController.navigate("home") },
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
-                            onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") }
+                            onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
+                            onNavigateToReadingDetail = { readingType ->
+                                navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+                            }
                         )
                     }
                     composable("more") {
@@ -274,11 +283,36 @@ class MainActivity : ComponentActivity() {
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }
-                    composable("general_readings") {
+                    composable(Screen.GeneralReadings.route) {
                         GeneralReadingsScreen(
-                            onNavigateToHome = { navController.navigate("home") },
-                            onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
-                            onNavigateToCareerReading = { navController.navigate("career_reading") }
+                            onNavigateToHome = {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onNavigateToRelationshipReadings = {
+                                navController.navigate("relationship_readings")
+                            },
+                            onNavigateToCareerReading = {
+                                navController.navigate("career_reading")
+                            },
+                            onNavigateToReadingDetail = { readingType ->
+                                navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+                            }
+                        )
+                    }
+                    composable(
+                        route = Screen.GeneralReadingDetail.route,
+                        arguments = listOf(
+                            navArgument("readingType") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val readingType = backStackEntry.arguments?.getString("readingType") ?: ""
+                        GeneralReadingDetailScreen(
+                            readingType = readingType,
+                            onNavigateBack = {
+                                navController.popBackStack()
+                            }
                         )
                     }
                 }

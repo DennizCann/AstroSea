@@ -11,4 +11,8 @@ sealed class Screen(val route: String) {
     object BirthChart : Screen("birth_chart")
     object Motivation : Screen("motivation")
     object YesNo : Screen("yes_no")
+    object GeneralReadings : Screen("general_readings")
+    object GeneralReadingDetail : Screen("general_reading_detail/{readingType}") {
+        fun createRoute(readingType: String) = "general_reading_detail/$readingType"
+    }
 }

@@ -21,7 +21,8 @@ import com.denizcan.astrosea.presentation.components.AstroTopBar
 fun RelationshipReadingsScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToGeneralReadings: () -> Unit,
-    onNavigateToCareerReading: () -> Unit
+    onNavigateToCareerReading: () -> Unit,
+    onNavigateToReadingDetail: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
@@ -59,7 +60,8 @@ fun RelationshipReadingsScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
                     ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    onClick = { onNavigateToReadingDetail("İLİŞKİ AÇILIMI") }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -117,7 +119,8 @@ fun RelationshipReadingsScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
                     ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    onClick = { onNavigateToReadingDetail("UYUMLULUK AÇILIMI") }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -237,7 +240,8 @@ fun RelationshipReadingsScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
                     ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    onClick = { onNavigateToReadingDetail("DETAYLI İLİŞKİ AÇILIMI") }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -299,7 +303,8 @@ fun RelationshipReadingsScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
                     ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    onClick = { onNavigateToReadingDetail("MÜCADELELER AÇILIMI") }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -419,7 +424,8 @@ fun RelationshipReadingsScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = androidx.compose.ui.graphics.Color(0xFF1A2236).copy(alpha = 0.7f)
                     ),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    onClick = { onNavigateToReadingDetail("TAMAM MI, DEVAM MI?") }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize().padding(12.dp),
