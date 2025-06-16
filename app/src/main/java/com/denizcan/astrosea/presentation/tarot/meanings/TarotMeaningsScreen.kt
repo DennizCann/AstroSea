@@ -36,6 +36,7 @@ import com.denizcan.astrosea.model.TarotCard
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +47,11 @@ fun TarotMeaningsScreen(
 ) {
     var selectedType by remember { mutableStateOf("tarot") } // tarot veya rune
     var selectedSuit by remember { mutableStateOf("all") }
+
+    // Mor tema rengi
+    val selectedBg = Color(0xFF6C4AB6)
+    val selectedContent = Color.White
+    val unselectedContent = Color.Black.copy(alpha = 0.6f)
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
@@ -169,66 +175,124 @@ fun TarotMeaningsScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         // Hepsi seçeneği
-                        Text(
-                            text = "Hepsi",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (selectedSuit == "all") Color.Black else Color.Black.copy(alpha = 0.6f),
-                            modifier = Modifier.clickable { selectedSuit = "all" },
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(
+                                    color = if (selectedSuit == "all") selectedBg else Color.Transparent,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable { selectedSuit = "all" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Hepsi",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (selectedSuit == "all") selectedContent else unselectedContent,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                                ),
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                        )
+                        }
 
                         // Major ikonu
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_crown),
-                            contentDescription = "Major",
-                            tint = if (selectedSuit == "major") Color.Black else Color.Black.copy(alpha = 0.6f),
+                        Box(
                             modifier = Modifier
-                                .size(28.dp)
-                                .clickable { selectedSuit = "major" }
-                        )
+                                .size(40.dp)
+                                .background(
+                                    color = if (selectedSuit == "major") selectedBg else Color.Transparent,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable { selectedSuit = "major" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_crown),
+                                contentDescription = "Major",
+                                tint = if (selectedSuit == "major") selectedContent else unselectedContent,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
 
                         // Kupa ikonu
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_cup),
-                            contentDescription = "Kupalar",
-                            tint = if (selectedSuit == "cups") Color.Black else Color.Black.copy(alpha = 0.6f),
+                        Box(
                             modifier = Modifier
-                                .size(28.dp)
-                                .clickable { selectedSuit = "cups" }
-                        )
+                                .size(40.dp)
+                                .background(
+                                    color = if (selectedSuit == "cups") selectedBg else Color.Transparent,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable { selectedSuit = "cups" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_cup),
+                                contentDescription = "Kupalar",
+                                tint = if (selectedSuit == "cups") selectedContent else unselectedContent,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
 
                         // Kılıç ikonu
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_sword),
-                            contentDescription = "Kılıçlar",
-                            tint = if (selectedSuit == "swords") Color.Black else Color.Black.copy(alpha = 0.6f),
+                        Box(
                             modifier = Modifier
-                                .size(28.dp)
-                                .clickable { selectedSuit = "swords" }
-                        )
+                                .size(40.dp)
+                                .background(
+                                    color = if (selectedSuit == "swords") selectedBg else Color.Transparent,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable { selectedSuit = "swords" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_sword),
+                                contentDescription = "Kılıçlar",
+                                tint = if (selectedSuit == "swords") selectedContent else unselectedContent,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
 
                         // Tılsım ikonu
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_pentacle),
-                            contentDescription = "Tılsımlar",
-                            tint = if (selectedSuit == "pentacles") Color.Black else Color.Black.copy(alpha = 0.6f),
+                        Box(
                             modifier = Modifier
-                                .size(28.dp)
-                                .clickable { selectedSuit = "pentacles" }
-                        )
+                                .size(40.dp)
+                                .background(
+                                    color = if (selectedSuit == "pentacles") selectedBg else Color.Transparent,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable { selectedSuit = "pentacles" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_pentacle),
+                                contentDescription = "Tılsımlar",
+                                tint = if (selectedSuit == "pentacles") selectedContent else unselectedContent,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
 
                         // Değnek ikonu
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_wand),
-                            contentDescription = "Değnekler",
-                            tint = if (selectedSuit == "wands") Color.Black else Color.Black.copy(alpha = 0.6f),
+                        Box(
                             modifier = Modifier
-                                .size(28.dp)
-                                .clickable { selectedSuit = "wands" }
-                        )
+                                .size(40.dp)
+                                .background(
+                                    color = if (selectedSuit == "wands") selectedBg else Color.Transparent,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable { selectedSuit = "wands" },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_wand),
+                                contentDescription = "Değnekler",
+                                tint = if (selectedSuit == "wands") selectedContent else unselectedContent,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
                     }
                 }
             } else {
