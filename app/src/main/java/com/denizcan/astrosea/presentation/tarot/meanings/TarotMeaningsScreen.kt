@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.denizcan.astrosea.model.TarotCard
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -231,21 +232,31 @@ fun TarotMeaningsScreen(
                     }
                 }
             } else {
-                // Rün filtreleri
-                Row(
+                // Rün sekmesi seçiliyse bilgi ve yakında mesajı göster
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .padding(horizontal = 24.dp, vertical = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Tüm Rünler",
-                        fontSize = 16.sp,
-                        color = if (selectedSuit == "all") Color.White else Color.White.copy(alpha = 0.6f),
-                        modifier = Modifier.clickable { selectedSuit = "all" },
+                        text = "Rünler, eski İskandinav ve Germen kültürlerinde kullanılan, sembolik anlamlar taşıyan kadim harflerdir. Fal ve spiritüel rehberlikte de kullanılır.",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
-                        )
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            color = Color.White,
+                            fontSize = 18.sp
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Çok yakında rün anlamları burada olacak!",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                            color = Color.White,
+                            fontSize = 22.sp
+                        ),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
