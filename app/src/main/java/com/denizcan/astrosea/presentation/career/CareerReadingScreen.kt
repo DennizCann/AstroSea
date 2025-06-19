@@ -9,12 +9,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 
@@ -26,6 +28,9 @@ fun CareerReadingScreen(
     onNavigateToRelationshipReadings: () -> Unit,
     onNavigateToReadingDetail: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    val viewModel: CareerReadingViewModel = viewModel(factory = CareerReadingViewModel.Factory(context))
+    
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
         Image(
@@ -295,64 +300,41 @@ fun CareerReadingScreen(
                         }
                     }
                 }
-                
-                // Alt Tab Bar'lar
+
+                // Alt navigasyon butonları
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    // Genel Açılımlar Tab
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(45.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
+                    Button(
+                        onClick = onNavigateToGeneralReadings,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4A5568)
                         ),
-                        shape = RoundedCornerShape(12.dp),
-                        onClick = onNavigateToGeneralReadings
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "GENEL AÇILIMLAR",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                    fontSize = 16.sp
-                                ),
+                        Text(
+                            text = "Genel Açılımlar",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                 color = Color.White
                             )
-                        }
+                        )
                     }
-                    
-                    // İlişki Açılımları Tab
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(45.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
+                    Button(
+                        onClick = onNavigateToRelationshipReadings,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4A5568)
                         ),
-                        shape = RoundedCornerShape(12.dp),
-                        onClick = onNavigateToRelationshipReadings
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "İLİŞKİ AÇILIMLARI",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                    fontSize = 16.sp
-                                ),
+                        Text(
+                            text = "İlişki Açılımları",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                 color = Color.White
                             )
-                        }
+                        )
                     }
                 }
             }

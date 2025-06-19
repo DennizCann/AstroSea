@@ -256,7 +256,7 @@ class MainActivity : ComponentActivity() {
                         RelationshipReadingsScreen(
                             onNavigateToHome = { navController.navigate("home") },
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
-                            onNavigateToCareerReading = { navController.navigate("career_reading") },
+                            onNavigateToCareerReadings = { navController.navigate("career_reading") },
                             onNavigateToReadingDetail = { readingType ->
                                 navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
                             }
@@ -306,6 +306,9 @@ class MainActivity : ComponentActivity() {
                             readingType = readingType,
                             onNavigateBack = {
                                 navController.popBackStack()
+                            },
+                            onNavigateToCardDetail = { cardId ->
+                                navController.navigate("tarot_detail/$cardId")
                             }
                         )
                     }
