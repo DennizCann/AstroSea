@@ -255,28 +255,6 @@ fun GeneralReadingDetailScreen(
                         }
                     }
                 } else {
-                    // Kartlar çekilmiş, tümünü aç butonu
-                    Button(
-                        onClick = { 
-                            viewModel.revealAllCards()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4A5568)
-                        ),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text(
-                            text = "Tüm Kartları Aç",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                color = Color.White
-                            )
-                        )
-                    }
-                    
                     // Yeni Açılım Butonu
                     Button(
                         onClick = { 

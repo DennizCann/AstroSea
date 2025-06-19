@@ -125,12 +125,12 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 // Rastgele kartları çek (hiçbiri aynı olmasın)
                 val randomCards = allTarotCards.shuffled().take(cardCount)
                 
-                // Kart durumlarını oluştur (hepsi kapalı başlar)
+                // Kart durumlarını oluştur (hepsi açık başlar)
                 drawnCards = randomCards.mapIndexed { index, card ->
                     ReadingCardState(
                         index = index,
                         card = card,
-                        isRevealed = false
+                        isRevealed = true // Kartlar otomatik olarak açık başlar
                     )
                 }
                 
@@ -140,7 +140,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 // State'i kaydet
                 saveReadingState(readingType)
                 
-                Log.d("GeneralReadingViewModel", "Successfully drew $cardCount cards for $readingType. isCardsDrawn: $isCardsDrawn")
+                Log.d("GeneralReadingViewModel", "Successfully drew and revealed $cardCount cards for $readingType. isCardsDrawn: $isCardsDrawn")
             } catch (e: Exception) {
                 Log.e("GeneralReadingViewModel", "Error drawing cards", e)
                 isLoading = false
