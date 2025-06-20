@@ -515,7 +515,7 @@ fun RelationshipReadingsScreen(
                             )
                         }
                     }
-
+                    
                     // Kariyer Açılımı Tab
                     Card(
                         modifier = Modifier

@@ -37,15 +37,15 @@ fun GeneralReadingDetailScreen(
         key = "GeneralReadingViewModel_$readingType",
         factory = GeneralReadingViewModel.Factory(context)
     )
-
+    
     LaunchedEffect(readingType) {
         viewModel.loadReadingState(readingType)
     }
-
+    
     val readingInfo = remember(readingType) {
         getReadingInfo(readingType)
     }
-
+    
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.acilimlararkaplan),
@@ -53,11 +53,11 @@ fun GeneralReadingDetailScreen(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
+        
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "", // Başlığı kaldırıyoruz, yeni tasarımda var
+                    title = readingType,
                     onBackClick = onNavigateBack
                 )
             },
@@ -67,52 +67,26 @@ fun GeneralReadingDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                // Başlık
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 0.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        color = Color.Black.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
-                    ) {
-                        Text(
-                            text = readingType,
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                fontSize = 24.sp
-                            ),
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.weight(0.5f))
-
                 // Çerçeve ve Kartlar
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
-                        .weight(5f),
+                        .weight(6f),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.acilimlarsayfasitak),
                         contentDescription = "Çerçeve",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
+                        contentScale = ContentScale.Fit
                     )
 
                     // Kartların yerleşeceği alan
-                    Row(
-                        modifier = Modifier
+                        Row(
+                            modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 32.dp, vertical = 48.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -128,18 +102,18 @@ fun GeneralReadingDetailScreen(
                                     .aspectRatio(0.7f)
                             ) {
                                 if (cardState != null) {
-                                    ReadingFlippableCard(
-                                        cardState = cardState,
-                                        onCardClick = {
+                                ReadingFlippableCard(
+                                    cardState = cardState,
+                                    onCardClick = {
                                             if (cardState.isRevealed) {
-                                                onNavigateToCardDetail(cardState.card.id)
-                                            }
-                                        },
+                                            onNavigateToCardDetail(cardState.card.id)
+                                        }
+                                    },
                                         modifier = Modifier.fillMaxSize()
                                     )
-                                } else {
-                                    Card(
-                                        modifier = Modifier
+                    } else {
+                                Card(
+                                    modifier = Modifier
                                             .fillMaxSize()
                                             .clickable {
                                                 viewModel.drawCardForPosition(
@@ -162,9 +136,7 @@ fun GeneralReadingDetailScreen(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.weight(0.5f))
-
+                
                 // Kart Anlamları ve Butonlar
                 Column(
                     modifier = Modifier
@@ -187,7 +159,7 @@ fun GeneralReadingDetailScreen(
                             
                             MeaningCard(
                                 text = "${index + 1}. $meaning: $cardName",
-                                onClick = {
+                        onClick = { 
                                     if (isCardDrawn) {
                                         onNavigateToCardDetail(card.id)
                                     } else {
@@ -227,12 +199,12 @@ fun MeaningCard(
 ) {
     val borderColor = if (isSelected) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f)
     val textColor = if (enabled) Color.White else Color.Gray
-    Card(
-        modifier = Modifier
+                    Card(
+                        modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick, enabled = enabled),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
+                        colors = CardDefaults.cardColors(
             containerColor = Color.Black.copy(alpha = 0.6f)
         ),
         border = BorderStroke(1.dp, borderColor)
