@@ -338,14 +338,15 @@ fun CareerReadingScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 8.dp),
+                        .padding(top = 8.dp, bottom = 8.dp)
+                        .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Genel Açılımlar Tab
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .height(60.dp),
+                            .height(50.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
@@ -372,7 +373,7 @@ fun CareerReadingScreen(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .height(60.dp),
+                            .height(50.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),

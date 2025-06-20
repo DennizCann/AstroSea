@@ -1,10 +1,13 @@
 package com.denizcan.astrosea.presentation.general
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,59 +33,32 @@ fun GeneralReadingDetailScreen(
     onNavigateToCardDetail: (String) -> Unit
 ) {
     val context = LocalContext.current
-    
-    // readingType'ı normalize et (boşlukları ve özel karakterleri temizle)
-    val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
-    
     val viewModel: GeneralReadingViewModel = viewModel(
-        key = "GeneralReadingViewModel_$normalizedReadingType",
+        key = "GeneralReadingViewModel_$readingType",
         factory = GeneralReadingViewModel.Factory(context)
     )
-    
-    // ViewModel oluşturulduktan sonra kaydedilmiş state'i yükle
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(readingType) {
         viewModel.loadReadingState(readingType)
     }
-    
-    Log.d("AcilimDebug", "readingType: '${readingType}' (length: ${readingType.length})")
-    Log.d("AcilimDebug", "normalizedReadingType: '${normalizedReadingType}'")
-    // Açılım türüne göre kart sayısı ve açıklama
-    val (cardCount, description) = when (readingType.trim()) {
-        // Genel Açılımlar
-        "GÜNLÜK AÇILIM" -> 3 to "Bu açılım, günlük düşünce ve hissiyatlarınızı, ayrıca mevcut sürecinizin gidişatını gösterir. Üç kart, sırasıyla düşüncelerinizi, duygularınızı ve sürecin genel yönünü temsil eder."
-        "TEK KART AÇILIMI" -> 1 to "Gününüzün genel enerjilerini ve size verilen tavsiyeleri gösteren tek kartlık bir açılımdır. Bu kart, gününüzün ana temasını ve size sunulan rehberliği temsil eder."
-        "EVET – HAYIR AÇILIMI" -> 1 to "Aklınızdaki soruya net bir cevap veren tek kartlık bir açılımdır. Kartın pozisyonu ve anlamı, sorunuza 'evet' veya 'hayır' cevabını verir."
-        "GEÇMİŞ, ŞİMDİ, GELECEK" -> 3 to "Üç kartlık bu açılım, geçmişteki durumunuzu, şu anki konumunuzu ve gelecekteki potansiyel sonucunuzu gösterir. Her kart, zaman çizgisindeki farklı bir noktayı temsil eder."
-        "DURUM, AKSİYON, SONUÇ" -> 3 to "Mevcut durumunuzu, atmanız gereken adımları ve olası sonuçları gösteren üç kartlık bir açılımdır. Her kart, sürecin farklı bir aşamasını temsil eder."
-        // İlişki Açılımları
-        "İLİŞKİ AÇILIMI" -> 3 to "İlişkinizde yaşanan güncel durumları gösteren temel açılım. Geçmiş, şimdi ve gelecekte ilişkinin durumunu anlamak için kullanılır."
-        "UYUMLULUK AÇILIMI" -> 7 to "Karşınızdaki insanla gerçekte ne kadar uyumlusunuz? Duygu, düşünce ve fiziksel uyumunuzu gösteren 7 kartlık açılım."
-        "DETAYLI İLİŞKİ AÇILIMI" -> 9 to "Kalp, düşünce ve aksiyon hanelerini içeren ve geçmiş, şimdi ve gelecek ekseninde yorumlanan detaylı açılım. 9 kart ile ilişkinin tüm boyutlarını analiz eder."
-        "MÜCADELELER AÇILIMI" -> 7 to "İlişki içerisindeki tartışma ve zorlukları inceleyen ve çözümler öneren 7 kartlık açılım."
-        "TAMAM MI, DEVAM MI" -> 6 to "Bazı durumlar ve kişiler değişmez. Peki artık bu ilişki için çabalamalı mı, yoksa bitmesine izin mi vermeli? 6 kart ile ilişkinin devam edip etmeyeceğine dair rehberlik sunar."
-        "GELECEĞİNE GİDEN YOL" -> 5 to "İstediğin geleceği biliyorsun, peki oraya nasıl ulaşacaksın? Size yol haritası çizen açılım."
-        "İŞ YERİNDEKİ PROBLEMLER" -> 6 to "İş yerinde karşılaştığınız problemlerin sebebini inceleyen açılım."
-        "FİNANSAL DURUM" -> 6 to "Finansal durumunuzu gösteren ve neye ihtiyacınız olduğunu söyleyen açılım."
-        else -> 1 to "Açılım açıklaması bulunamadı."
+
+    val readingInfo = remember(readingType) {
+        getReadingInfo(readingType)
     }
-    
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // Arka plan görseli
         Image(
             painter = painterResource(id = R.drawable.acilimlararkaplan),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        
+
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "",
-                    onBackClick = onNavigateBack,
-                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
-                    )
+                    title = "", // Başlığı kaldırıyoruz, yeni tasarımda var
+                    onBackClick = onNavigateBack
                 )
             },
             containerColor = Color.Transparent
@@ -91,102 +66,95 @@ fun GeneralReadingDetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Başlık
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 8.dp),
+                        .padding(top = 0.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = readingType,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                            fontSize = 24.sp
-                        ),
-                        color = Color.White,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(0.9f)
-                    )
-                }
-                
-                // Kartların yerleşimi
-                if (viewModel.isCardsDrawn) {
-                    // Kartlar çekilmiş, FlippableCard'ları göster
-                    if (readingType.trim() in listOf(
-                            "İLİŞKİ AÇILIMI", "UYUMLULUK AÇILIMI", "DETAYLI İLİŞKİ AÇILIMI", "MÜCADELELER AÇILIMI", "TAMAM MI, DEVAM MI",
-                            "GELECEĞİNE GİDEN YOL", "İŞ YERİNDEKİ PROBLEMLER", "FİNANSAL DURUM"
-                        )) {
-                        CareerCardLayoutWithFlippableCards(readingType.trim(), viewModel.drawnCards, viewModel, onNavigateToCardDetail)
-                    } else {
-                        // Basit yatay düzen
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            viewModel.drawnCards.forEach { cardState ->
-                                ReadingFlippableCard(
-                                    cardState = cardState,
-                                    onCardClick = {
-                                        if (!cardState.isRevealed) {
-                                            viewModel.revealCard(cardState.index)
-                                        } else {
-                                            onNavigateToCardDetail(cardState.card.id)
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .width(60.dp)
-                                        .height(90.dp)
-                                        .padding(horizontal = 4.dp)
-                                )
-                            }
-                        }
+                    Surface(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                    ) {
+                        Text(
+                            text = readingType,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                fontSize = 24.sp
+                            ),
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+                        )
                     }
-                } else {
-                    // Kartlar henüz çekilmemiş, statik kart arkalarını göster
-                    if (readingType.trim() in listOf(
-                            "İLİŞKİ AÇILIMI", "UYUMLULUK AÇILIMI", "DETAYLI İLİŞKİ AÇILIMI", "MÜCADELELER AÇILIMI", "TAMAM MI, DEVAM MI",
-                            "GELECEĞİNE GİDEN YOL", "İŞ YERİNDEKİ PROBLEMLER", "FİNANSAL DURUM"
-                        )) {
-                        CareerCardLayout(readingType.trim())
-                    } else {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            repeat(cardCount) { index ->
-                                Card(
-                                    modifier = Modifier
-                                        .width(60.dp)
-                                        .height(90.dp)
-                                        .padding(horizontal = 4.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
-                                    ),
-                                    shape = MaterialTheme.shapes.medium
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
+                }
+
+                Spacer(modifier = Modifier.weight(0.5f))
+
+                // Çerçeve ve Kartlar
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .weight(5f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.acilimlarsayfasitak),
+                        contentDescription = "Çerçeve",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.FillBounds
+                    )
+
+                    // Kartların yerleşeceği alan
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 32.dp, vertical = 48.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val drawnCardMap = viewModel.drawnCards.associateBy { it.index }
+
+                        repeat(readingInfo.cardCount) { index ->
+                            val cardState = drawnCardMap[index]
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(0.7f)
+                            ) {
+                                if (cardState != null) {
+                                    ReadingFlippableCard(
+                                        cardState = cardState,
+                                        onCardClick = {
+                                            if (cardState.isRevealed) {
+                                                onNavigateToCardDetail(cardState.card.id)
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                } else {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .clickable {
+                                                viewModel.drawCardForPosition(
+                                                    readingType,
+                                                    index
+                                                )
+                                            },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                                     ) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart ${index + 1}",
-                                            modifier = Modifier
-                                                .width(48.dp)
-                                                .height(72.dp),
-                                            contentScale = ContentScale.Fit
+                                            contentDescription = "Kapalı Kart",
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize()
                                         )
                                     }
                                 }
@@ -194,87 +162,55 @@ fun GeneralReadingDetailScreen(
                         }
                     }
                 }
-                
-                // Açılım açıklaması
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
-                    ),
-                    shape = MaterialTheme.shapes.medium
+
+                Spacer(modifier = Modifier.weight(0.5f))
+
+                // Kart Anlamları ve Butonlar
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .weight(4f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    // Kart Anlamları - Her zaman görünür
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Açılım Hakkında",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                color = Color.White
+                        itemsIndexed(readingInfo.cardMeanings) { index, meaning ->
+                            val card = viewModel.drawnCards.find { it.index == index }?.card
+                            val cardName = card?.name ?: "..."
+                            val isCardDrawn = card != null
+                            
+                            MeaningCard(
+                                text = "${index + 1}. $meaning: $cardName",
+                                onClick = {
+                                    if (isCardDrawn) {
+                                        onNavigateToCardDetail(card.id)
+                                    } else {
+                                        // Kart henüz çekilmemişse, tıklandığında çek
+                                        viewModel.drawCardForPosition(readingType, index)
+                                    }
+                                },
+                                isSelected = isCardDrawn,
+                                enabled = true
                             )
-                        )
-                        Text(
-                            text = description,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                color = Color.White
-                            )
-                        )
+                        }
                     }
-                }
-                
-                // Kartları Çek Butonu
-                if (!viewModel.isCardsDrawn) {
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Yeniden Çek Butonu - Her zaman görünür
                     Button(
-                        onClick = { 
-                            viewModel.drawCards(readingType)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4A5568)
-                        ),
-                        shape = MaterialTheme.shapes.medium,
-                        enabled = !viewModel.isLoading
+                        onClick = { viewModel.resetAndDrawNew(readingType) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f)),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                     ) {
-                        if (viewModel.isLoading) {
-                            CircularProgressIndicator(
-                                color = Color.White,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        } else {
-                            Text(
-                                text = "Kartları Çek",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                    color = Color.White
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    // Yeni Açılım Butonu
-                    Button(
-                        onClick = { 
-                            viewModel.resetReading()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2D3748)
-                        ),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text(
-                            text = "Yeni Açılım",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                color = Color.White
-                            )
-                        )
+                        Text("Yeniden Çek", color = Color.White)
                     }
                 }
             }
@@ -283,846 +219,51 @@ fun GeneralReadingDetailScreen(
 }
 
 @Composable
-fun RelationshipCardLayout(readingType: String) {
-    when (readingType) {
-        "İLİŞKİ AÇILIMI" -> {
-            // 3 kart yatay
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(3) {
-                    Card(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(90.dp)
-                            .padding(horizontal = 4.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
-                        ),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                contentDescription = "Kart ${it + 1}",
-                                modifier = Modifier.width(48.dp).height(72.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        "UYUMLULUK AÇILIMI" -> {
-            // 1-2-1-2-1 dizilişi (toplam 7 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 1", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 2. satır: 2 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 2..3) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 3. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 4", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 4. satır: 2 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 5..6) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 5. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 7", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-            }
-        }
-        "DETAYLI İLİŞKİ AÇILIMI" -> {
-            // 3x3 grid (9 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                repeat(3) { row ->
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        repeat(3) { col ->
-                            val index = row * 3 + col + 1
-                            Card(
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                                shape = MaterialTheme.shapes.medium
-                            ) {
-                                Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                    Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $index", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        "MÜCADELELER AÇILIMI" -> {
-            // 1-2-1-2-1 dizilişi (toplam 7 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 1", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 2. satır: 2 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 2..3) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 3. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 4", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 4. satır: 2 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 5..6) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 5. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 7", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-            }
-        }
-        "TAMAM MI, DEVAM MI" -> {
-            // 1-2-3 (6 kart, piramit)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 1", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 2. satır: 2 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 2..3) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 3. satır: 3 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 4..6) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+fun MeaningCard(
+    text: String,
+    onClick: () -> Unit,
+    isSelected: Boolean = false,
+    enabled: Boolean = true
+) {
+    val borderColor = if (isSelected) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f)
+    val textColor = if (enabled) Color.White else Color.Gray
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick, enabled = enabled),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.6f)
+        ),
+        border = BorderStroke(1.dp, borderColor)
+    ) {
+        Text(
+            text = text,
+            color = textColor,
+            modifier = Modifier.padding(16.dp),
+            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+            fontSize = 18.sp
+        )
     }
 }
 
-@Composable
-fun CareerCardLayout(readingType: String) {
-    when (readingType) {
-        "GELECEĞİNE GİDEN YOL" -> {
-            // 1-1-3 (5 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 1", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 2. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 2", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 3. satır: 3 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 3..5) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        "İŞ YERİNDEKİ PROBLEMLER" -> {
-            // 1-4-1 (6 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 1", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 2. satır: 4 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 2..5) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 3. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 6", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-            }
-        }
-        "FİNANSAL DURUM" -> {
-            // 1-3-2 (6 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                Card(
-                    modifier = Modifier.width(60.dp).height(90.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Box(Modifier.fillMaxSize(), Alignment.Center) {
-                        Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart 1", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                    }
-                }
-                // 2. satır: 3 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 2..4) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-                // 3. satır: 2 kart
-                Row(horizontalArrangement = Arrangement.Center) {
-                    for (i in 5..6) {
-                        Card(
-                            modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Box(Modifier.fillMaxSize(), Alignment.Center) {
-                                Image(painter = painterResource(id = R.drawable.tarotkartiarkasikesimli), contentDescription = "Kart $i", modifier = Modifier.width(48.dp).height(72.dp), contentScale = ContentScale.Fit)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else -> RelationshipCardLayout(readingType)
-    }
-}
+data class ReadingInfo(val cardCount: Int, val cardMeanings: List<String>)
 
-@Composable
-fun CareerCardLayoutWithFlippableCards(readingType: String, drawnCards: List<ReadingCardState>, viewModel: GeneralReadingViewModel, onNavigateToCardDetail: (String) -> Unit) {
-    when (readingType) {
-        "İLİŞKİ AÇILIMI" -> {
-            // 3 kart yatay
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                drawnCards.take(3).forEach { cardState ->
-                    ReadingFlippableCard(
-                        cardState = cardState,
-                        onCardClick = {
-                            if (!cardState.isRevealed) {
-                                viewModel.revealCard(cardState.index)
-                            } else {
-                                onNavigateToCardDetail(cardState.card.id)
-                            }
-                        },
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(90.dp)
-                            .padding(horizontal = 4.dp)
-                    )
-                }
-            }
-        }
-        "UYUMLULUK AÇILIMI" -> {
-            // 1-2-1-2-1 dizilişi (toplam 7 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                if (drawnCards.isNotEmpty()) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[0],
-                        onCardClick = {
-                            if (!drawnCards[0].isRevealed) {
-                                viewModel.revealCard(drawnCards[0].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[0].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 2. satır: 2 kart
-                if (drawnCards.size >= 3) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 1..2) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 3. satır: 1 kart
-                if (drawnCards.size >= 4) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[3],
-                        onCardClick = {
-                            if (!drawnCards[3].isRevealed) {
-                                viewModel.revealCard(drawnCards[3].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[3].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 4. satır: 2 kart
-                if (drawnCards.size >= 6) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 4..5) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 5. satır: 1 kart
-                if (drawnCards.size >= 7) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[6],
-                        onCardClick = {
-                            if (!drawnCards[6].isRevealed) {
-                                viewModel.revealCard(drawnCards[6].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[6].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-            }
-        }
-        "DETAYLI İLİŞKİ AÇILIMI" -> {
-            // 3x3 grid (9 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                repeat(3) { row ->
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        repeat(3) { col ->
-                            val index = row * 3 + col
-                            if (index < drawnCards.size) {
-                                ReadingFlippableCard(
-                                    cardState = drawnCards[index],
-                                    onCardClick = {
-                                        if (!drawnCards[index].isRevealed) {
-                                            viewModel.revealCard(drawnCards[index].index)
-                                        } else {
-                                            onNavigateToCardDetail(drawnCards[index].card.id)
-                                        }
-                                    },
-                                    modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        "MÜCADELELER AÇILIMI" -> {
-            // 1-2-1-2-1 dizilişi (toplam 7 kart) - UYUMLULUK AÇILIMI ile aynı
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                if (drawnCards.isNotEmpty()) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[0],
-                        onCardClick = {
-                            if (!drawnCards[0].isRevealed) {
-                                viewModel.revealCard(drawnCards[0].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[0].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 2. satır: 2 kart
-                if (drawnCards.size >= 3) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 1..2) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 3. satır: 1 kart
-                if (drawnCards.size >= 4) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[3],
-                        onCardClick = {
-                            if (!drawnCards[3].isRevealed) {
-                                viewModel.revealCard(drawnCards[3].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[3].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 4. satır: 2 kart
-                if (drawnCards.size >= 6) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 4..5) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 5. satır: 1 kart
-                if (drawnCards.size >= 7) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[6],
-                        onCardClick = {
-                            if (!drawnCards[6].isRevealed) {
-                                viewModel.revealCard(drawnCards[6].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[6].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-            }
-        }
-        "TAMAM MI, DEVAM MI" -> {
-            // 1-2-3 (6 kart, piramit)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                if (drawnCards.isNotEmpty()) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[0],
-                        onCardClick = {
-                            if (!drawnCards[0].isRevealed) {
-                                viewModel.revealCard(drawnCards[0].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[0].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 2. satır: 2 kart
-                if (drawnCards.size >= 3) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 1..2) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 3. satır: 3 kart
-                if (drawnCards.size >= 6) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 3..5) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        "GELECEĞİNE GİDEN YOL" -> {
-            // 1-1-3 (5 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                if (drawnCards.isNotEmpty()) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[0],
-                        onCardClick = {
-                            if (!drawnCards[0].isRevealed) {
-                                viewModel.revealCard(drawnCards[0].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[0].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 2. satır: 1 kart
-                if (drawnCards.size >= 2) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[1],
-                        onCardClick = {
-                            if (!drawnCards[1].isRevealed) {
-                                viewModel.revealCard(drawnCards[1].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[1].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 3. satır: 3 kart
-                if (drawnCards.size >= 5) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 2..4) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        "İŞ YERİNDEKİ PROBLEMLER" -> {
-            // 1-4-1 (6 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                if (drawnCards.isNotEmpty()) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[0],
-                        onCardClick = {
-                            if (!drawnCards[0].isRevealed) {
-                                viewModel.revealCard(drawnCards[0].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[0].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 2. satır: 4 kart
-                if (drawnCards.size >= 5) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 1..4) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 3. satır: 1 kart
-                if (drawnCards.size >= 6) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[5],
-                        onCardClick = {
-                            if (!drawnCards[5].isRevealed) {
-                                viewModel.revealCard(drawnCards[5].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[5].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-            }
-        }
-        "FİNANSAL DURUM" -> {
-            // 1-3-2 (6 kart)
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. satır: 1 kart
-                if (drawnCards.isNotEmpty()) {
-                    ReadingFlippableCard(
-                        cardState = drawnCards[0],
-                        onCardClick = {
-                            if (!drawnCards[0].isRevealed) {
-                                viewModel.revealCard(drawnCards[0].index)
-                            } else {
-                                onNavigateToCardDetail(drawnCards[0].card.id)
-                            }
-                        },
-                        modifier = Modifier.width(60.dp).height(90.dp)
-                    )
-                }
-                // 2. satır: 3 kart
-                if (drawnCards.size >= 4) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 1..3) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-                // 3. satır: 2 kart
-                if (drawnCards.size >= 6) {
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        for (i in 4..5) {
-                            ReadingFlippableCard(
-                                cardState = drawnCards[i],
-                                onCardClick = {
-                                    if (!drawnCards[i].isRevealed) {
-                                        viewModel.revealCard(drawnCards[i].index)
-                                    } else {
-                                        onNavigateToCardDetail(drawnCards[i].card.id)
-                                    }
-                                },
-                                modifier = Modifier.width(60.dp).height(90.dp).padding(horizontal = 4.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
+fun getReadingInfo(readingType: String): ReadingInfo {
+    return when (readingType.trim()) {
+        "GÜNLÜK AÇILIM" -> ReadingInfo(3, listOf("Düşünce", "His", "Aksiyon"))
+        "TEK KART AÇILIMI" -> ReadingInfo(1, listOf("Günün Kartı"))
+        "EVET – HAYIR AÇILIMI" -> ReadingInfo(1, listOf("Cevap"))
+        "GEÇMİŞ, ŞİMDİ, GELECEK" -> ReadingInfo(3, listOf("Geçmiş", "Şimdi", "Gelecek"))
+        "DURUM, AKSİYON, SONUÇ" -> ReadingInfo(3, listOf("Durum", "Aksiyon", "Sonuç"))
+        "İLİŞKİ AÇILIMI" -> ReadingInfo(3, listOf("Sen", "O", "İlişkiniz"))
+        "UYUMLULUK AÇILIMI" -> ReadingInfo(7, listOf("Senin Geçmişin", "Onun Geçmişi", "Sizin Uyumunuz", "Senin Beklentin", "Onun Beklentisi", "İlişkinin Geleceği", "Sonuç"))
+        "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf("Geçmiş", "Şimdi", "Gelecek", "Senin Bilinçaltın", "Onun Bilinçaltı", "Dış Etkenler", "Umutlar ve Korkular", "Potansiyel", "Nihai Sonuç"))
+        "MÜCADELELER AÇILIMI" -> ReadingInfo(7, listOf("Ana Sorun", "Senin Bakış Açın", "Onun Bakış Açısı", "Geçmişin Etkisi", "Çözüm Önerisi", "Olası Gelecek", "Nihai Tavsiye"))
+        "TAMAM MI, DEVAM MI" -> ReadingInfo(6, listOf("İlişkinin Temeli", "Mevcut Durum", "Devam Etme Potansiyeli", "Bitirme Potansiyeli", "Senin İçin En İyisi", "Nihai Karar"))
+        "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf("Mevcut Durumun", "Hedefin", "Engellerin", "Yardımcı Etkenler", "Atman Gereken Adım"))
+        "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf("Problemin Kökü", "Seni Etkileyen Faktör", "Diğerlerini Etkileyen Faktör", "Gözden Kaçırdığın", "Çözüm Yolu", "Sonuç"))
+        "FİNANSAL DURUM" -> ReadingInfo(6, listOf("Mevcut Finansal Durum", "Para Akışın", "Engeller", "Fırsatlar", "Atman Gereken Adım", "Uzun Vadeli Sonuç"))
+        else -> ReadingInfo(1, listOf("Kart"))
     }
 } 
