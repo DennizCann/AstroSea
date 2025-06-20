@@ -2,7 +2,9 @@ package com.denizcan.astrosea.presentation.general
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,59 +67,70 @@ fun GeneralReadingsScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 8.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                readings.forEachIndexed { idx, (title, desc, cardCount) ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        onClick = { onNavigateToReadingDetail(title) }
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize().padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    readings.forEachIndexed { idx, (title, desc, cardCount) ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(100.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            onClick = { onNavigateToReadingDetail(title) }
                         ) {
                             Row(
-                                modifier = Modifier.width(48.dp),
-                                horizontalArrangement = Arrangement.Center
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                repeat(cardArrangements[idx][0]) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                        contentDescription = "Kart Arkası",
-                                        modifier = Modifier
-                                            .width(14.dp)
-                                            .height(21.dp),
-                                        contentScale = ContentScale.Fit
+                                Row(
+                                    modifier = Modifier.width(48.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    repeat(cardArrangements[idx][0]) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                            contentDescription = "Kart Arkası",
+                                            modifier = Modifier
+                                                .width(14.dp)
+                                                .height(21.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 8.dp)
+                                ) {
+                                    Text(
+                                        text = title,
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                            fontSize = 18.sp
+                                        ),
+                                        color = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = desc,
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                            fontSize = 14.sp
+                                        ),
+                                        color = Color.White
                                     )
                                 }
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column(
-                                modifier = Modifier.weight(1f).padding(start = 8.dp)
-                            ) {
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                        fontSize = 18.sp
-                                    ),
-                                    color = Color.White
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = desc,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                        fontSize = 14.sp
-                                    ),
-                                    color = Color.White
-                                )
                             }
                         }
                     }
@@ -127,7 +140,7 @@ fun GeneralReadingsScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
+                        .padding(top = 8.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // İlişki Açılımları Tab

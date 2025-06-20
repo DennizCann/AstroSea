@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +63,9 @@ fun CareerReadingScreen(
             ) {
                 // Açılım kartları
                 Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // 1. Geleceğine Giden Yol
@@ -75,7 +80,9 @@ fun CareerReadingScreen(
                         onClick = { onNavigateToReadingDetail("GELECEĞİNE GİDEN YOL") }
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxSize().padding(12.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
@@ -91,7 +98,9 @@ fun CareerReadingScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(14.dp).height(21.dp),
+                                            modifier = Modifier
+                                                .width(14.dp)
+                                                .height(21.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -100,7 +109,9 @@ fun CareerReadingScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(14.dp).height(21.dp),
+                                            modifier = Modifier
+                                                .width(14.dp)
+                                                .height(21.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -110,7 +121,9 @@ fun CareerReadingScreen(
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(14.dp).height(21.dp),
+                                                modifier = Modifier
+                                                    .width(14.dp)
+                                                    .height(21.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
@@ -119,7 +132,9 @@ fun CareerReadingScreen(
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Column(
-                                modifier = Modifier.weight(1f).padding(start = 8.dp)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)
                             ) {
                                 Text(
                                     text = "GELECEĞİNE GİDEN YOL",
@@ -153,7 +168,9 @@ fun CareerReadingScreen(
                         onClick = { onNavigateToReadingDetail("İŞ YERİNDEKİ PROBLEMLER") }
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxSize().padding(12.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
@@ -169,7 +186,9 @@ fun CareerReadingScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(12.dp).height(18.dp),
+                                            modifier = Modifier
+                                                .width(12.dp)
+                                                .height(18.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -179,7 +198,9 @@ fun CareerReadingScreen(
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(12.dp).height(18.dp),
+                                                modifier = Modifier
+                                                    .width(12.dp)
+                                                    .height(18.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
@@ -189,7 +210,9 @@ fun CareerReadingScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(12.dp).height(18.dp),
+                                            modifier = Modifier
+                                                .width(12.dp)
+                                                .height(18.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -197,7 +220,9 @@ fun CareerReadingScreen(
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Column(
-                                modifier = Modifier.weight(1f).padding(start = 8.dp)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)
                             ) {
                                 Text(
                                     text = "İŞ YERİNDEKİ PROBLEMLER",
@@ -231,7 +256,9 @@ fun CareerReadingScreen(
                         onClick = { onNavigateToReadingDetail("FİNANSAL DURUM") }
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxSize().padding(12.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
@@ -247,20 +274,11 @@ fun CareerReadingScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(14.dp).height(21.dp),
+                                            modifier = Modifier
+                                                .width(14.dp)
+                                                .height(21.dp),
                                             contentScale = ContentScale.Fit
                                         )
-                                    }
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                        repeat(3) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(14.dp).height(21.dp),
-                                                contentScale = ContentScale.Fit
-                                            )
-                                        }
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -268,16 +286,31 @@ fun CareerReadingScreen(
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(14.dp).height(21.dp),
+                                                modifier = Modifier
+                                                    .width(14.dp)
+                                                    .height(21.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
+                                    }
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                            contentDescription = "Kart Arkası",
+                                            modifier = Modifier
+                                                .width(14.dp)
+                                                .height(21.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
                                     }
                                 }
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Column(
-                                modifier = Modifier.weight(1f).padding(start = 8.dp)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)
                             ) {
                                 Text(
                                     text = "FİNANSAL DURUM",
@@ -303,38 +336,63 @@ fun CareerReadingScreen(
 
                 // Alt navigasyon butonları
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Button(
-                        onClick = onNavigateToGeneralReadings,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4A5568)
+                    // Genel Açılımlar Tab
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = onNavigateToGeneralReadings
                     ) {
-                        Text(
-                            text = "Genel Açılımlar",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                color = Color.White
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "GENEL AÇILIMLAR",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 16.sp
+                                ),
+                                color = Color.White,
+                                textAlign = TextAlign.Center
                             )
-                        )
+                        }
                     }
-                    Button(
-                        onClick = onNavigateToRelationshipReadings,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4A5568)
+
+                    // İlişki Açılımları Tab
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(60.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF1A2236).copy(alpha = 0.7f)
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = onNavigateToRelationshipReadings
                     ) {
-                        Text(
-                            text = "İlişki Açılımları",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                color = Color.White
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "İLİŞKİ AÇILIMLARI",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                    fontSize = 16.sp
+                                ),
+                                color = Color.White,
+                                textAlign = TextAlign.Center
                             )
-                        )
+                        }
                     }
                 }
             }
