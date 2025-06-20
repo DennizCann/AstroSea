@@ -27,6 +27,7 @@ import com.denizcan.astrosea.util.TarotCard
 fun FlippableCard(
     cardState: DailyCardState,
     onCardClick: () -> Unit,
+    onCardDetailClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -74,6 +75,12 @@ fun FlippableCard(
                     .fillMaxSize()
                     .graphicsLayer {
                         rotationY = 180f // Ters çevirme düzeltmesi
+                    }
+                    .clickable {
+                        // Kart açıksa ve tıklanırsa detay sayfasına git
+                        cardState.card?.let { card ->
+                            onCardDetailClick(card.id)
+                        }
                     },
                 colors = CardDefaults.cardColors(
                     containerColor = Color.Transparent

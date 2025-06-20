@@ -197,6 +197,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToGeneralReadings = {
                                 navController.navigate("general_readings")
                             },
+                            onNavigateToCardDetail = { cardId ->
+                                navController.navigate("tarot_detail/$cardId")
+                            },
                             onSignOut = {
                                 FirebaseAuth.getInstance().signOut()
                                 navController.navigate(Screen.Auth.route) {

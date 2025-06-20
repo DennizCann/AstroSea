@@ -61,6 +61,7 @@ fun HomeScreen(
     onNavigateToCareerReading: () -> Unit,
     onNavigateToMore: () -> Unit,
     onNavigateToGeneralReadings: () -> Unit,
+    onNavigateToCardDetail: (String) -> Unit,
     onSignOut: () -> Unit
 ) {
     val profileState = viewModel.profileState
@@ -396,6 +397,9 @@ fun HomeScreen(
                                     // Sonra kartı açalım
                                     dailyTarotViewModel.revealCard(cardState.index)
                                 }
+                            },
+                            onCardDetailClick = { cardId ->
+                                onNavigateToCardDetail(cardId)
                             },
                             modifier = Modifier
                                 .height(160.dp)
