@@ -74,7 +74,7 @@ fun GeneralReadingDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
-                        .weight(6f),
+                        .weight(6.5f),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -85,56 +85,14 @@ fun GeneralReadingDetailScreen(
                     )
 
                     // Kartların yerleşeceği alan
-                        Row(
-                            modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 32.dp, vertical = 48.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        val drawnCardMap = viewModel.drawnCards.associateBy { it.index }
-
-                        repeat(readingInfo.cardCount) { index ->
-                            val cardState = drawnCardMap[index]
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .aspectRatio(0.7f)
-                            ) {
-                                if (cardState != null) {
-                                ReadingFlippableCard(
-                                    cardState = cardState,
-                                    onCardClick = {
-                                            if (cardState.isRevealed) {
-                                            onNavigateToCardDetail(cardState.card.id)
-                                        }
-                                    },
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                    } else {
-                                Card(
-                                    modifier = Modifier
-                                            .fillMaxSize()
-                                            .clickable {
-                                                viewModel.drawCardForPosition(
-                                                    readingType,
-                                                    index
-                                                )
-                                            },
-                                        shape = RoundedCornerShape(8.dp),
-                                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kapalı Kart",
-                                            contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxSize()
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    CardLayoutContainer(
+                        readingInfo = readingInfo,
+                        drawnCardMap = viewModel.drawnCards.associateBy { it.index },
+                        onDrawCard = { index ->
+                            viewModel.drawCardForPosition(readingType, index)
+                        },
+                        onNavigateToCardDetail = onNavigateToCardDetail
+                    )
                 }
                 
                 // Kart Anlamları ve Butonlar
@@ -142,7 +100,7 @@ fun GeneralReadingDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .weight(4f),
+                        .weight(3.5f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -200,12 +158,12 @@ fun MeaningCard(
     val borderColor = if (isSelected) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f)
     val textColor = if (enabled) Color.White else Color.Gray
     
-    Card(
-        modifier = Modifier
+                    Card(
+                        modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick, enabled = enabled),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
+                        colors = CardDefaults.cardColors(
             containerColor = Color.Black.copy(alpha = 0.6f)
         ),
         border = BorderStroke(1.dp, borderColor)
@@ -220,23 +178,461 @@ fun MeaningCard(
     }
 }
 
-data class ReadingInfo(val cardCount: Int, val cardMeanings: List<String>)
+@Composable
+fun CardLayoutContainer(
+    readingInfo: ReadingInfo,
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        when (readingInfo.layout) {
+            CardLayout.SINGLE -> SingleCardLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.HORIZONTAL_3 -> HorizontalLayout(3, drawnCardMap, onDrawCard, onNavigateToCardDetail, maxWidthFraction = 0.65f)
+            CardLayout.PYRAMID_3 -> Pyramid3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.CROSS_5 -> Cross5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.PYRAMID_6 -> Pyramid6Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.CROSS_7 -> Cross7Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.COMPATIBILITY_CROSS -> CompatibilityCrossLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.GRID_3x3 -> Grid3x3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.PATH_5 -> Path5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.FINANCIAL_4 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            // Diğer layout'lar için varsayılan
+            else -> HorizontalLayout(readingInfo.cardCount, drawnCardMap, onDrawCard, onNavigateToCardDetail)
+        }
+    }
+}
+
+@Composable
+private fun CardView(
+    modifier: Modifier,
+    cardState: ReadingCardState?,
+    onDrawCard: () -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = modifier) {
+        if (cardState != null) {
+            ReadingFlippableCard(
+                cardState = cardState,
+                onCardClick = {
+                    if (cardState.isRevealed) {
+                        onNavigateToCardDetail(cardState.card.id)
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                contentDescription = "Kapalı Kart",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { onDrawCard() }
+            )
+        }
+    }
+}
+
+@Composable
+fun SingleCardLayout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    val cardModifier = Modifier
+        .width(130.dp)
+        .aspectRatio(0.7f)
+    CardView(
+        modifier = cardModifier,
+        cardState = drawnCardMap[0],
+        onDrawCard = { onDrawCard(0) },
+        onNavigateToCardDetail = onNavigateToCardDetail
+    )
+}
+
+@Composable
+fun HorizontalLayout(
+    cardCount: Int,
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit,
+    maxWidthFraction: Float = 1.0f
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(maxWidthFraction),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(cardCount) { index ->
+            CardView(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(0.7f),
+                cardState = drawnCardMap[index],
+                onDrawCard = { onDrawCard(index) },
+                onNavigateToCardDetail = onNavigateToCardDetail
+            )
+        }
+    }
+}
+
+@Composable
+fun Pyramid3Layout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    val cardModifier = Modifier
+        .width(100.dp)
+        .aspectRatio(0.7f)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        CardView(
+            modifier = cardModifier,
+            cardState = drawnCardMap[0],
+            onDrawCard = { onDrawCard(0) },
+            onNavigateToCardDetail = onNavigateToCardDetail
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            CardView(
+                modifier = cardModifier,
+                cardState = drawnCardMap[1],
+                onDrawCard = { onDrawCard(1) },
+                onNavigateToCardDetail = onNavigateToCardDetail
+            )
+            CardView(
+                modifier = cardModifier,
+                cardState = drawnCardMap[2],
+                onDrawCard = { onDrawCard(2) },
+                onNavigateToCardDetail = onNavigateToCardDetail
+            )
+        }
+    }
+}
+
+@Composable
+fun Cross5Layout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    val cardModifier = Modifier
+        .width(85.dp)
+        .aspectRatio(0.7f)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+        }
+        CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+    }
+}
+
+@Composable
+fun Pyramid6Layout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        val cardModifier = Modifier
+            .width(43.dp)
+            .aspectRatio(0.7f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // 1. sıra (1 kart)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            // 2. sıra (2 kart)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+            }
+            // 3. sıra (3 kart)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+            }
+        }
+    }
+}
+
+@Composable
+fun Cross7Layout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    val cardModifier = Modifier
+        .width(80.dp)
+        .aspectRatio(0.7f)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[6], { onDrawCard(6) }, onNavigateToCardDetail)
+        }
+    }
+}
+
+@Composable
+fun CompatibilityCrossLayout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        val cardModifier = Modifier
+            .width(43.dp)
+            .aspectRatio(0.7f)
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Row 1: Card 1 (index 0)
+            CardView(
+                cardModifier,
+                drawnCardMap[0],
+                { onDrawCard(0) },
+                onNavigateToCardDetail
+            )
+
+            // Row 2: Cards 2 & 3 (indices 1, 2)
+            Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+                CardView(
+                    cardModifier,
+                    drawnCardMap[1],
+                    { onDrawCard(1) },
+                    onNavigateToCardDetail
+                )
+                CardView(
+                    cardModifier,
+                    drawnCardMap[2],
+                    { onDrawCard(2) },
+                    onNavigateToCardDetail
+                )
+            }
+
+            // Row 3: Card 4 (index 3)
+            CardView(
+                cardModifier,
+                drawnCardMap[3],
+                { onDrawCard(3) },
+                onNavigateToCardDetail
+            )
+
+            // Row 4: Cards 5 & 6 (indices 4, 5)
+            Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+                CardView(
+                    cardModifier,
+                    drawnCardMap[4],
+                    { onDrawCard(4) },
+                    onNavigateToCardDetail
+                )
+                CardView(
+                    cardModifier,
+                    drawnCardMap[5],
+                    { onDrawCard(5) },
+                    onNavigateToCardDetail
+                )
+            }
+
+            // Row 5: Card 7 (index 6)
+            CardView(
+                cardModifier,
+                drawnCardMap[6],
+                { onDrawCard(6) },
+                onNavigateToCardDetail
+            )
+        }
+    }
+}
+
+@Composable
+fun Grid3x3Layout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        val cardModifier = Modifier
+            .width(43.dp)
+            .aspectRatio(0.7f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            repeat(3) { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    repeat(3) { col ->
+                        val index = row * 3 + col
+                        CardView(
+                            modifier = cardModifier,
+                            cardState = drawnCardMap[index],
+                            onDrawCard = { onDrawCard(index) },
+                            onNavigateToCardDetail = onNavigateToCardDetail
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Path5Layout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        val cardModifier = Modifier
+            .width(43.dp)
+            .aspectRatio(0.7f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // 1. sıra (1 kart)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            // 2. sıra (1 kart)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+            // 3. sıra (3 kart)
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkProblemLayout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        val cardModifier = Modifier
+            .width(40.dp)
+            .aspectRatio(0.7f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // 1. sıra: 1 kart
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            
+            // 2. sıra: 4 kart
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+            }
+            
+            // 3. sıra: 1 kart
+            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+        }
+    }
+}
+
+@Composable
+fun FinancialLayout(
+    drawnCardMap: Map<Int, ReadingCardState>,
+    onDrawCard: (Int) -> Unit,
+    onNavigateToCardDetail: (String) -> Unit
+) {
+    Box(modifier = Modifier.padding(top = 16.dp)) {
+        val cardModifier = Modifier
+            .width(43.dp)
+            .aspectRatio(0.7f)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // 1. sıra: 1 kart
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            
+            // 2. sıra: 2 kart
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+            }
+            
+            // 3. sıra: 1 kart
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+        }
+    }
+}
+
+data class ReadingInfo(
+    val cardCount: Int,
+    val cardMeanings: List<String>,
+    val layout: CardLayout
+)
+
+enum class CardLayout {
+    SINGLE,
+    HORIZONTAL_3,
+    PYRAMID_3,
+    CROSS_5,
+    PYRAMID_6,
+    CROSS_7,
+    COMPATIBILITY_CROSS,
+    GRID_3x3,
+    HORIZONTAL_5,
+    HORIZONTAL_6,
+    HORIZONTAL_7,
+    HORIZONTAL_9,
+    CELTIC_CROSS_10,
+    PATH_5,
+    WORK_PROBLEM_6,
+    FINANCIAL_4
+}
 
 fun getReadingInfo(readingType: String): ReadingInfo {
     return when (readingType.trim()) {
-        "GÜNLÜK AÇILIM" -> ReadingInfo(3, listOf("Düşünce", "His", "Aksiyon"))
-        "TEK KART AÇILIMI" -> ReadingInfo(1, listOf("Günün Kartı"))
-        "EVET – HAYIR AÇILIMI" -> ReadingInfo(1, listOf("Cevap"))
-        "GEÇMİŞ, ŞİMDİ, GELECEK" -> ReadingInfo(3, listOf("Geçmiş", "Şimdi", "Gelecek"))
-        "DURUM, AKSİYON, SONUÇ" -> ReadingInfo(3, listOf("Durum", "Aksiyon", "Sonuç"))
-        "İLİŞKİ AÇILIMI" -> ReadingInfo(3, listOf("Sen", "O", "İlişkiniz"))
-        "UYUMLULUK AÇILIMI" -> ReadingInfo(7, listOf("Senin Geçmişin", "Onun Geçmişi", "Sizin Uyumunuz", "Senin Beklentin", "Onun Beklentisi", "İlişkinin Geleceği", "Sonuç"))
-        "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf("Geçmiş", "Şimdi", "Gelecek", "Senin Bilinçaltın", "Onun Bilinçaltı", "Dış Etkenler", "Umutlar ve Korkular", "Potansiyel", "Nihai Sonuç"))
-        "MÜCADELELER AÇILIMI" -> ReadingInfo(7, listOf("Ana Sorun", "Senin Bakış Açın", "Onun Bakış Açısı", "Geçmişin Etkisi", "Çözüm Önerisi", "Olası Gelecek", "Nihai Tavsiye"))
-        "TAMAM MI, DEVAM MI" -> ReadingInfo(6, listOf("İlişkinin Temeli", "Mevcut Durum", "Devam Etme Potansiyeli", "Bitirme Potansiyeli", "Senin İçin En İyisi", "Nihai Karar"))
-        "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf("Mevcut Durumun", "Hedefin", "Engellerin", "Yardımcı Etkenler", "Atman Gereken Adım"))
-        "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf("Problemin Kökü", "Seni Etkileyen Faktör", "Diğerlerini Etkileyen Faktör", "Gözden Kaçırdığın", "Çözüm Yolu", "Sonuç"))
-        "FİNANSAL DURUM" -> ReadingInfo(6, listOf("Mevcut Finansal Durum", "Para Akışın", "Engeller", "Fırsatlar", "Atman Gereken Adım", "Uzun Vadeli Sonuç"))
-        else -> ReadingInfo(1, listOf("Kart"))
+        "GÜNLÜK AÇILIM" -> ReadingInfo(3, listOf("Düşünce", "His", "Aksiyon"), CardLayout.HORIZONTAL_3)
+        "TEK KART AÇILIMI" -> ReadingInfo(1, listOf("Günün Kartı"), CardLayout.SINGLE)
+        "EVET – HAYIR AÇILIMI" -> ReadingInfo(1, listOf("Cevap"), CardLayout.SINGLE)
+        "GEÇMİŞ, ŞİMDİ, GELECEK" -> ReadingInfo(3, listOf("Geçmiş", "Şimdi", "Gelecek"), CardLayout.HORIZONTAL_3)
+        "DURUM, AKSİYON, SONUÇ" -> ReadingInfo(3, listOf("Durum", "Aksiyon", "Sonuç"), CardLayout.HORIZONTAL_3)
+        "İLİŞKİ AÇILIMI" -> ReadingInfo(3, listOf("Sen", "O", "İlişkiniz"), CardLayout.HORIZONTAL_3)
+        "UYUMLULUK AÇILIMI" -> ReadingInfo(7, listOf("Senin Geçmişin", "Onun Geçmişi", "Sizin Uyumunuz", "Senin Beklentin", "Onun Beklentisi", "İlişkinin Geleceği", "Sonuç"), CardLayout.COMPATIBILITY_CROSS)
+        "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf("Geçmiş", "Şimdi", "Gelecek", "Senin Bilinçaltın", "Onun Bilinçaltı", "Dış Etkenler", "Umutlar ve Korkular", "Potansiyel", "Nihai Sonuç"), CardLayout.GRID_3x3)
+        "MÜCADELELER AÇILIMI" -> ReadingInfo(7, listOf("Ana Sorun", "Senin Bakış Açın", "Onun Bakış Açısı", "Geçmişin Etkisi", "Çözüm Önerisi", "Olası Gelecek", "Nihai Tavsiye"), CardLayout.COMPATIBILITY_CROSS)
+        "TAMAM MI, DEVAM MI" -> ReadingInfo(6, listOf("İlişkinin Temeli", "Mevcut Durum", "Devam Etme Potansiyeli", "Bitirme Potansiyeli", "Senin İçin En İyisi", "Nihai Karar"), CardLayout.PYRAMID_6)
+        "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf("Mevcut Durumun", "Hedefin", "Engellerin", "Yardımcı Etkenler", "Atman Gereken Adım"), CardLayout.PATH_5)
+        "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf("Problemin Kökü", "Seni Etkileyen Faktör", "Diğerlerini Etkileyen Faktör", "Gözden Kaçırdığın", "Çözüm Yolu", "Sonuç"), CardLayout.WORK_PROBLEM_6)
+        "FİNANSAL DURUM" -> ReadingInfo(4, listOf("Mevcut Finansal Durum", "Para Akışın", "Engeller", "Fırsatlar"), CardLayout.FINANCIAL_4)
+        else -> ReadingInfo(1, listOf("Kart"), CardLayout.SINGLE)
     }
 } 

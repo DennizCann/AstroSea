@@ -46,9 +46,6 @@ fun ProfileScreen(
                 AstroTopBar(
                     title = "Profil",
                     onBackClick = onNavigateBack,
-                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
-                    ),
                     actions = {
                         if (!state.isLoading) {
                             IconButton(

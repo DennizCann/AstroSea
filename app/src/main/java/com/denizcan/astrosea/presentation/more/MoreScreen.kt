@@ -31,16 +31,13 @@ fun MoreScreen(
         )
 
         Scaffold(
-            containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "DAHA FAZLASI",
-                    onBackClick = onNavigateBack,
-                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
-                    )
+                    title = "Daha Fazlası",
+                    onBackClick = onNavigateBack
                 )
-            }
+            },
+            containerColor = Color.Transparent
         ) { paddingValues ->
             Column(
                 modifier = Modifier

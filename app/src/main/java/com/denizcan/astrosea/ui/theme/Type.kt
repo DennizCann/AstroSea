@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.R
 
-private val cinzelFamily = FontFamily(
+val Cinzel = FontFamily(
     Font(R.font.cinzel_regular, FontWeight.Normal),
     Font(R.font.cinzel_bold, FontWeight.Bold)
 )
@@ -20,63 +20,61 @@ private val cormorantFamily = FontFamily(
 
 val AstroSeaTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontWeight = FontWeight.Bold,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = 0.sp
     ),
     displayMedium = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontWeight = FontWeight.Normal,
         fontSize = 45.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp
     ),
     displaySmall = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontWeight = FontWeight.Normal,
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.sp
     ),
     headlineLarge = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontWeight = FontWeight.Normal,
         fontSize = 32.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontWeight = FontWeight.Normal,
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp
     ),
     headlineSmall = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontWeight = FontWeight.Normal,
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = cinzelFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        fontFamily = Cinzel,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp,
         fontWeight = FontWeight.Normal
     ),
     titleSmall = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
@@ -101,21 +99,21 @@ val AstroSeaTypography = Typography(
         letterSpacing = 0.4.sp
     ),
     labelLarge = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
         fontWeight = FontWeight.Normal
     ),
     labelMedium = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
         fontWeight = FontWeight.Normal
     ),
     labelSmall = TextStyle(
-        fontFamily = cinzelFamily,
+        fontFamily = Cinzel,
         fontSize = 11.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,

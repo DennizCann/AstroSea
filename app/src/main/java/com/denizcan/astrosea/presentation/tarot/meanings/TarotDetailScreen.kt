@@ -24,6 +24,7 @@ import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
+import com.denizcan.astrosea.presentation.components.AstroTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,45 +47,9 @@ fun TarotDetailScreen(
                 .background(Color.Black.copy(alpha = 0.3f))
         ) {
             // Üst Bar
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Surface(
-                            modifier = Modifier.align(Alignment.Center),
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.Black.copy(alpha = 0.5f),
-                            shadowElevation = 8.dp
-                        ) {
-                            Text(
-                                text = card.name,
-                                color = Color.White,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                    fontSize = 28.sp
-                                ),
-                                maxLines = 2,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Geri",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+            AstroTopBar(
+                title = card.name,
+                onBackClick = onNavigateBack
             )
 
             Column(

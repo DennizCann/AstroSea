@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.denizcan.astrosea.presentation.components.AstroTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,42 +69,9 @@ fun TarotMeaningsScreen(
                 .background(Color.Black.copy(alpha = 0.3f))
         ) {
             // Üst Bar
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Surface(
-                            modifier = Modifier.padding(start = 12.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.Black.copy(alpha = 0.5f),
-                            shadowElevation = 8.dp
-                        ) {
-                            Text(
-                                text = "Tüm Anlamlar",
-                                color = Color.White,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
-                                    fontSize = 28.sp
-                                )
-                            )
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Geri",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+            AstroTopBar(
+                title = "Tüm Anlamlar",
+                onBackClick = onNavigateBack
             )
 
             // Tarot/Rün seçimi

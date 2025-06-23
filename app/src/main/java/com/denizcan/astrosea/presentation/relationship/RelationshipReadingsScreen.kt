@@ -45,11 +45,8 @@ fun RelationshipReadingsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "İLİŞKİ AÇILIMI",
-                    onBackClick = onNavigateToHome,
-                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
-                    )
+                    title = "İLİŞKİ AÇILIMLARI",
+                    onBackClick = onNavigateToHome
                 )
             },
             containerColor = Color.Transparent

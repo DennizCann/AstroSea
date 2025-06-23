@@ -53,11 +53,8 @@ fun GeneralReadingsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "GENEL AÇILIMLAR",
-                    onBackClick = onNavigateToHome,
-                    titleStyle = MaterialTheme.typography.headlineLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
-                    )
+                    title = "Genel Açılımlar",
+                    onBackClick = onNavigateToHome
                 )
             },
             containerColor = Color.Transparent

@@ -272,7 +272,8 @@ class MainActivity : ComponentActivity() {
                             onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
                             onNavigateToReadingDetail = { readingType ->
                                 navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
-                            }
+                            },
+                            navController = navController
                         )
                     }
                     composable("more") {
