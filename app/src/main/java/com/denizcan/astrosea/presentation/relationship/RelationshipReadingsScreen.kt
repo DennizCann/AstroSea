@@ -141,12 +141,12 @@ fun RelationshipReadingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
-                                modifier = Modifier.width(80.dp),
+                                modifier = Modifier.width(80.dp).height(60.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(
-                                    modifier = Modifier.width(56.dp),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.SpaceEvenly,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     // 1. satır: 1 kart
@@ -154,20 +154,19 @@ fun RelationshipReadingsScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(10.dp).height(15.dp),
+                                            modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
                                     // 2. satır: 2 kart
-                                    Row(horizontalArrangement = Arrangement.Center) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)) {
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(10.dp).height(15.dp),
+                                                modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
-                                            Spacer(modifier = Modifier.width(2.dp))
                                         }
                                     }
                                     // 3. satır: 1 kart
@@ -175,20 +174,19 @@ fun RelationshipReadingsScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(10.dp).height(15.dp),
+                                            modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
                                     // 4. satır: 2 kart
-                                    Row(horizontalArrangement = Arrangement.Center) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)) {
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(10.dp).height(15.dp),
+                                                modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
-                                            Spacer(modifier = Modifier.width(2.dp))
                                         }
                                     }
                                     // 5. satır: 1 kart
@@ -196,7 +194,7 @@ fun RelationshipReadingsScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(10.dp).height(15.dp),
+                                            modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -307,12 +305,12 @@ fun RelationshipReadingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
-                                modifier = Modifier.width(80.dp),
+                                modifier = Modifier.width(80.dp).height(60.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(
-                                    modifier = Modifier.width(56.dp),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.SpaceEvenly,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     // 1. satır: 1 kart
@@ -320,20 +318,19 @@ fun RelationshipReadingsScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(10.dp).height(15.dp),
+                                            modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
                                     // 2. satır: 2 kart
-                                    Row(horizontalArrangement = Arrangement.Center) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)) {
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(10.dp).height(15.dp),
+                                                modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
-                                            Spacer(modifier = Modifier.width(2.dp))
                                         }
                                     }
                                     // 3. satır: 1 kart
@@ -341,20 +338,19 @@ fun RelationshipReadingsScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(10.dp).height(15.dp),
+                                            modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
                                     // 4. satır: 2 kart
-                                    Row(horizontalArrangement = Arrangement.Center) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)) {
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
-                                                modifier = Modifier.width(10.dp).height(15.dp),
+                                                modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
-                                            Spacer(modifier = Modifier.width(2.dp))
                                         }
                                     }
                                     // 5. satır: 1 kart
@@ -362,7 +358,7 @@ fun RelationshipReadingsScreen(
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
-                                            modifier = Modifier.width(10.dp).height(15.dp),
+                                            modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }

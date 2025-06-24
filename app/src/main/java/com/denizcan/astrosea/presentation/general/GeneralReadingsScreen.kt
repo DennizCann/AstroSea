@@ -91,14 +91,14 @@ fun GeneralReadingsScreen(
                             ) {
                                 Row(
                                     modifier = Modifier.width(48.dp),
-                                    horizontalArrangement = Arrangement.Center
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
                                 ) {
                                     repeat(cardArrangements[idx][0]) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(14.dp)
+                                                .width(12.dp)
                                                 .height(21.dp),
                                             contentScale = ContentScale.Fit
                                         )

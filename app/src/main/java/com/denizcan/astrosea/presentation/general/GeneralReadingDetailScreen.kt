@@ -73,7 +73,7 @@ fun GeneralReadingDetailScreen(
                 // Çerçeve ve Kartlar
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
+                        .fillMaxWidth(0.98f)
                         .weight(6.5f),
                     contentAlignment = Alignment.Center
                 ) {
@@ -81,7 +81,7 @@ fun GeneralReadingDetailScreen(
                         painter = painterResource(id = R.drawable.acilimlarsayfasitak),
                         contentDescription = "Çerçeve",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.FillBounds
                     )
 
                     // Kartların yerleşeceği alan
@@ -348,9 +348,9 @@ fun Pyramid6Layout(
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit
 ) {
-    Box(modifier = Modifier.padding(top = 16.dp)) {
+    Box(modifier = Modifier.padding(top = 16.dp), contentAlignment = Alignment.Center) {
         val cardModifier = Modifier
-            .width(43.dp)
+            .width(54.dp)
             .aspectRatio(0.7f)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -383,16 +383,16 @@ fun Cross7Layout(
         .width(80.dp)
         .aspectRatio(0.7f)
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)) {
             CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
             CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
             CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)) {
             CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
             CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
             CardView(cardModifier, drawnCardMap[6], { onDrawCard(6) }, onNavigateToCardDetail)
@@ -406,14 +406,14 @@ fun CompatibilityCrossLayout(
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit
 ) {
-    Box(modifier = Modifier.padding(top = 16.dp)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top = 24.dp), contentAlignment = Alignment.Center) {
         val cardModifier = Modifier
             .width(43.dp)
             .aspectRatio(0.7f)
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             // Row 1: Card 1 (index 0)
             CardView(
@@ -424,7 +424,7 @@ fun CompatibilityCrossLayout(
             )
 
             // Row 2: Cards 2 & 3 (indices 1, 2)
-            Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(90.dp)) {
                 CardView(
                     cardModifier,
                     drawnCardMap[1],
@@ -448,7 +448,7 @@ fun CompatibilityCrossLayout(
             )
 
             // Row 4: Cards 5 & 6 (indices 4, 5)
-            Row(horizontalArrangement = Arrangement.spacedBy(1.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(90.dp)) {
                 CardView(
                     cardModifier,
                     drawnCardMap[4],
@@ -480,16 +480,16 @@ fun Grid3x3Layout(
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit
 ) {
-    Box(modifier = Modifier.padding(top = 16.dp)) {
+    Box(modifier = Modifier.padding(top = 28.dp)) {
         val cardModifier = Modifier
-            .width(43.dp)
+            .width(58.dp)
             .aspectRatio(0.7f)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             repeat(3) { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     repeat(3) { col ->
                         val index = row * 3 + col
                         CardView(
