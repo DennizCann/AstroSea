@@ -103,8 +103,8 @@ fun CareerReadingScreen(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(14.dp)
-                                                .height(21.dp),
+                                                .width(18.dp)
+                                                .height(27.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -114,8 +114,8 @@ fun CareerReadingScreen(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(14.dp)
-                                                .height(21.dp),
+                                                .width(18.dp)
+                                                .height(27.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -126,8 +126,8 @@ fun CareerReadingScreen(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
                                                 modifier = Modifier
-                                                    .width(14.dp)
-                                                    .height(21.dp),
+                                                    .width(18.dp)
+                                                    .height(27.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
@@ -178,45 +178,45 @@ fun CareerReadingScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
-                                modifier = Modifier.width(80.dp),
+                                modifier = Modifier.width(100.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(
-                                    modifier = Modifier.width(56.dp),
+                                    modifier = Modifier.width(72.dp),
                                     verticalArrangement = Arrangement.spacedBy(2.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(12.dp)
-                                                .height(18.dp),
+                                                .width(16.dp)
+                                                .height(24.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                                         repeat(4) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
                                                 modifier = Modifier
-                                                    .width(12.dp)
-                                                    .height(18.dp),
+                                                    .width(16.dp)
+                                                    .height(24.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(12.dp)
-                                                .height(18.dp),
+                                                .width(16.dp)
+                                                .height(24.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -279,8 +279,8 @@ fun CareerReadingScreen(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(14.dp)
-                                                .height(21.dp),
+                                                .width(18.dp)
+                                                .height(27.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
@@ -291,8 +291,8 @@ fun CareerReadingScreen(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
                                                 modifier = Modifier
-                                                    .width(14.dp)
-                                                    .height(21.dp),
+                                                    .width(18.dp)
+                                                    .height(27.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
@@ -303,8 +303,8 @@ fun CareerReadingScreen(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(14.dp)
-                                                .height(21.dp),
+                                                .width(18.dp)
+                                                .height(27.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }

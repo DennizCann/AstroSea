@@ -513,7 +513,7 @@ fun Path5Layout(
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
-            .width(43.dp)
+            .width(62.dp)
             .aspectRatio(0.7f)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -541,7 +541,7 @@ fun WorkProblemLayout(
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
-            .width(40.dp)
+            .width(48.dp)
             .aspectRatio(0.7f)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -572,7 +572,7 @@ fun FinancialLayout(
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
-            .width(43.dp)
+            .width(58.dp)
             .aspectRatio(0.7f)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
