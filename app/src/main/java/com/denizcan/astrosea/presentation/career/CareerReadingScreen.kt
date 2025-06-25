@@ -90,11 +90,11 @@ fun CareerReadingScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
-                                modifier = Modifier.width(80.dp),
+                                modifier = Modifier.width(100.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(
-                                    modifier = Modifier.width(56.dp),
+                                    modifier = Modifier.width(72.dp),
                                     verticalArrangement = Arrangement.spacedBy(2.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -138,7 +138,7 @@ fun CareerReadingScreen(
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(start = 8.dp)
+                                    .padding(start = 4.dp)
                             ) {
                                 Text(
                                     text = "GELECEĞİNE GİDEN YOL",
@@ -226,7 +226,7 @@ fun CareerReadingScreen(
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(start = 8.dp)
+                                    .padding(start = 4.dp)
                             ) {
                                 Text(
                                     text = "İŞ YERİNDEKİ PROBLEMLER",
@@ -266,11 +266,11 @@ fun CareerReadingScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
-                                modifier = Modifier.width(80.dp),
+                                modifier = Modifier.width(100.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(
-                                    modifier = Modifier.width(56.dp),
+                                    modifier = Modifier.width(72.dp),
                                     verticalArrangement = Arrangement.spacedBy(2.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -314,7 +314,7 @@ fun CareerReadingScreen(
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(start = 8.dp)
+                                    .padding(start = 4.dp)
                             ) {
                                 Text(
                                     text = "FİNANSAL DURUM",

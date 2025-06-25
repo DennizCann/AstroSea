@@ -462,7 +462,7 @@ fun RelationshipReadingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Bazı durumlar ve kişiler değişmez. Peki artık bu ilişki için çabalamalı mı, yoksa bitmesine izin mi vermeli? 6 kart ile ilişkinin devam edip etmeyeceğine dair rehberlik sunar.",
+                                    text = "Bu ilişki için çabalamalı mı, yoksa bitmesine izin mi vermeli? 6 kart ile rehberlik sunar.",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
