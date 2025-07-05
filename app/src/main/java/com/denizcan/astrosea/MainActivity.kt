@@ -46,6 +46,7 @@ import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
 import androidx.navigation.navArgument
 import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
+import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -261,7 +262,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
                             onNavigateToCareerReadings = { navController.navigate("career_reading") },
                             onNavigateToReadingDetail = { readingType ->
-                                navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+                                navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
                             }
                         )
                     }
@@ -271,7 +272,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
                             onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
                             onNavigateToReadingDetail = { readingType ->
-                                navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+                                navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
                             },
                             navController = navController
                         )
@@ -293,6 +294,23 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavigateToCareerReading = {
                                 navController.navigate("career_reading")
+                            },
+                            onNavigateToReadingDetail = { readingType ->
+                                navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
+                            }
+                        )
+                    }
+                    composable(
+                        route = Screen.GeneralReadingInfo.route,
+                        arguments = listOf(
+                            navArgument("readingType") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val readingType = backStackEntry.arguments?.getString("readingType") ?: ""
+                        GeneralReadingInfoScreen(
+                            readingType = readingType,
+                            onNavigateBack = {
+                                navController.popBackStack()
                             },
                             onNavigateToReadingDetail = { readingType ->
                                 navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
