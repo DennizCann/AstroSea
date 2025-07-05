@@ -48,7 +48,7 @@ fun TarotDetailScreen(
         ) {
             // Üst Bar
             AstroTopBar(
-                title = card.name,
+                title = card.turkishName ?: card.name,
                 onBackClick = onNavigateBack
             )
 

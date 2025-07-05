@@ -3,6 +3,7 @@
     {
       "id": "fool",
       "name": "The Fool",
+      "turkishName": "Deli",
       "number": "0",
       "type": "major",
       "imageResName": "fool",
@@ -27,6 +28,7 @@
     {
       "id": "magician",
       "name": "The Magician",
+      "turkishName": "Sihirbaz",
       "number": "1",
       "type": "major",
       "imageResName": "magician",
@@ -51,6 +53,7 @@
     {
       "id": "high_priestess",
       "name": "The High Priestess",
+      "turkishName": "Rahibe",
       "number": "2",
       "type": "major",
       "imageResName": "highpriestess",
@@ -75,6 +78,7 @@
     {
       "id": "empress",
       "name": "The Empress",
+      "turkishName": "İmparatoriçe",
       "number": "3",
       "type": "major",
       "imageResName": "empress",
@@ -99,6 +103,7 @@
     {
       "id": "emperor",
       "name": "The Emperor",
+      "turkishName": "İmparator",
       "number": "4",
       "type": "major",
       "imageResName": "emperor",
@@ -123,6 +128,7 @@
     {
       "id": "hierophant",
       "name": "The Hierophant",
+      "turkishName": "Başrahip",
       "number": "5",
       "type": "major",
       "imageResName": "hierophant",
@@ -147,6 +153,7 @@
     {
       "id": "lovers",
       "name": "The Lovers",
+      "turkishName": "Aşıklar",
       "number": "6",
       "type": "major",
       "imageResName": "lovers",
@@ -171,6 +178,7 @@
     {
       "id": "chariot",
       "name": "The Chariot",
+      "turkishName": "Savaş Arabası",
       "number": "7",
       "type": "major",
       "imageResName": "chariot",
@@ -195,6 +203,7 @@
     {
       "id": "strength",
       "name": "Strength",
+      "turkishName": "Güç",
       "number": "8",
       "type": "major",
       "imageResName": "strength",
@@ -219,6 +228,7 @@
     {
       "id": "hermit",
       "name": "The Hermit",
+      "turkishName": "Ermiş",
       "number": "9",
       "type": "major",
       "imageResName": "hermit",
@@ -243,6 +253,7 @@
     {
       "id": "wheel_of_fortune",
       "name": "Wheel of Fortune",
+      "turkishName": "Kader Çarkı",
       "number": "10",
       "type": "major",
       "imageResName": "wheeloffortune",
@@ -267,6 +278,7 @@
     {
       "id": "justice",
       "name": "Justice",
+      "turkishName": "Adalet",
       "number": "11",
       "type": "major",
       "imageResName": "justice",
@@ -291,6 +303,7 @@
     {
       "id": "hanged_man",
       "name": "The Hanged Man",
+      "turkishName": "Asılan Adam",
       "number": "12",
       "type": "major",
       "imageResName": "hangedman",
@@ -315,6 +328,7 @@
     {
       "id": "death",
       "name": "Death",
+      "turkishName": "Ölüm",
       "number": "13",
       "type": "major",
       "imageResName": "death",
@@ -339,6 +353,7 @@
     {
       "id": "temperance",
       "name": "Temperance",
+      "turkishName": "Denge",
       "number": "14",
       "type": "major",
       "imageResName": "temperance",
@@ -363,6 +378,7 @@
     {
       "id": "devil",
       "name": "The Devil",
+      "turkishName": "Şeytan",
       "number": "15",
       "type": "major",
       "imageResName": "devil",
@@ -387,6 +403,7 @@
     {
       "id": "tower",
       "name": "The Tower",
+      "turkishName": "Yıkılan Kule",
       "number": "16",
       "type": "major",
       "imageResName": "tower",
@@ -411,6 +428,7 @@
     {
       "id": "star",
       "name": "The Star",
+      "turkishName": "Yıldız",
       "number": "17",
       "type": "major",
       "imageResName": "star",
@@ -435,6 +453,7 @@
     {
       "id": "moon",
       "name": "The Moon",
+      "turkishName": "Ay",
       "number": "18",
       "type": "major",
       "imageResName": "moon",
@@ -459,6 +478,7 @@
     {
       "id": "sun",
       "name": "The Sun",
+      "turkishName": "Güneş",
       "number": "19",
       "type": "major",
       "imageResName": "sun",
@@ -483,6 +503,7 @@
     {
       "id": "judgement",
       "name": "Judgement",
+      "turkishName": "Mahkeme",
       "number": "20",
       "type": "major",
       "imageResName": "judgement",
@@ -507,6 +528,7 @@
     {
       "id": "world",
       "name": "The World",
+      "turkishName": "Dünya",
       "number": "21",
       "type": "major",
       "imageResName": "world",
@@ -534,6 +556,7 @@
       {
         "id": "ace_of_wands",
         "name": "Ace of Wands",
+        "turkishName": "Değnek Ası",
         "number": "1",
         "type": "Minor Arcana - Wands",
         "imageResName": "ace_of_wands",
@@ -558,6 +581,7 @@
       {
         "id": "two_of_wands",
         "name": "Two of Wands",
+        "turkishName": "Değnek İkilisi",
         "number": "2",
         "type": "Minor Arcana - Wands",
         "imageResName": "two_of_wands",
@@ -582,6 +606,7 @@
       {
         "id": "three_of_wands",
         "name": "Three of Wands",
+        "turkishName": "Değnek Üçlüsü",
         "number": "3",
         "type": "Minor Arcana - Wands",
         "imageResName": "three_of_wands",
@@ -606,6 +631,7 @@
       {
         "id": "four_of_wands",
         "name": "Four of Wands",
+        "turkishName": "Değnek Dörtlüsü",
         "number": "4",
         "type": "Minor Arcana - Wands",
         "imageResName": "four_of_wands",
@@ -630,6 +656,7 @@
       {
         "id": "five_of_wands",
         "name": "Five of Wands",
+        "turkishName": "Değnek Beşlisi",
         "number": "5",
         "type": "Minor Arcana - Wands",
         "imageResName": "five_of_wands",
@@ -654,6 +681,7 @@
       {
         "id": "six_of_wands",
         "name": "Six of Wands",
+        "turkishName": "Değnek Altılısı",
         "number": "6",
         "type": "Minor Arcana - Wands",
         "imageResName": "six_of_wands",
@@ -678,6 +706,7 @@
       {
         "id": "seven_of_wands",
         "name": "Seven of Wands",
+        "turkishName": "Değnek Yedilisi",
         "number": "7",
         "type": "Minor Arcana - Wands",
         "imageResName": "seven_of_wands",
@@ -702,6 +731,7 @@
       {
         "id": "eight_of_wands",
         "name": "Eight of Wands",
+        "turkishName": "Değnek Sekizlisi",
         "number": "8",
         "type": "Minor Arcana - Wands",
         "imageResName": "eight_of_wands",
@@ -726,6 +756,7 @@
       {
         "id": "nine_of_wands",
         "name": "Nine of Wands",
+        "turkishName": "Değnek Dokuzlusu",
         "number": "9",
         "type": "Minor Arcana - Wands",
         "imageResName": "nine_of_wands",
@@ -750,6 +781,7 @@
       {
         "id": "ten_of_wands",
         "name": "Ten of Wands",
+        "turkishName": "Değnek Onlusu",
         "number": "10",
         "type": "Minor Arcana - Wands",
         "imageResName": "ten_of_wands",
@@ -774,6 +806,7 @@
       {
         "id": "page_of_wands",
         "name": "Page of Wands",
+        "turkishName": "Değnek Prensi",
         "number": "11",
         "type": "Minor Arcana - Wands",
         "imageResName": "page_of_wands",
@@ -798,6 +831,7 @@
       {
         "id": "knight_of_wands",
         "name": "Knight of Wands",
+        "turkishName": "Değnek Şövalyesi",
         "number": "12",
         "type": "Minor Arcana - Wands",
         "imageResName": "knight_of_wands",
@@ -822,6 +856,7 @@
       {
         "id": "queen_of_wands",
         "name": "Queen of Wands",
+        "turkishName": "Değnek Kraliçesi",
         "number": "13",
         "type": "Minor Arcana - Wands",
         "imageResName": "queen_of_wands",
@@ -846,6 +881,7 @@
       {
         "id": "king_of_wands",
         "name": "King of Wands",
+        "turkishName": "Değnek Kralı",
         "number": "14",
         "type": "Minor Arcana - Wands",
         "imageResName": "king_of_wands",
@@ -872,6 +908,7 @@
       {
         "id": "ace_of_cups",
         "name": "Ace of Cups",
+        "turkishName": "Kupa Ası",
         "number": "1",
         "type": "Minor Arcana - Cups",
         "imageResName": "ace_of_cups",
@@ -896,6 +933,7 @@
       {
         "id": "two_of_cups",
         "name": "Two of Cups",
+        "turkishName": "Kupa İkilisi",
         "number": "2",
         "type": "Minor Arcana - Cups",
         "imageResName": "two_of_cups",
@@ -920,6 +958,7 @@
       {
         "id": "three_of_cups",
         "name": "Three of Cups",
+        "turkishName": "Kupa Üçlüsü",
         "number": "3",
         "type": "Minor Arcana - Cups",
         "imageResName": "three_of_cups",
@@ -944,6 +983,7 @@
       {
         "id": "four_of_cups",
         "name": "Four of Cups",
+        "turkishName": "Kupa Dörtlüsü",
         "number": "4",
         "type": "Minor Arcana - Cups",
         "imageResName": "four_of_cups",
@@ -968,6 +1008,7 @@
       {
         "id": "five_of_cups",
         "name": "Five of Cups",
+        "turkishName": "Kupa Beşlisi",
         "number": "5",
         "type": "Minor Arcana - Cups",
         "imageResName": "five_of_cups",
@@ -992,6 +1033,7 @@
       {
         "id": "six_of_cups",
         "name": "Six of Cups",
+        "turkishName": "Kupa Altılısı",
         "number": "6",
         "type": "Minor Arcana - Cups",
         "imageResName": "six_of_cups",
@@ -1016,6 +1058,7 @@
       {
         "id": "seven_of_cups",
         "name": "Seven of Cups",
+        "turkishName": "Kupa Yedilisi",
         "number": "7",
         "type": "Minor Arcana - Cups",
         "imageResName": "seven_of_cups",
@@ -1040,6 +1083,7 @@
       {
         "id": "eight_of_cups",
         "name": "Eight of Cups",
+        "turkishName": "Kupa Sekizlisi",
         "number": "8",
         "type": "Minor Arcana - Cups",
         "imageResName": "eight_of_cups",
@@ -1064,6 +1108,7 @@
       {
         "id": "nine_of_cups",
         "name": "Nine of Cups",
+        "turkishName": "Kupa Dokuzlusu",
         "number": "9",
         "type": "Minor Arcana - Cups",
         "imageResName": "nine_of_cups",
@@ -1088,6 +1133,7 @@
       {
         "id": "ten_of_cups",
         "name": "Ten of Cups",
+        "turkishName": "Kupa Onlusu",
         "number": "10",
         "type": "Minor Arcana - Cups",
         "imageResName": "ten_of_cups",
@@ -1112,6 +1158,7 @@
       {
         "id": "page_of_cups",
         "name": "Page of Cups",
+        "turkishName": "Kupa Prensi",
         "number": "11",
         "type": "Minor Arcana - Cups",
         "imageResName": "page_of_cups",
@@ -1136,6 +1183,7 @@
       {
         "id": "knight_of_cups",
         "name": "Knight of Cups",
+        "turkishName": "Kupa Şövalyesi",
         "number": "12",
         "type": "Minor Arcana - Cups",
         "imageResName": "knight_of_cups",
@@ -1160,6 +1208,7 @@
       {
         "id": "queen_of_cups",
         "name": "Queen of Cups",
+        "turkishName": "Kupa Kraliçesi",
         "number": "13",
         "type": "Minor Arcana - Cups",
         "imageResName": "queen_of_cups",
@@ -1184,6 +1233,7 @@
       {
         "id": "king_of_cups",
         "name": "King of Cups",
+        "turkishName": "Kupa Kralı",
         "number": "14",
         "type": "Minor Arcana - Cups",
         "imageResName": "king_of_cups",
@@ -1210,6 +1260,7 @@
       {
         "id": "ace_of_swords",
         "name": "Ace of Swords",
+        "turkishName": "Kılıç Ası",
         "number": "1",
         "type": "Minor Arcana - Swords",
         "imageResName": "ace_of_swords",
@@ -1234,6 +1285,7 @@
       {
         "id": "two_of_swords",
         "name": "Two of Swords",
+        "turkishName": "Kılıç İkilisi",
         "number": "2",
         "type": "Minor Arcana - Swords",
         "imageResName": "two_of_swords",
@@ -1258,6 +1310,7 @@
       {
         "id": "three_of_swords",
         "name": "Three of Swords",
+        "turkishName": "Kılıç Üçlüsü",
         "number": "3",
         "type": "Minor Arcana - Swords",
         "imageResName": "three_of_swords",
@@ -1282,6 +1335,7 @@
       {
         "id": "four_of_swords",
         "name": "Four of Swords",
+        "turkishName": "Kılıç Dörtlüsü",
         "number": "4",
         "type": "Minor Arcana - Swords",
         "imageResName": "four_of_swords",
@@ -1306,6 +1360,7 @@
       {
         "id": "five_of_swords",
         "name": "Five of Swords",
+        "turkishName": "Kılıç Beşlisi",
         "number": "5",
         "type": "Minor Arcana - Swords",
         "imageResName": "five_of_swords",
@@ -1330,6 +1385,7 @@
       {
         "id": "six_of_swords",
         "name": "Six of Swords",
+        "turkishName": "Kılıç Altılısı",
         "number": "6",
         "type": "Minor Arcana - Swords",
         "imageResName": "six_of_swords",
@@ -1354,6 +1410,7 @@
       {
         "id": "seven_of_swords",
         "name": "Seven of Swords",
+        "turkishName": "Kılıç Yedilisi",
         "number": "7",
         "type": "Minor Arcana - Swords",
         "imageResName": "seven_of_swords",
@@ -1378,6 +1435,7 @@
       {
         "id": "eight_of_swords",
         "name": "Eight of Swords",
+        "turkishName": "Kılıç Sekizlisi",
         "number": "8",
         "type": "Minor Arcana - Swords",
         "imageResName": "eight_of_swords",
@@ -1402,6 +1460,7 @@
       {
         "id": "nine_of_swords",
         "name": "Nine of Swords",
+        "turkishName": "Kılıç Dokuzlusu",
         "number": "9",
         "type": "Minor Arcana - Swords",
         "imageResName": "nine_of_swords",
@@ -1426,6 +1485,7 @@
       {
         "id": "ten_of_swords",
         "name": "Ten of Swords",
+        "turkishName": "Kılıç Onlusu",
         "number": "10",
         "type": "Minor Arcana - Swords",
         "imageResName": "ten_of_swords",
@@ -1450,6 +1510,7 @@
       {
         "id": "page_of_swords",
         "name": "Page of Swords",
+        "turkishName": "Kılıç Prensi",
         "number": "11",
         "type": "Minor Arcana - Swords",
         "imageResName": "page_of_swords",
@@ -1474,6 +1535,7 @@
       {
         "id": "knight_of_swords",
         "name": "Knight of Swords",
+        "turkishName": "Kılıç Şövalyesi",
         "number": "12",
         "type": "Minor Arcana - Swords",
         "imageResName": "knight_of_swords",
@@ -1498,6 +1560,7 @@
       {
         "id": "queen_of_swords",
         "name": "Queen of Swords",
+        "turkishName": "Kılıç Kraliçesi",
         "number": "13",
         "type": "Minor Arcana - Swords",
         "imageResName": "queen_of_swords",
@@ -1522,6 +1585,7 @@
       {
         "id": "king_of_swords",
         "name": "King of Swords",
+        "turkishName": "Kılıç Kralı",
         "number": "14",
         "type": "Minor Arcana - Swords",
         "imageResName": "king_of_swords",
@@ -1548,6 +1612,7 @@
       {
         "id": "ace_of_pentacles",
         "name": "Ace of Pentacles",
+        "turkishName": "Tılsım Ası",
         "number": "1",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "ace_of_pentacles",
@@ -1572,6 +1637,7 @@
       {
         "id": "two_of_pentacles",
         "name": "Two of Pentacles",
+        "turkishName": "Tılsım İkilisi",
         "number": "2",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "two_of_pentacles",
@@ -1596,6 +1662,7 @@
       {
         "id": "three_of_pentacles",
         "name": "Three of Pentacles",
+        "turkishName": "Tılsım Üçlüsü",
         "number": "3",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "three_of_pentacles",
@@ -1620,6 +1687,7 @@
       {
         "id": "four_of_pentacles",
         "name": "Four of Pentacles",
+        "turkishName": "Tılsım Dörtlüsü",
         "number": "4",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "four_of_pentacles",
@@ -1644,6 +1712,7 @@
       {
         "id": "five_of_pentacles",
         "name": "Five of Pentacles",
+        "turkishName": "Tılsım Beşlisi",
         "number": "5",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "five_of_pentacles",
@@ -1668,6 +1737,7 @@
       {
         "id": "six_of_pentacles",
         "name": "Six of Pentacles",
+        "turkishName": "Tılsım Altılısı",
         "number": "6",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "six_of_pentacles",
@@ -1692,6 +1762,7 @@
       {
         "id": "seven_of_pentacles",
         "name": "Seven of Pentacles",
+        "turkishName": "Tılsım Yedilisi",
         "number": "7",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "seven_of_pentacles",
@@ -1716,6 +1787,7 @@
       {
         "id": "eight_of_pentacles",
         "name": "Eight of Pentacles",
+        "turkishName": "Tılsım Sekizlisi",
         "number": "8",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "eight_of_pentacles",
@@ -1740,6 +1812,7 @@
       {
         "id": "nine_of_pentacles",
         "name": "Nine of Pentacles",
+        "turkishName": "Tılsım Dokuzlusu",
         "number": "9",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "nine_of_pentacles",
@@ -1764,6 +1837,7 @@
       {
         "id": "ten_of_pentacles",
         "name": "Ten of Pentacles",
+        "turkishName": "Tılsım Onlusu",
         "number": "10",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "ten_of_pentacles",
@@ -1788,6 +1862,7 @@
       {
         "id": "page_of_pentacles",
         "name": "Page of Pentacles",
+        "turkishName": "Tılsım Prensi",
         "number": "11",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "page_of_pentacles",
@@ -1812,6 +1887,7 @@
       {
         "id": "knight_of_pentacles",
         "name": "Knight of Pentacles",
+        "turkishName": "Tılsım Şövalyesi",
         "number": "12",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "knight_of_pentacles",
@@ -1836,6 +1912,7 @@
       {
         "id": "queen_of_pentacles",
         "name": "Queen of Pentacles",
+        "turkishName": "Tılsım Kraliçesi",
         "number": "13",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "queen_of_pentacles",
@@ -1860,6 +1937,7 @@
       {
         "id": "king_of_pentacles",
         "name": "King of Pentacles",
+        "turkishName": "Tılsım Kralı",
         "number": "14",
         "type": "Minor Arcana - Pentacles",
         "imageResName": "king_of_pentacles",
