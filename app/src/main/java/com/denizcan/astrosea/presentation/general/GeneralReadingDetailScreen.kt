@@ -158,12 +158,12 @@ fun MeaningCard(
     val borderColor = if (isSelected) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f)
     val textColor = if (enabled) Color.White else Color.Gray
     
-                    Card(
-                        modifier = Modifier
+    Card(
+        modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick, enabled = enabled),
         shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = Color.Black.copy(alpha = 0.6f)
         ),
         border = BorderStroke(1.dp, borderColor)
