@@ -203,6 +203,7 @@ fun CardLayoutContainer(
             CardLayout.PATH_5 -> Path5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
             CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
             CardLayout.FINANCIAL_4 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.FINANCIAL_6 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
             // Diğer layout'lar için varsayılan
             else -> HorizontalLayout(readingInfo.cardCount, drawnCardMap, onDrawCard, onNavigateToCardDetail)
         }
@@ -580,15 +581,17 @@ fun FinancialLayout(
         ) {
             // 1. sıra: 1 kart
             CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
-            
-            // 2. sıra: 2 kart
+            // 2. sıra: 3 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
                 CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
             }
-            
-            // 3. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+            // 3. sıra: 2 kart
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+            }
         }
     }
 }
@@ -615,7 +618,8 @@ enum class CardLayout {
     CELTIC_CROSS_10,
     PATH_5,
     WORK_PROBLEM_6,
-    FINANCIAL_4
+    FINANCIAL_4,
+    FINANCIAL_6
 }
 
 fun getReadingInfo(readingType: String): ReadingInfo {
@@ -627,12 +631,57 @@ fun getReadingInfo(readingType: String): ReadingInfo {
         "DURUM, AKSİYON, SONUÇ" -> ReadingInfo(3, listOf("Durum", "Aksiyon", "Sonuç"), CardLayout.HORIZONTAL_3)
         "İLİŞKİ AÇILIMI" -> ReadingInfo(3, listOf("Sen", "O", "İlişkiniz"), CardLayout.HORIZONTAL_3)
         "UYUMLULUK AÇILIMI" -> ReadingInfo(7, listOf("Senin Geçmişin", "Onun Geçmişi", "Sizin Uyumunuz", "Senin Beklentin", "Onun Beklentisi", "İlişkinin Geleceği", "Sonuç"), CardLayout.COMPATIBILITY_CROSS)
-        "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf("Geçmiş", "Şimdi", "Gelecek", "Senin Bilinçaltın", "Onun Bilinçaltı", "Dış Etkenler", "Umutlar ve Korkular", "Potansiyel", "Nihai Sonuç"), CardLayout.GRID_3x3)
-        "MÜCADELELER AÇILIMI" -> ReadingInfo(7, listOf("Ana Sorun", "Senin Bakış Açın", "Onun Bakış Açısı", "Geçmişin Etkisi", "Çözüm Önerisi", "Olası Gelecek", "Nihai Tavsiye"), CardLayout.COMPATIBILITY_CROSS)
-        "TAMAM MI, DEVAM MI" -> ReadingInfo(6, listOf("İlişkinin Temeli", "Mevcut Durum", "Devam Etme Potansiyeli", "Bitirme Potansiyeli", "Senin İçin En İyisi", "Nihai Karar"), CardLayout.PYRAMID_6)
-        "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf("Mevcut Durumun", "Hedefin", "Engellerin", "Yardımcı Etkenler", "Atman Gereken Adım"), CardLayout.PATH_5)
-        "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf("Problemin Kökü", "Seni Etkileyen Faktör", "Diğerlerini Etkileyen Faktör", "Gözden Kaçırdığın", "Çözüm Yolu", "Sonuç"), CardLayout.WORK_PROBLEM_6)
-        "FİNANSAL DURUM" -> ReadingInfo(4, listOf("Mevcut Finansal Durum", "Para Akışın", "Engeller", "Fırsatlar"), CardLayout.FINANCIAL_4)
+        "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf(
+            "Geçmişteki Duygular",
+            "Mevcut Duygular",
+            "Gelecekteki Duygular",
+            "Geçmişteki Düşünceler",
+            "Mevcut Düşünceler",
+            "Gelecekteki Düşünceler",
+            "Geçmişteki Eylemler",
+            "Mevcut Eylemler",
+            "Gelecekteki Eylemler/Sonuç"
+        ), CardLayout.GRID_3x3)
+        "MÜCADELELER AÇILIMI" -> ReadingInfo(7, listOf(
+            "İlişkinizdeki problemde sizin rolünüz",
+            "Problemde partnerinizin rolü",
+            "Sizin için tavsiye",
+            "Partneriniz için tavsiye",
+            "Dış etkiler",
+            "İlişkiniz kurtarılabilir mi?",
+            "İlişkiniz kurtarılmaya değer mi?"
+        ), CardLayout.COMPATIBILITY_CROSS)
+        "TAMAM MI, DEVAM MI" -> ReadingInfo(6, listOf(
+            "İlişkinin Mevcut Durumu",
+            "Devam Etmenin Potansiyeli",
+            "Bitirmenin Potansiyeli",
+            "İlişki devam ederse hissedecekleriniz",
+            "İlişkiniz biterse hissedecekleriniz",
+            "Genel tavsiye"
+        ), CardLayout.PYRAMID_6)
+        "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf(
+            "Hayalinizdeki kariyer",
+            "Potansiyel yollar",
+            "Yetenekleriniz",
+            "Yardımcı olabilecek kaynaklar",
+            "Dikkat etmeniz gerekenler"
+        ), CardLayout.PATH_5)
+        "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf(
+            "Hedefiniz",
+            "İşinizdeki Engel", 
+            "Sizi İşinizden Geri Çeken Etmenler",
+            "Sizi İşinizde İleri İten Etmenler",
+            "İşinizin Size Kazandırdıkları",
+            "Gizli Kalmış Sebepler"
+        ), CardLayout.WORK_PROBLEM_6)
+        "FİNANSAL DURUM" -> ReadingInfo(6, listOf(
+            "Kök Neden",
+            "Karşıt Güçler",
+            "Eylem Planı",
+            "Destekleyici Güçler",
+            "Yardım Kaynakları",
+            "Olası Sonuç"
+        ), CardLayout.FINANCIAL_6)
         else -> ReadingInfo(1, listOf("Kart"), CardLayout.SINGLE)
     }
 } 

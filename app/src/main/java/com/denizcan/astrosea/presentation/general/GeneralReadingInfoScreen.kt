@@ -182,6 +182,7 @@ fun CardLayoutContainer(
             CardLayout.PATH_5 -> Path5Layout()
             CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout()
             CardLayout.FINANCIAL_4 -> FinancialLayout()
+            CardLayout.FINANCIAL_6 -> FinancialLayout()
             // Diğer layout'lar için varsayılan
             else -> HorizontalLayout(readingInfo.cardCount)
         }
@@ -462,34 +463,36 @@ fun FinancialLayout() {
         ) {
             // 1. sıra: 1 kart
             CardView(cardModifier, 1)
-            
-            // 2. sıra: 2 kart
+            // 2. sıra: 3 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 CardView(cardModifier, 2)
                 CardView(cardModifier, 3)
+                CardView(cardModifier, 4)
             }
-            
-            // 3. sıra: 1 kart
-            CardView(cardModifier, 4)
+            // 3. sıra: 2 kart
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                CardView(cardModifier, 5)
+                CardView(cardModifier, 6)
+            }
         }
     }
 }
 
 fun getReadingDescription(readingType: String): String {
     return when (readingType.trim()) {
-        "GÜNLÜK AÇILIM" -> "Günlük açılım, gününüzün genel enerjilerini ve size rehberlik edecek mesajları görmenizi sağlar. Bu açılım, günlük hayatınızın akışını anlamanıza ve gününüzü daha bilinçli yaşamanıza yardımcı olur."
-        "TEK KART AÇILIMI" -> "Tek kart açılımı, gününüzün ana temasını veya belirli bir konuda size rehberlik edecek mesajı görmenizi sağlar. Bu basit ama etkili açılım, gününüzün genel durumunu anlamanıza yardımcı olur."
-        "EVET – HAYIR AÇILIMI" -> "Evet-Hayır açılımı, net bir soruya cevap almak için kullanılır. Bu açılım, evet/hayır cevabı alabileceğiniz sorular için idealdir ve size net bir yön gösterir."
-        "GEÇMİŞ, ŞİMDİ, GELECEK" -> "Geçmiş-Şimdi-Gelecek açılımı, bir durumun zaman çizelgesini görmenizi sağlar. Bu açılım, geçmişin etkilerini, mevcut durumu ve gelecekteki potansiyeli anlamanıza yardımcı olur."
-        "DURUM, AKSİYON, SONUÇ" -> "Durum-Aksiyon-Sonuç açılımı, mevcut durumunuzu, yapmanız gerekenleri ve olası sonucu görmenizi sağlar. Bu açılım, karar verme sürecinizde size rehberlik eder."
-        "İLİŞKİ AÇILIMI" -> "İlişki açılımı, ilişkinizin farklı yönlerini incelemenizi sağlar. Bu açılım, ilişkinizin dinamiklerini anlamanıza ve daha sağlıklı bir ilişki kurmanıza yardımcı olur."
-        "UYUMLULUK AÇILIMI" -> "Uyumluluk açılımı, iki kişi arasındaki uyumu detaylı bir şekilde analiz eder. Bu açılım, ilişkinizin güçlü yanlarını ve geliştirilmesi gereken alanları görmenizi sağlar."
-        "DETAYLI İLİŞKİ AÇILIMI" -> "Detaylı ilişki açılımı, ilişkinizin tüm boyutlarını kapsamlı bir şekilde inceler. Bu açılım, ilişkinizin geçmişini, şimdiki durumunu ve geleceğini detaylı olarak analiz eder."
-        "MÜCADELELER AÇILIMI" -> "Mücadeleler açılımı, ilişkinizdeki zorlukları ve çözüm yollarını görmenizi sağlar. Bu açılım, problemleri anlamanıza ve çözüm bulmanıza yardımcı olur."
-        "TAMAM MI, DEVAM MI" -> "Tamam mı Devam mı açılımı, bir ilişkinin devam edip etmemesi konusunda size rehberlik eder. Bu açılım, karar verme sürecinizde size net bir yön gösterir."
-        "GELECEĞİNE GİDEN YOL" -> "Geleceğine Giden Yol açılımı, kariyerinizdeki yolculuğunuzu görmenizi sağlar. Bu açılım, hedeflerinizi, engellerinizi ve başarıya ulaşma yollarınızı analiz eder."
-        "İŞ YERİNDEKİ PROBLEMLER" -> "İş Yerindeki Problemler açılımı, iş hayatınızdaki zorlukları ve çözüm yollarını görmenizi sağlar. Bu açılım, iş ortamınızdaki dinamikleri anlamanıza yardımcı olur."
-        "FİNANSAL DURUM" -> "Finansal Durum açılımı, para ve maddi konularınızı analiz eder. Bu açılım, finansal durumunuzu, fırsatlarınızı ve dikkat etmeniz gereken alanları görmenizi sağlar."
+        "GÜNLÜK AÇILIM" -> "Güne başlarken niyetinizi belirlemek ve günün enerjilerine uyumlanmak için bu açılımdan faydalanabilirsiniz. Bu açılım, güne dair bir farkındalık meditasyonu gibidir; seçilen üç kart sırasıyla gün içindeki zihinsel odağınızı, duygusal atmosferinizi ve eylemsel olarak atmanız gereken adımları sembolize eder. Size özel sunulan bu rehberlik, karşınıza çıkacak durumlara daha hazırlıklı ve bilinçli yaklaşmanızı sağlar. Günlük yol haritanızı çizerek potansiyelinizi en üst seviyeye çıkarabilir, günü daha verimli ve anlamlı kılabilirsiniz. Her yeni gün, yeni bir başlangıçtır ve bu açılım o başlangıcı en doğru şekilde yapmanıza yardımcı olur.\n\nİpucu: Günlük açılım günde bir defa o günün enerjilerini yorumlamak için yapılır."
+        "TEK KART AÇILIMI" -> "Zamanınız kısıtlı olduğunda veya aklınızdaki spesifik bir konu için anlık bir rehberliğe ihtiyaç duyduğunuzda, tek kart seçimi en güçlü ve pratik yardımcınızdır. Bu yöntem, evrenin size o anki mesajını en öz şekilde iletir. Seçtiğiniz kart, o an bilmeniz gereken en önemli bilgiyi, odaklanmanız gereken ana temayı veya ihtiyacınız olan tavsiyeyi size sunar. Karmaşık durumları basitleştirerek anın özünü yakalamanızı ve ihtiyacınız olan ilhamı bulmanızı sağlar. Bu kartı gün boyunca size yol gösterecek bir \"manevi çapa\" veya gününüzün mottosu olarak benimseyebilirsiniz."
+        "EVET – HAYIR AÇILIMI" -> "Aklınızda net bir \"evet\" ya da \"hayır\" cevabı gerektiren bir soru olduğunda, bu açılım size bir yön gösterebilir. Ancak unutmamanız gerekir ki tarot, basit bir madeni para atışı değildir; çok daha derin bir bilgelik sunar. Seçtiğiniz kart, sadece olumlu veya olumsuz bir yönelim belirtmekle kalmaz, aynı zamanda bu cevabın arkasındaki enerjileri ve koşulları da açıklar. Cevabı \"evet\" yapan destekleyici güçleri veya \"hayır\" cevabına yönlendiren koruyucu engelleri anlamanızı sağlar. Böylece, sadece yüzeysel bir cevap almakla kalmaz, durumun ruhunu ve size ne öğretmek istediğini de kavramış olursunuz."
+        "GEÇMİŞ, ŞİMDİ, GELECEK" -> "Hayatınızdaki bir durumun nereden kaynaklandığını, şu anda nerede durduğunu ve nereye doğru evrildiğini anlamak için bu klasik ve güçlü açılımı kullanabilirsiniz. İlk kart, konunun kökenini, geçmişin bugüne olan etkilerini ve öğrenilen dersleri gösterir. Ortadaki kart, mevcut durumun gerçekliğini ve şu anki dinamikleri objektif bir şekilde aydınlatır. Son kart ise, mevcut yolda devam etmeniz halinde karşılaşacağınız olası geleceği ve potansiyel sonucu ortaya koyarak size bir öngörü sunar. Bu açılım, olaylar arasındaki sebep-sonuç ilişkisini görmeniz ve geleceği şekillendirme gücünüzü fark etmeniz için size berrak bir zaman çizgisi çizer."
+        "DURUM, AKSİYON, SONUÇ" -> "Bir yol ayrımında hissettiğinizde veya atacağınız önemli bir adımın olası sonuçlarını öngörmek istediğinizde bu açılım en iyi stratejik rehberinizdir. İlk kart, içinde bulunduğunuz durumu tüm çıplaklığıyla tanımlayarak size objektif bir zemin sunar. İkinci kart, değerlendirdiğiniz potansiyel eylemi veya izleyebileceğiniz bir yolu temsil eder. Üçüncü ve son kart ise, o eylemi gerçekleştirmeniz durumunda ortaya çıkması en muhtemel sonucu gözler önüne serer. Karar verme süreçlerinizde size pratik bir içgörü ve stratejik bir bakış açısı kazandırarak en doğru ve bilinçli adımı atmanıza yardımcı olur."
+        "İLİŞKİ AÇILIMI" -> "Mevcut ilişkinizin veya duygusal bağınızın anlık enerjisini ve atmosferini anlamak için bu temel açılımdan yararlanabilirsiniz. Bu üç kart, ilişkinin mevcut dinamiğini, temelindeki ana temayı ve kısa vadeli potansiyelini bir anlık fotoğraf gibi net bir şekilde gözler önüne serer. Adeta ilişkinizin \"nabzını ölçmek\" gibidir; her şey yolunda giderken de, belirsizlik anlarında da kullanılabilir. Bağlantınızdaki ana enerjiyi hızla kavramanıza yardımcı olarak neyin yolunda gittiğini veya neye odaklanmanız gerektiğini kolayca anlamanızı sağlar."
+        "UYUMLULUK AÇILIMI" -> "Partnerinizle aranızdaki uyumun derinliklerini ve çok katmanlı yapısını keşfetmek için bu özel açılımı seçebilirsiniz. Bu yerleşim, ilişkinizi üç temel seviyede analiz eder: Kalplerin buluştuğu duygusal uyum, zihinlerin anlaştığı düşünsel uyum ve tenlerin konuştuğu fiziksel uyum. Kartlar, sizin ve partnerinizin bu alanlardaki enerjilerini, birbirinizi nasıl beslediğinizi ve hangi noktalarda dengeye ihtiyaç duyduğunuzu gösterir. Aranızdaki bağın güçlü yönlerini kutlamanız ve geliştirilmesi gereken tarafları ise şefkatle ele almanız için size bir yol haritası sunar."
+        "DETAYLI İLİŞKİ AÇILIMI" -> "İlişkinizin kapsamlı bir analizini yaparak geçmişin temellerini, şimdinin gerçeklerini ve geleceğin potansiyellerini bütüncül bir bakışla görmek istiyorsanız, bu açılım tam size göredir. Dokuz kartlık bu güçlü yorum, ilişkinizi kalp (duygular), zihin (düşünceler) ve eylem (davranışlar) ekseninde, geçmiş, şimdi ve gelecek zaman dilimlerinde inceler. Bu, sadece ne olduğunu değil, aynı zamanda söze dökülmemiş duyguları, zihinsel süreçleri ve davranış kalıplarını da anlamanızı sağlar. İlişkinizin adeta bir röntgenini çekerek size en derin katmanlara inen, bütüncül bir bakış açısı sunan bir bilgelik yolculuğudur."
+        "MÜCADELELER AÇILIMI" -> "Her ilişkide zaman zaman zorluklar ve anlaşmazlıklar yaşanması doğal bir süreçtir. Bu açılım, ilişkinizdeki mevcut sorunların yüzeydeki belirtilerinin ötesine geçerek, kökenine inmek ve kalıcı çözümler bulmak için tasarlanmıştır. Tartışmaların ardındaki gerçek sebepleri, karşılanmamış beklentileri ve sizi zorlayan gizli dinamikleri şefkatle aydınlatır. Bu açılımın amacı suçlu aramak değil, ortak bir anlayış ve çözüm yolu bulmaktır. Engelleri birlikte aşmanız için size yapıcı ve eyleme dönük bir rehberlik sunarak bağınızı daha da güçlendirir."
+        "TAMAM MI, DEVAM MI" -> "İlişkinizin kritik bir dönüm noktasında olduğunu hissediyor ve bir karar vermenin ağırlığını taşıyorsanız, bu açılım size ihtiyaç duyduğunuz berraklığı sunacaktır. Bu altı kartlık açılım, mevcut durumda kalmanın ve yola devam etmenin potansiyellerini objektif bir şekilde tartar. Bir yanda ilişkinin size kattıklarını, diğer yanda ise bitişin ardındaki nedenleri ve potansiyel özgürleşmeyi görmenizi sağlar. Hangi yolun sizin ruhsal gelişiminiz ve uzun vadedeki mutluluğunuz için daha iyi olduğunu anlamanıza yardımcı olur. Bu, kalbinizle mantığınız arasına sıkıştığınızda başvurabileceğiniz en dürüst ve şefkatli rehberdir."
+        "GELECEĞİNE GİDEN YOL" -> "Kariyer hedeflerinizi belirlediniz ama o zirveye giden patikayı çizmekte zorlanıyor musunuz? Bu açılım, sizin için kişisel bir kariyer yol haritası tasarlar. Mevcut profesyonel konumunuzdan yola çıkarak hedeflerinize giden yoldaki somut adımları, karşılaşabileceğiniz potansiyel engelleri ve bu yolda size destek olacak içsel ve dışsal kaynakları belirler. Bu kartlar, stratejik bir plan oluşturmanıza, motivasyonunuzu tazelemenize ve daha önce düşünmediğiniz alternatif yolları keşfetmenize yardımcı olur. Hayallerinizdeki kariyere ulaşmak için atmanız gereken adımları netleştirerek hedefinizi ulaşılabilir kılar."
+        "İŞ YERİNDEKİ PROBLEMLER" -> "İş yerinde tekrar eden sorunlar, gerginlikler veya iletişim kopuklukları enerjinizi mi düşürüyor? Bu açılım, ofis ortamındaki problemlerin sadece görünen yüzünü değil, görünmeyen kök nedenlerini de ortaya çıkarmak için tasarlanmıştır. Mevcut sorunu, sizin ve diğer kişilerin bu duruma olan bilinçli veya bilinçsiz etkisini ve ortamdaki gizli dinamikleri analiz eder. Bu sayede, olaylara daha geniş ve objektif bir perspektiften bakarak çözüm için en doğru yaklaşımı belirleyebilirsiniz. İş hayatınızda huzuru, uyumu ve verimliliği yeniden tesis etmenize yardımcı olacak değerli içgörüler sunar."
+        "FİNANSAL DURUM" -> "Maddi durumunuzu daha derin bir seviyede anlamak ve finansal hedeflerinize ulaşmak için neye ihtiyacınız olduğunu keşfetmek istiyorsanız, bu açılımı seçebilirsiniz. Kartlar, mevcut finansal durumunuzun bir anlık görüntüsünü sunmanın ötesine geçer; parayla olan duygusal ilişkinizi ve bilinçaltınızdaki 'para inançlarınızı' yansıtır. Bolluk ve bereketin önündeki engelleri ve bu akışı serbest bırakmak için atmanız gereken adımları gösterir. Sadece bütçenizi değil, paraya dair zihniyetinizi de dönüştürmeniz için size pratik ve ruhsal bir rehberlik yaparak finansal refahınızın önünü açar."
         else -> "Bu açılım hakkında detaylı bilgi bulunmaktadır."
     }
 }
@@ -497,84 +500,84 @@ fun getReadingDescription(readingType: String): String {
 fun getCardMeaningDescription(readingType: String, cardMeaning: String): String {
     return when (readingType.trim()) {
         "GÜNLÜK AÇILIM" -> when (cardMeaning) {
-            "Düşünce" -> "Gününüzdeki düşünce kalıplarınızı ve zihinsel durumunuzu temsil eder."
-            "His" -> "Gününüzdeki duygusal durumunuzu ve hislerinizi temsil eder."
-            "Aksiyon" -> "Gününüzde yapmanız gereken eylemleri ve davranışlarınızı temsil eder."
+            "Düşünce" -> "Bugün aklınızda genel olarak hangi düşünceler olacak? Bugün en çok ne ile ilgili düşüneceksiniz."
+            "His" -> "Bugün neler hissedeceksiniz? Bugünkü duygu durumunuzdaki en hakim duygular neler olacak?"
+            "Aksiyon" -> "Bugünkü genel eylemleriniz neler olacak? Neler yapacaksınız?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "TEK KART AÇILIMI" -> when (cardMeaning) {
-            "Günün Kartı" -> "Gününüzün ana temasını ve size verilen mesajı temsil eder."
+            "Günün Kartı" -> "Sorunuz ile ilgili genel etkiler neler? Evrenden size ulaşan tavsiyeler neler? Ne yapmalısınız ya da sorunuz ile ilgili neleri dikkate almalısınız?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "EVET – HAYIR AÇILIMI" -> when (cardMeaning) {
-            "Cevap" -> "Sorunuzun cevabını ve size verilen yönlendirmeyi temsil eder."
+            "Cevap" -> "Sorduğunuz sorunun güncel enerjilerine göre Evet ya da Hayır cevabınız."
             else -> "Bu kartın anlamını temsil eder."
         }
         "GEÇMİŞ, ŞİMDİ, GELECEK" -> when (cardMeaning) {
-            "Geçmiş" -> "Sorunuzla ilgili geçmişteki etkenleri ve temelleri temsil eder."
-            "Şimdi" -> "Mevcut durumunuzu ve şu anki koşulları temsil eder."
-            "Gelecek" -> "Gelecekteki potansiyeli ve olası sonuçları temsil eder."
+            "Geçmiş" -> "Şimdiki durumunuza gelmenize sebep olan geçmiş; inanç, etki, duygu ya da düşünceler."
+            "Şimdi" -> "Şuan, şimdi, burada… Hali hazırda aktif olan enerjiler nedir? Şuanki durumunuzda hangi enerjiler sizi etkiliyor. Hangi güçler aktif?"
+            "Gelecek" -> "Gelecekte olabilecek durumlar nelerdir?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "DURUM, AKSİYON, SONUÇ" -> when (cardMeaning) {
-            "Durum" -> "Mevcut durumunuzu ve koşulları temsil eder."
-            "Aksiyon" -> "Yapmanız gereken eylemleri ve davranışları temsil eder."
-            "Sonuç" -> "Olası sonuçları ve sonuçları temsil eder."
+            "Durum" -> "Şu anki durumunuz nedir?"
+            "Aksiyon" -> "Almayı planladığınız ya da alacağını aksiyonlar."
+            "Sonuç" -> "Gerçekleştirdiğiniz aksiyon sonucunda ortaya çıkması muhtemel sonuçlar."
             else -> "Bu kartın anlamını temsil eder."
         }
         "İLİŞKİ AÇILIMI" -> when (cardMeaning) {
-            "Sen" -> "İlişkideki rolünüzü ve bakış açınızı temsil eder."
-            "O" -> "Partnerinizin rolünü ve bakış açısını temsil eder."
-            "İlişkiniz" -> "İlişkinizin genel durumunu ve dinamiklerini temsil eder."
+            "Sen" -> "İlişkideki güncel durumunuzu temsil eder."
+            "O" -> "İlişkide olduğunuz partnerinizin güncel durumunu temsil eder."
+            "İlişkiniz" -> "İlişkinizdeki güncel durum nedir? Evren enerjilerine göre ilişkiniz nasıl görünüyor? Güncel karakteristik özelliği nedir?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "UYUMLULUK AÇILIMI" -> when (cardMeaning) {
-            "Senin Geçmişin" -> "Sizin geçmiş deneyimlerinizi ve etkilerini temsil eder."
-            "Onun Geçmişi" -> "Partnerinizin geçmiş deneyimlerini ve etkilerini temsil eder."
-            "Sizin Uyumunuz" -> "İkinizin uyum seviyesini ve uyumluluğunuzu temsil eder."
-            "Senin Beklentin" -> "Sizin beklentilerinizi ve umutlarınızı temsil eder."
-            "Onun Beklentisi" -> "Partnerinizin beklentilerini ve umutlarını temsil eder."
-            "İlişkinin Geleceği" -> "İlişkinizin gelecekteki potansiyelini temsil eder."
-            "Sonuç" -> "İlişkinizin genel sonucunu ve yönünü temsil eder."
+            "Senin Geçmişin" -> "Siz bu ilişkiden ne istiyorsunuz?"
+            "Onun Geçmişi" -> "Partneriniz bu ilişkiden ne istiyor?"
+            "Sizin Uyumunuz" -> "Partneriniz ile temel farklılıklarınız neler? Temelde anlaşamadığınız konular ve durumlar neler?"
+            "Senin Beklentin" -> "Hangi konularda benzersiniz? Partneriniz ile anlaştığınız ve onu anladığınız noktalar neler? Hayata bakış açınızda aynı olduğunuz noktalar neler?"
+            "Onun Beklentisi" -> "Bu ilişkideki duygusal uyumluluğunuz nasıl? Birbirinize nasıl hissettiriyorsunuz?"
+            "İlişkinin Geleceği" -> "İlişkinizdeki fiziksel uyumunuz nasıl? Fiziksel olarak birbirinizi çekici buluyor musunuz?"
+            "Sonuç" -> "İlişkinizdeki mental uyumunuz nasıl? Düşünceleriniz, değerleriniz ve idealleriniz arasındaki uyumun farkına varın."
             else -> "Bu kartın anlamını temsil eder."
         }
         "DETAYLI İLİŞKİ AÇILIMI" -> when (cardMeaning) {
-            "Geçmiş" -> "İlişkinizin geçmişini ve temellerini temsil eder."
-            "Şimdi" -> "İlişkinizin mevcut durumunu temsil eder."
-            "Gelecek" -> "İlişkinizin gelecekteki potansiyelini temsil eder."
-            "Senin Bilinçaltın" -> "Sizin bilinçaltı düşüncelerinizi ve duygularınızı temsil eder."
-            "Onun Bilinçaltı" -> "Partnerinizin bilinçaltı düşüncelerini ve duygularını temsil eder."
-            "Dış Etkenler" -> "İlişkinizi etkileyen dış faktörleri temsil eder."
-            "Umutlar ve Korkular" -> "İlişkiyle ilgili umutlarınızı ve korkularınızı temsil eder."
-            "Potansiyel" -> "İlişkinizin potansiyelini ve gelişim alanlarını temsil eder."
-            "Nihai Sonuç" -> "İlişkinizin nihai sonucunu ve yönünü temsil eder."
+            "Geçmişteki Duygular" -> "İlişkinin geçmişinde hakim olan duygusal atmosfer neydi?"
+            "Mevcut Duygular" -> "Şu anda ilişkinin kalbinde yatan duygular nelerdir?"
+            "Gelecekteki Duygular" -> "İlişkinin gelecekte evrileceği muhtemel duygusal durum nedir?"
+            "Geçmişteki Düşünceler" -> "Geçmişte ilişkiye dair zihinsel tutumunuz ve düşünceleriniz nasıldı?"
+            "Mevcut Düşünceler" -> "Şu anda ilişki hakkındaki baskın düşünceler ve zihinsel süreçler nelerdir?"
+            "Gelecekteki Düşünceler" -> "Gelecekte ilişkiyle ilgili zihinsel odağınız ne yönde olacak?"
+            "Geçmişteki Eylemler" -> "Geçmişte ilişkinizi şekillendiren eylemler nelerdi?"
+            "Mevcut Eylemler" -> "Şu anki davranışlarınız ve eylemleriniz ilişkiyi nasıl etkiliyor?"
+            "Gelecekteki Eylemler/Sonuç" -> "Tüm bu dinamiklerin birleşimiyle ortaya çıkacak en olası eylem veya nihai sonuç nedir?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "MÜCADELELER AÇILIMI" -> when (cardMeaning) {
-            "Ana Sorun" -> "İlişkinizdeki ana problemi temsil eder."
-            "Senin Bakış Açın" -> "Soruna karşı sizin bakış açınızı temsil eder."
-            "Onun Bakış Açısı" -> "Soruna karşı partnerinizin bakış açısını temsil eder."
-            "Geçmişin Etkisi" -> "Geçmişin mevcut soruna etkisini temsil eder."
-            "Çözüm Önerisi" -> "Sorunun çözümü için önerileri temsil eder."
-            "Olası Gelecek" -> "Sorun çözüldükten sonraki olası geleceği temsil eder."
-            "Nihai Tavsiye" -> "Size verilen nihai tavsiyeyi temsil eder."
+            "İlişkinizdeki problemde sizin rolünüz" -> "Bu problemde sizin rolünüz nedir? Eylem ve düşünceleriniz problem üzerinde nasıl bir etki yaratıyor."
+            "Problemde partnerinizin rolü" -> "Bu sorunu ne büyütüyor veya ne tetikliyor? Bu problemde partnerinizin rolü nedir? Eylem ve düşünceleri problem üzerinde nasıl bir etki yaratıyor."
+            "Sizin için tavsiye" -> "İlişkinin düzelmesi için evren enerjileri ne diyor? Bu problemin çözülmesinde sizin katkınız ne olabilir?"
+            "Partneriniz için tavsiye" -> "Partneriniz ilişkinin düzelmesi için hangi adımları atabilir? İlişkinin eski sağlığına kavuşması için ne yapması lazım?"
+            "Dış etkiler" -> "Dışarıdan gelen hangi etkiler ilişkinizdeki problemi besliyor?"
+            "İlişkiniz kurtarılabilir mi?" -> "Bu kırılma noktası yaşanıp bittikten sonra ilişkiniz devam edecek mi?"
+            "İlişkiniz kurtarılmaya değer mi?" -> "Bütün bu zorluk ve mücadelelere karşın ilişkiniz gerçekten kurtarılmaya değer mi? İlişkinin devamı hem sizin hem de partneriniz için sağlıklı mı? Gerçekten mutlu olacak mısınız?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "TAMAM MI, DEVAM MI" -> when (cardMeaning) {
-            "İlişkinin Temeli" -> "İlişkinizin temelini ve gücünü temsil eder."
-            "Mevcut Durum" -> "İlişkinizin mevcut durumunu temsil eder."
-            "Devam Etme Potansiyeli" -> "İlişkinin devam etme potansiyelini temsil eder."
-            "Bitirme Potansiyeli" -> "İlişkinin bitme potansiyelini temsil eder."
-            "Senin İçin En İyisi" -> "Sizin için en iyi olanı temsil eder."
-            "Nihai Karar" -> "Size verilen nihai kararı temsil eder."
+            "İlişkinin Mevcut Durumu" -> "Şu anki durumun en dürüst ve çıplak özeti nedir?"
+            "Devam Etmenin Potansiyeli" -> "Bu ilişkide kalırsanız, sizi ne bekliyor? Bu yolun size sunacağı en olumlu potansiyel nedir?"
+            "Bitirmenin Potansiyeli" -> "Bu ilişkiyi bitirirseniz, sizi ne bekliyor? Bu yolun size getireceği ders veya özgürleşme nedir?"
+            "İlişki devam ederse hissedecekleriniz" -> "İlişkinizi devam ettirirseniz duygusal dünyanızda sizi bekleyen durumlar nelerdir?"
+            "İlişkiniz biterse hissedecekleriniz" -> "İlişkinizi bitirirseniz duygusal dünyanızda sizi bekleyen durumlar nelerdir?"
+            "Genel tavsiye" -> "Bitirmek ya da devam etmek… Bu iki sonuç arasında kaldığınızda dikkate almanız gereken durumlar nelerdir? Hangi konuları düşünmeli, tartmalı ve ona göre karar vermelisiniz?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "GELECEĞİNE GİDEN YOL" -> when (cardMeaning) {
-            "Mevcut Durumun" -> "Kariyerinizdeki mevcut durumunuzu temsil eder."
-            "Hedefin" -> "Kariyer hedeflerinizi temsil eder."
-            "Engellerin" -> "Hedefinize ulaşmanızdaki engelleri temsil eder."
-            "Yardımcı Etkenler" -> "Size yardımcı olacak faktörleri temsil eder."
-            "Atman Gereken Adım" -> "Hedefinize ulaşmak için atmanız gereken adımı temsil eder."
+            "Hayalinizdeki kariyer" -> "Hayalinizdeki iş neye benziyor? Ömrünüzün geri kalanında yapmak istediğiniz ve asla sıkılmayacağınız o iş nedir? Sizin rolünüz nedir? Bu yolda neler bulacaksınız?"
+            "Potansiyel yollar" -> "Hayalinizdeki kariyere giden potansiyel yollar neler? İstediğiniz noktaya nasıl ulaşabilirsiniz?"
+            "Yetenekleriniz" -> "Hayalinizdeki kariyere ulaşmak için sahip olduğunuz yetenekleriniz neler?"
+            "Yardımcı olabilecek kaynaklar" -> "Size kim yardımcı olabilir? Hayalinizdeki kariyere giden yolda yararlanabileceğiniz bağlantılarınız neler veya kimler?"
+            "Dikkat etmeniz gerekenler" -> "Hedefinize giderken neleri gözden kaçırmamanız gerekiyor?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "İŞ YERİNDEKİ PROBLEMLER" -> when (cardMeaning) {
@@ -587,10 +590,12 @@ fun getCardMeaningDescription(readingType: String, cardMeaning: String): String 
             else -> "Bu kartın anlamını temsil eder."
         }
         "FİNANSAL DURUM" -> when (cardMeaning) {
-            "Mevcut Finansal Durum" -> "Şu anki finansal durumunuzu temsil eder."
-            "Para Akışın" -> "Para akışınızı ve gelir-gider durumunuzu temsil eder."
-            "Engeller" -> "Finansal hedeflerinize ulaşmanızdaki engelleri temsil eder."
-            "Fırsatlar" -> "Finansal fırsatlarınızı ve potansiyelinizi temsil eder."
+            "Kök Neden" -> "Finansal durumunuzun temelindeki asıl sebep nedir? Bu kart, mevcut durumun kökenindeki ana dinamiği veya başlangıç noktasını aydınlatıyor."
+            "Karşıt Güçler" -> "Size karşı çalışan veya finansal hedeflerinize ulaşmanızı zorlaştıran içsel yada dışsal etkenler nelerdir? Bu kart, önünüzdeki engelleri gösteriyor."
+            "Eylem Planı" -> "Mevcut finansal durumu iyileştirmek için atabileceğiniz en etkili ve yapıcı adım nedir? Bu kart, size durumu lehinize çevirecek somut bir eylem planı sunar."
+            "Destekleyici Güçler" -> "Başarınıza yardımcı olan, lehinize işleyen güçler, yetenekler veya durumlar nelerdir? Bu kart, sahip olduğunuz avantajları ve size destek olan müttefikleri ortaya çıkarır."
+            "Yardım Kaynakları" -> "Finansal yolculuğunuzda nereden veya kimden yardım alabilirsiniz? Bu kart, başvurabileceğiniz dış kaynakları, kişileri veya beklenmedik fırsatları işaret eder."
+            "Olası Sonuç" -> "Mevcut enerjiler ve dinamikler göz önüne alındığında, bu yolun sizi götüreceği en olası finansal sonuç nedir? Bu kart, yakın gelecekteki potansiyel durumu öngörür."
             else -> "Bu kartın anlamını temsil eder."
         }
         else -> "Bu kartın anlamını temsil eder."

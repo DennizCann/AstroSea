@@ -274,39 +274,44 @@ fun CareerReadingScreen(
                                     verticalArrangement = Arrangement.spacedBy(2.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    // 1. sıra: 1 kart
+                                    Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                             contentDescription = "Kart Arkası",
                                             modifier = Modifier
-                                                .width(18.dp)
-                                                .height(27.dp),
+                                                .width(14.dp)
+                                                .height(21.dp),
                                             contentScale = ContentScale.Fit
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(2.dp))
+                                    // 2. sıra: 3 kart
+                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                        repeat(3) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                                                contentDescription = "Kart Arkası",
+                                                modifier = Modifier
+                                                    .width(14.dp)
+                                                    .height(21.dp),
+                                                contentScale = ContentScale.Fit
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    // 3. sıra: 2 kart
                                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
                                                 contentDescription = "Kart Arkası",
                                                 modifier = Modifier
-                                                    .width(18.dp)
-                                                    .height(27.dp),
+                                                    .width(14.dp)
+                                                    .height(21.dp),
                                                 contentScale = ContentScale.Fit
                                             )
                                         }
-                                    }
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
-                                            modifier = Modifier
-                                                .width(18.dp)
-                                                .height(27.dp),
-                                            contentScale = ContentScale.Fit
-                                        )
                                     }
                                 }
                             }
