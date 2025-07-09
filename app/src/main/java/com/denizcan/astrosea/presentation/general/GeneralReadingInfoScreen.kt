@@ -557,13 +557,13 @@ fun getCardMeaningDescription(readingType: String, meaning: String): String {
             else -> "Bu kartın anlamını temsil eder."
         }
         "MÜCADELELER AÇILIMI" -> when (meaning) {
+            "Dış etkiler" -> "Dışarıdan gelen hangi etkiler ilişkinizdeki problemi besliyor?"
             "İlişkinizdeki problemde sizin rolünüz" -> "Bu problemde sizin rolünüz nedir? Eylem ve düşünceleriniz problem üzerinde nasıl bir etki yaratıyor."
             "Problemde partnerinizin rolü" -> "Bu sorunu ne büyütüyor veya ne tetikliyor? Bu problemde partnerinizin rolü nedir? Eylem ve düşünceleri problem üzerinde nasıl bir etki yaratıyor."
+            "İlişkiniz kurtarılabilir mi?" -> "Bu kırılma noktası yaşanıp bittikten sonra ilişkiniz devam edecek mi?"
             "Sizin için tavsiye" -> "İlişkinin düzelmesi için evren enerjileri ne diyor? Bu problemin çözülmesinde sizin katkınız ne olabilir?"
             "Partneriniz için tavsiye" -> "Partneriniz ilişkinin düzelmesi için hangi adımları atabilir? İlişkinin eski sağlığına kavuşması için ne yapması lazım?"
-            "Dış etkiler" -> "Dışarıdan gelen hangi etkiler ilişkinizdeki problemi besliyor?"
-            "İlişkiniz kurtarılabilir mi?" -> "Bu kırılma noktası yaşanıp bittikten sonra ilişkiniz devam edecek mi?"
-            "İlişkiniz kurtarılmaya değer mi?" -> "Bütün bu zorluk ve mücadelelere karşın ilişkiniz gerçekten kurtarılmaya değer mi? İlişkinin devamı hem sizin hem de partneriniz için sağlıklı mı? Gerçekten mutlu olacak mısınız?"
+            "İlişkiniz kurtarılmaya değer mi?" -> "Bütün bu zorluk ve mücadelelere karşın ilişkiniz gerçekte kurtarılmaya değer mi? İlişkinin devamı hem sizin hem de partneriniz için sağlıklı mı? Gerçekten mutlu olacak mısınız?"
             else -> "Bu kartın anlamını temsil eder."
         }
         "TAMAM MI, DEVAM MI" -> when (meaning) {

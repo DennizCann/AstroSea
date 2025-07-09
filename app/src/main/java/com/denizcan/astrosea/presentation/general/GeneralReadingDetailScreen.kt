@@ -670,12 +670,12 @@ fun getReadingInfo(readingType: String): ReadingInfo {
             "Gelecekteki Eylemler/Sonuç"
         ), CardLayout.GRID_3x3)
         "MÜCADELELER AÇILIMI" -> ReadingInfo(7, listOf(
+            "Dış etkiler",
             "İlişkinizdeki problemde sizin rolünüz",
             "Problemde partnerinizin rolü",
+            "İlişkiniz kurtarılabilir mi?",
             "Sizin için tavsiye",
             "Partneriniz için tavsiye",
-            "Dış etkiler",
-            "İlişkiniz kurtarılabilir mi?",
             "İlişkiniz kurtarılmaya değer mi?"
         ), CardLayout.COMPATIBILITY_CROSS)
         "TAMAM MI, DEVAM MI" -> ReadingInfo(6, listOf(
