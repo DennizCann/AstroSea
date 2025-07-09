@@ -683,8 +683,8 @@ fun getReadingInfo(readingType: String): ReadingInfo {
             "Devam Etmenin Potansiyeli",
             "Bitirmenin Potansiyeli",
             "İlişki devam ederse hissedecekleriniz",
-            "İlişkiniz biterse hissedecekleriniz",
-            "Genel tavsiye"
+            "Genel tavsiye",
+            "İlişkiniz biterse hissedecekleriniz"
         ), CardLayout.PYRAMID_6)
         "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf(
             "Hayalinizdeki kariyer",
