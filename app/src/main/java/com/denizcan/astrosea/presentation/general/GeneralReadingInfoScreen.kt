@@ -545,12 +545,12 @@ fun getCardMeaningDescription(readingType: String, meaning: String): String {
             else -> "Bu kartın anlamını temsil eder."
         }
         "DETAYLI İLİŞKİ AÇILIMI" -> when (meaning) {
-            "Geçmişteki Duygular" -> "İlişkinin geçmişinde hakim olan duygusal atmosfer neydi?"
-            "Mevcut Duygular" -> "Şu anda ilişkinin kalbinde yatan duygular nelerdir?"
-            "Gelecekteki Duygular" -> "İlişkinin gelecekte evrileceği muhtemel duygusal durum nedir?"
             "Geçmişteki Düşünceler" -> "Geçmişte ilişkiye dair zihinsel tutumunuz ve düşünceleriniz nasıldı?"
             "Mevcut Düşünceler" -> "Şu anda ilişki hakkındaki baskın düşünceler ve zihinsel süreçler nelerdir?"
             "Gelecekteki Düşünceler" -> "Gelecekte ilişkiyle ilgili zihinsel odağınız ne yönde olacak?"
+            "Geçmişteki Duygular" -> "İlişkinin geçmişinde hakim olan duygusal atmosfer neydi?"
+            "Mevcut Duygular" -> "Şu anda ilişkinin kalbinde yatan duygular nelerdir?"
+            "Gelecekteki Duygular" -> "İlişkinin gelecekte evrileceği muhtemel duygusal durum nedir?"
             "Geçmişteki Eylemler" -> "Geçmişte ilişkinizi şekillendiren eylemler nelerdi?"
             "Mevcut Eylemler" -> "Şu anki davranışlarınız ve eylemleriniz ilişkiyi nasıl etkiliyor?"
             "Gelecekteki Eylemler/Sonuç" -> "Tüm bu dinamiklerin birleşimiyle ortaya çıkacak en olası eylem veya nihai sonuç nedir?"

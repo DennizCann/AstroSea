@@ -659,12 +659,12 @@ fun getReadingInfo(readingType: String): ReadingInfo {
             "Mental uyumunuz"
         ), CardLayout.COMPATIBILITY_CROSS)
         "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf(
-            "Geçmişteki Duygular",
-            "Mevcut Duygular",
-            "Gelecekteki Duygular",
             "Geçmişteki Düşünceler",
             "Mevcut Düşünceler",
             "Gelecekteki Düşünceler",
+            "Geçmişteki Duygular",
+            "Mevcut Duygular",
+            "Gelecekteki Duygular",
             "Geçmişteki Eylemler",
             "Mevcut Eylemler",
             "Gelecekteki Eylemler/Sonuç"
