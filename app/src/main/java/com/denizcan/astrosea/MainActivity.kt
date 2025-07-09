@@ -184,7 +184,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.Motivation.route)
                             },
                             onNavigateToYesNo = {
-                                navController.navigate(Screen.GeneralReadingDetail.createRoute("EVET – HAYIR AÇILIMI"))
+                                navController.navigate(Screen.GeneralReadingInfo.createRoute("EVET – HAYIR AÇILIMI"))
                             },
                             onNavigateToRelationshipReadings = {
                                 navController.navigate("relationship_readings")
@@ -200,6 +200,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavigateToCardDetail = { cardId ->
                                 navController.navigate("tarot_detail/$cardId")
+                            },
+                            onNavigateToDailyReadingInfo = {
+                                navController.navigate(Screen.GeneralReadingInfo.createRoute("GÜNLÜK AÇILIM"))
                             },
                             onSignOut = {
                                 FirebaseAuth.getInstance().signOut()

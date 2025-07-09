@@ -112,20 +112,32 @@ fun GeneralReadingDetailScreen(
                     ) {
                         itemsIndexed(readingInfo.cardMeanings) { index, meaning ->
                             val card = viewModel.drawnCards.find { it.index == index }?.card
-                            val cardName = card?.name ?: "..."
                             val isCardDrawn = card != null
+                            val isCardRevealed = card != null && viewModel.drawnCards.find { it.index == index }?.isRevealed == true
+                            
+                            // Günlük açılım için özel mantık: kart açılmışsa ismini göster, açılmamışsa sadece anlamı göster
+                            val displayText = if (readingType.trim() == "GÜNLÜK AÇILIM") {
+                                if (isCardRevealed) {
+                                    "${index + 1}. $meaning: ${card?.name ?: ""}"
+                                } else {
+                                    "${index + 1}. $meaning"
+                                }
+                            } else {
+                                // Diğer açılımlar için normal mantık
+                                "${index + 1}. $meaning: ${card?.name ?: "..."}"
+                            }
                             
                             MeaningCard(
-                                text = "${index + 1}. $meaning: $cardName",
-                        onClick = { 
-                                    if (isCardDrawn) {
+                                text = displayText,
+                                onClick = { 
+                                    if (isCardDrawn && isCardRevealed) {
                                         onNavigateToCardDetail(card.id)
                                     } else {
-                                        // Kart henüz çekilmemişse, tıklandığında çek
+                                        // Kart henüz çekilmemişse veya açılmamışsa, tıklandığında çek
                                         viewModel.drawCardForPosition(readingType, index)
                                     }
                                 },
-                                isSelected = isCardDrawn,
+                                isSelected = isCardRevealed,
                                 enabled = true
                             )
                         }
@@ -133,14 +145,21 @@ fun GeneralReadingDetailScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Yeniden Çek Butonu - Her zaman görünür
+                    // Yeniden Çek Butonu - Günlük açılım için inaktif
+                    val isDailyReading = readingType.trim() == "GÜNLÜK AÇILIM"
                     Button(
                         onClick = { viewModel.resetAndDrawNew(readingType) },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.6f)),
+                        enabled = !isDailyReading,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isDailyReading) Color.Gray.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.6f)
+                        ),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                     ) {
-                        Text("Yeniden Çek", color = Color.White)
+                        Text(
+                            text = if (isDailyReading) "Günlük Açılım - Günde Bir Kez" else "Yeniden Çek",
+                            color = if (isDailyReading) Color.Gray else Color.White
+                        )
                     }
                 }
             }

@@ -62,6 +62,7 @@ fun HomeScreen(
     onNavigateToMore: () -> Unit,
     onNavigateToGeneralReadings: () -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
+    onNavigateToDailyReadingInfo: () -> Unit,
     onSignOut: () -> Unit
 ) {
     val profileState = viewModel.profileState
@@ -71,6 +72,14 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         // viewModel init bloğunda loadProfile() çağrılıyor
+    }
+
+    // Günlük kartları periyodik olarak yenile (detay sayfasından döndüğünde güncel olsun)
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(1000) // 1 saniyede bir kontrol et
+            dailyTarotViewModel.refreshCards()
+        }
     }
 
     // Menü seçeneklerini güncelliyoruz
@@ -341,7 +350,8 @@ fun HomeScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 48.dp),
+                        .padding(horizontal = 48.dp)
+                        .clickable { onNavigateToDailyReadingInfo() },
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
@@ -396,6 +406,9 @@ fun HomeScreen(
                                     }
                                     // Sonra kartı açalım
                                     dailyTarotViewModel.revealCard(cardState.index)
+                                } else {
+                                    // Kart zaten açıksa, günlük açılım info sayfasına git
+                                    onNavigateToDailyReadingInfo()
                                 }
                             },
                             onCardDetailClick = { cardId ->
