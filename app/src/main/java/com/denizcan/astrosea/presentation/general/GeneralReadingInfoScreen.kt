@@ -584,12 +584,12 @@ fun getCardMeaningDescription(readingType: String, meaning: String): String {
             else -> "Bu kartın anlamını temsil eder."
         }
         "İŞ YERİNDEKİ PROBLEMLER" -> when (meaning) {
-            "Hedefiniz" -> "İş yerindeki problemin temel nedenini temsil eder."
-            "İşinizdeki Engel" -> "Problemin sizi nasıl etkilediğini temsil eder."
-            "Sizi İşinizden Geri Çeken Etmenler" -> "Problemin diğerlerini nasıl etkilediğini temsil eder."
-            "Sizi İşinizde İleri İten Etmenler" -> "Gözden kaçırdığınız faktörleri temsil eder."
-            "İşinizin Size Kazandırdıkları" -> "Problemin çözümü için yolu temsil eder."
-            "Gizli Kalmış Sebepler" -> "Problemin çözümünden sonraki sonucu temsil eder."
+            "İşinizin Size Kazandırdıkları" -> "Mevcut işiniz size maddi veya manevi olarak neler katıyor? Bu kart, bu profesyonel deneyimin size kazandırdığı dersleri, yetenekleri veya faydaları görmenizi sağlar."
+            "Sizi İşinizden Geri Çeken Etmenler" -> "Motivasyonunuzu düşüren, enerjinizi tüketen veya ilerlemenizi yavaşlatan içsel veya dışsal faktörler nelerdir? Bu kart, sizi geriye çeken ve potansiyelinizi kısıtlayan dinamikleri gösteriyor."
+            "Hedefiniz" -> "Kariyerinizde veya mevcut işinizde ulaşmayı arzuladığınız asıl hedef nedir? Bu kart, bu hedefin doğasını ve sizin için taşıdığı gerçek önemi aydınlatıyor."
+            "İşinizdeki Engel" -> "Hedefinize ulaşmanızın veya iş yerinde huzur bulmanızın önündeki temel engel nedir? Bu kart, yüzleşmeniz gereken ana zorluğu net bir şekilde ortaya koyuyor."
+            "Sizi İşinizde İleri İten Etmenler" -> "İşinizde size güç, motivasyon ve ilham veren kaynaklar nelerdir? Bu kart, ilerlemenizi sağlayan, sizi destekleyen ve hedeflerinize doğru iten olumlu güçleri aydınlatıyor."
+            "Gizli Kalmış Sebepler" -> "Tüm bu durumun yüzeyinin altında yatan, gözden kaçırdığınız veya farkında olmadığınız gizli sebep nedir? Bu kart, sorunun kökenindeki o kritik ve görünmeyen detayı ortaya koyuyor."
             else -> "Bu kartın anlamını temsil eder."
         }
         "FİNANSAL DURUM" -> when (meaning) {

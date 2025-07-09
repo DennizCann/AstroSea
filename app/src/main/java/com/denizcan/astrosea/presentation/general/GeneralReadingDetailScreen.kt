@@ -694,11 +694,11 @@ fun getReadingInfo(readingType: String): ReadingInfo {
             "Dikkat etmeniz gerekenler"
         ), CardLayout.PATH_5)
         "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf(
+            "İşinizin Size Kazandırdıkları",
+            "Sizi İşinizden Geri Çeken Etmenler",
             "Hedefiniz",
             "İşinizdeki Engel", 
-            "Sizi İşinizden Geri Çeken Etmenler",
             "Sizi İşinizde İleri İten Etmenler",
-            "İşinizin Size Kazandırdıkları",
             "Gizli Kalmış Sebepler"
         ), CardLayout.WORK_PROBLEM_6)
         "FİNANSAL DURUM" -> ReadingInfo(6, listOf(
