@@ -689,8 +689,8 @@ fun getReadingInfo(readingType: String): ReadingInfo {
         "GELECEĞİNE GİDEN YOL" -> ReadingInfo(5, listOf(
             "Hayalinizdeki kariyer",
             "Potansiyel yollar",
-            "Yetenekleriniz",
             "Yardımcı olabilecek kaynaklar",
+            "Yetenekleriniz",
             "Dikkat etmeniz gerekenler"
         ), CardLayout.PATH_5)
         "İŞ YERİNDEKİ PROBLEMLER" -> ReadingInfo(6, listOf(
