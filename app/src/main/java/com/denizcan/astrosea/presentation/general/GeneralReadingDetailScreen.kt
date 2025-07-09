@@ -649,7 +649,15 @@ fun getReadingInfo(readingType: String): ReadingInfo {
         "GEÇMİŞ, ŞİMDİ, GELECEK" -> ReadingInfo(3, listOf("Geçmiş", "Şimdi", "Gelecek"), CardLayout.HORIZONTAL_3)
         "DURUM, AKSİYON, SONUÇ" -> ReadingInfo(3, listOf("Durum", "Aksiyon", "Sonuç"), CardLayout.HORIZONTAL_3)
         "İLİŞKİ AÇILIMI" -> ReadingInfo(3, listOf("Sen", "O", "İlişkiniz"), CardLayout.HORIZONTAL_3)
-        "UYUMLULUK AÇILIMI" -> ReadingInfo(7, listOf("Senin Geçmişin", "Onun Geçmişi", "Sizin Uyumunuz", "Senin Beklentin", "Onun Beklentisi", "İlişkinin Geleceği", "Sonuç"), CardLayout.COMPATIBILITY_CROSS)
+        "UYUMLULUK AÇILIMI" -> ReadingInfo(7, listOf(
+            "Duygusal uyumunuz",
+            "Sizin istekleriniz",
+            "Partnerinizin istekleri",
+            "Fiziksel uyumunuz",
+            "Farklılıklar",
+            "Benzerlikler",
+            "Mental uyumunuz"
+        ), CardLayout.COMPATIBILITY_CROSS)
         "DETAYLI İLİŞKİ AÇILIMI" -> ReadingInfo(9, listOf(
             "Geçmişteki Duygular",
             "Mevcut Duygular",

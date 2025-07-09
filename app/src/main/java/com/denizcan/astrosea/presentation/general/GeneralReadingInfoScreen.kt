@@ -497,107 +497,19 @@ fun getReadingDescription(readingType: String): String {
     }
 }
 
-fun getCardMeaningDescription(readingType: String, cardMeaning: String): String {
-    return when (readingType.trim()) {
-        "GÜNLÜK AÇILIM" -> when (cardMeaning) {
-            "Düşünce" -> "Bugün aklınızda genel olarak hangi düşünceler olacak? Bugün en çok ne ile ilgili düşüneceksiniz."
-            "His" -> "Bugün neler hissedeceksiniz? Bugünkü duygu durumunuzdaki en hakim duygular neler olacak?"
-            "Aksiyon" -> "Bugünkü genel eylemleriniz neler olacak? Neler yapacaksınız?"
-            else -> "Bu kartın anlamını temsil eder."
+fun getCardMeaningDescription(readingType: String, meaning: String): String {
+    if (readingType.trim() == "UYUMLULUK AÇILIMI") {
+        return when (meaning) {
+            "Duygusal uyumunuz" -> "Bu ilişkideki duygusal uyumluluğunuz nasıl? Birbirinize nasıl hissettiriyorsunuz?"
+            "Sizin istekleriniz" -> "Siz bu ilişkiden ne istiyorsunuz?"
+            "Partnerinizin istekleri" -> "Partneriniz bu ilişkiden ne istiyor?"
+            "Fiziksel uyumunuz" -> "İlişkinizdeki fiziksel uyumunuz nasıl? Fiziksel olarak birbirinizi çekici buluyor musunuz?"
+            "Farklılıklar" -> "Partneriniz ile temel farklılıklarınız neler? Temelde anlaşamadığınız konular ve durumlar neler?"
+            "Benzerlikler" -> "Hangi konularda benzersiniz? Partneriniz ile anlaştığınız ve onu anladığınız noktalar neler? Hayata bakış açınızda aynı olduğunuz noktalar neler?"
+            "Mental uyumunuz" -> "İlişkinizdeki mental uyumunuz nasıl? Düşünceleriniz, değerleriniz ve idealleriniz arasındaki uyumun farkına varın."
+            else -> ""
         }
-        "TEK KART AÇILIMI" -> when (cardMeaning) {
-            "Günün Kartı" -> "Sorunuz ile ilgili genel etkiler neler? Evrenden size ulaşan tavsiyeler neler? Ne yapmalısınız ya da sorunuz ile ilgili neleri dikkate almalısınız?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "EVET – HAYIR AÇILIMI" -> when (cardMeaning) {
-            "Cevap" -> "Sorduğunuz sorunun güncel enerjilerine göre Evet ya da Hayır cevabınız."
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "GEÇMİŞ, ŞİMDİ, GELECEK" -> when (cardMeaning) {
-            "Geçmiş" -> "Şimdiki durumunuza gelmenize sebep olan geçmiş; inanç, etki, duygu ya da düşünceler."
-            "Şimdi" -> "Şuan, şimdi, burada… Hali hazırda aktif olan enerjiler nedir? Şuanki durumunuzda hangi enerjiler sizi etkiliyor. Hangi güçler aktif?"
-            "Gelecek" -> "Gelecekte olabilecek durumlar nelerdir?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "DURUM, AKSİYON, SONUÇ" -> when (cardMeaning) {
-            "Durum" -> "Şu anki durumunuz nedir?"
-            "Aksiyon" -> "Almayı planladığınız ya da alacağını aksiyonlar."
-            "Sonuç" -> "Gerçekleştirdiğiniz aksiyon sonucunda ortaya çıkması muhtemel sonuçlar."
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "İLİŞKİ AÇILIMI" -> when (cardMeaning) {
-            "Sen" -> "İlişkideki güncel durumunuzu temsil eder."
-            "O" -> "İlişkide olduğunuz partnerinizin güncel durumunu temsil eder."
-            "İlişkiniz" -> "İlişkinizdeki güncel durum nedir? Evren enerjilerine göre ilişkiniz nasıl görünüyor? Güncel karakteristik özelliği nedir?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "UYUMLULUK AÇILIMI" -> when (cardMeaning) {
-            "Senin Geçmişin" -> "Siz bu ilişkiden ne istiyorsunuz?"
-            "Onun Geçmişi" -> "Partneriniz bu ilişkiden ne istiyor?"
-            "Sizin Uyumunuz" -> "Partneriniz ile temel farklılıklarınız neler? Temelde anlaşamadığınız konular ve durumlar neler?"
-            "Senin Beklentin" -> "Hangi konularda benzersiniz? Partneriniz ile anlaştığınız ve onu anladığınız noktalar neler? Hayata bakış açınızda aynı olduğunuz noktalar neler?"
-            "Onun Beklentisi" -> "Bu ilişkideki duygusal uyumluluğunuz nasıl? Birbirinize nasıl hissettiriyorsunuz?"
-            "İlişkinin Geleceği" -> "İlişkinizdeki fiziksel uyumunuz nasıl? Fiziksel olarak birbirinizi çekici buluyor musunuz?"
-            "Sonuç" -> "İlişkinizdeki mental uyumunuz nasıl? Düşünceleriniz, değerleriniz ve idealleriniz arasındaki uyumun farkına varın."
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "DETAYLI İLİŞKİ AÇILIMI" -> when (cardMeaning) {
-            "Geçmişteki Duygular" -> "İlişkinin geçmişinde hakim olan duygusal atmosfer neydi?"
-            "Mevcut Duygular" -> "Şu anda ilişkinin kalbinde yatan duygular nelerdir?"
-            "Gelecekteki Duygular" -> "İlişkinin gelecekte evrileceği muhtemel duygusal durum nedir?"
-            "Geçmişteki Düşünceler" -> "Geçmişte ilişkiye dair zihinsel tutumunuz ve düşünceleriniz nasıldı?"
-            "Mevcut Düşünceler" -> "Şu anda ilişki hakkındaki baskın düşünceler ve zihinsel süreçler nelerdir?"
-            "Gelecekteki Düşünceler" -> "Gelecekte ilişkiyle ilgili zihinsel odağınız ne yönde olacak?"
-            "Geçmişteki Eylemler" -> "Geçmişte ilişkinizi şekillendiren eylemler nelerdi?"
-            "Mevcut Eylemler" -> "Şu anki davranışlarınız ve eylemleriniz ilişkiyi nasıl etkiliyor?"
-            "Gelecekteki Eylemler/Sonuç" -> "Tüm bu dinamiklerin birleşimiyle ortaya çıkacak en olası eylem veya nihai sonuç nedir?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "MÜCADELELER AÇILIMI" -> when (cardMeaning) {
-            "İlişkinizdeki problemde sizin rolünüz" -> "Bu problemde sizin rolünüz nedir? Eylem ve düşünceleriniz problem üzerinde nasıl bir etki yaratıyor."
-            "Problemde partnerinizin rolü" -> "Bu sorunu ne büyütüyor veya ne tetikliyor? Bu problemde partnerinizin rolü nedir? Eylem ve düşünceleri problem üzerinde nasıl bir etki yaratıyor."
-            "Sizin için tavsiye" -> "İlişkinin düzelmesi için evren enerjileri ne diyor? Bu problemin çözülmesinde sizin katkınız ne olabilir?"
-            "Partneriniz için tavsiye" -> "Partneriniz ilişkinin düzelmesi için hangi adımları atabilir? İlişkinin eski sağlığına kavuşması için ne yapması lazım?"
-            "Dış etkiler" -> "Dışarıdan gelen hangi etkiler ilişkinizdeki problemi besliyor?"
-            "İlişkiniz kurtarılabilir mi?" -> "Bu kırılma noktası yaşanıp bittikten sonra ilişkiniz devam edecek mi?"
-            "İlişkiniz kurtarılmaya değer mi?" -> "Bütün bu zorluk ve mücadelelere karşın ilişkiniz gerçekten kurtarılmaya değer mi? İlişkinin devamı hem sizin hem de partneriniz için sağlıklı mı? Gerçekten mutlu olacak mısınız?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "TAMAM MI, DEVAM MI" -> when (cardMeaning) {
-            "İlişkinin Mevcut Durumu" -> "Şu anki durumun en dürüst ve çıplak özeti nedir?"
-            "Devam Etmenin Potansiyeli" -> "Bu ilişkide kalırsanız, sizi ne bekliyor? Bu yolun size sunacağı en olumlu potansiyel nedir?"
-            "Bitirmenin Potansiyeli" -> "Bu ilişkiyi bitirirseniz, sizi ne bekliyor? Bu yolun size getireceği ders veya özgürleşme nedir?"
-            "İlişki devam ederse hissedecekleriniz" -> "İlişkinizi devam ettirirseniz duygusal dünyanızda sizi bekleyen durumlar nelerdir?"
-            "İlişkiniz biterse hissedecekleriniz" -> "İlişkinizi bitirirseniz duygusal dünyanızda sizi bekleyen durumlar nelerdir?"
-            "Genel tavsiye" -> "Bitirmek ya da devam etmek… Bu iki sonuç arasında kaldığınızda dikkate almanız gereken durumlar nelerdir? Hangi konuları düşünmeli, tartmalı ve ona göre karar vermelisiniz?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "GELECEĞİNE GİDEN YOL" -> when (cardMeaning) {
-            "Hayalinizdeki kariyer" -> "Hayalinizdeki iş neye benziyor? Ömrünüzün geri kalanında yapmak istediğiniz ve asla sıkılmayacağınız o iş nedir? Sizin rolünüz nedir? Bu yolda neler bulacaksınız?"
-            "Potansiyel yollar" -> "Hayalinizdeki kariyere giden potansiyel yollar neler? İstediğiniz noktaya nasıl ulaşabilirsiniz?"
-            "Yetenekleriniz" -> "Hayalinizdeki kariyere ulaşmak için sahip olduğunuz yetenekleriniz neler?"
-            "Yardımcı olabilecek kaynaklar" -> "Size kim yardımcı olabilir? Hayalinizdeki kariyere giden yolda yararlanabileceğiniz bağlantılarınız neler veya kimler?"
-            "Dikkat etmeniz gerekenler" -> "Hedefinize giderken neleri gözden kaçırmamanız gerekiyor?"
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "İŞ YERİNDEKİ PROBLEMLER" -> when (cardMeaning) {
-            "Problemin Kökü" -> "İş yerindeki problemin temel nedenini temsil eder."
-            "Seni Etkileyen Faktör" -> "Problemin sizi nasıl etkilediğini temsil eder."
-            "Diğerlerini Etkileyen Faktör" -> "Problemin diğerlerini nasıl etkilediğini temsil eder."
-            "Gözden Kaçırdığın" -> "Gözden kaçırdığınız faktörleri temsil eder."
-            "Çözüm Yolu" -> "Problemin çözümü için yolu temsil eder."
-            "Sonuç" -> "Problemin çözümünden sonraki sonucu temsil eder."
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        "FİNANSAL DURUM" -> when (cardMeaning) {
-            "Kök Neden" -> "Finansal durumunuzun temelindeki asıl sebep nedir? Bu kart, mevcut durumun kökenindeki ana dinamiği veya başlangıç noktasını aydınlatıyor."
-            "Karşıt Güçler" -> "Size karşı çalışan veya finansal hedeflerinize ulaşmanızı zorlaştıran içsel yada dışsal etkenler nelerdir? Bu kart, önünüzdeki engelleri gösteriyor."
-            "Eylem Planı" -> "Mevcut finansal durumu iyileştirmek için atabileceğiniz en etkili ve yapıcı adım nedir? Bu kart, size durumu lehinize çevirecek somut bir eylem planı sunar."
-            "Destekleyici Güçler" -> "Başarınıza yardımcı olan, lehinize işleyen güçler, yetenekler veya durumlar nelerdir? Bu kart, sahip olduğunuz avantajları ve size destek olan müttefikleri ortaya çıkarır."
-            "Yardım Kaynakları" -> "Finansal yolculuğunuzda nereden veya kimden yardım alabilirsiniz? Bu kart, başvurabileceğiniz dış kaynakları, kişileri veya beklenmedik fırsatları işaret eder."
-            "Olası Sonuç" -> "Mevcut enerjiler ve dinamikler göz önüne alındığında, bu yolun sizi götüreceği en olası finansal sonuç nedir? Bu kart, yakın gelecekteki potansiyel durumu öngörür."
-            else -> "Bu kartın anlamını temsil eder."
-        }
-        else -> "Bu kartın anlamını temsil eder."
     }
+    // Diğer açılımlar için varsayılan açıklama
+    return ""
 } 
