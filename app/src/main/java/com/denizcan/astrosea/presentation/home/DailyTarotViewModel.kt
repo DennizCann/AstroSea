@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.denizcan.astrosea.util.JsonLoader
 import com.denizcan.astrosea.model.TarotCard
+import com.denizcan.astrosea.presentation.notifications.sendDailyTarotNotification
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -74,6 +75,8 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         )
                     }
                     hasDrawnToday = false
+                    // Bildirim gönder (kart isimleri bilinmediği için boş string)
+                    sendDailyTarotNotification(userId!!, listOf("Gizli Kart", "Gizli Kart", "Gizli Kart"))
                 } else {
                     // Bugün kartlar zaten çekilmiş, kaydedilen verileri yükle
                     loadSavedCards()
@@ -128,6 +131,10 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     }
                     
                     hasDrawnToday = true
+                    
+                    // Bildirim gönder
+                    val cardNames = randomCards.map { it.name }
+                    sendDailyTarotNotification(userId!!, cardNames)
                 } else {
                     // Bugün kartlar zaten çekilmiş, mevcut durumu yükle
                     loadSavedCards()

@@ -48,6 +48,7 @@ import androidx.navigation.navArgument
 import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
 import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
 import com.denizcan.astrosea.navigation.SmartNavigationHelper
+import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -211,6 +212,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToDailyReadingInfo = {
                                 smartNavigation.navigateToReading("GÜNLÜK AÇILIM")
                             },
+                            onNavigateToNotifications = {
+                                navController.navigate(Screen.Notifications.route)
+                            },
                             onSignOut = {
                                 FirebaseAuth.getInstance().signOut()
                                 navController.navigate(Screen.Auth.route) {
@@ -342,6 +346,11 @@ class MainActivity : ComponentActivity() {
                             onNavigateToCardDetail = { cardId ->
                                 navController.navigate("tarot_detail/$cardId")
                             }
+                        )
+                    }
+                    composable(Screen.Notifications.route) {
+                        NotificationsScreen(
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                 }

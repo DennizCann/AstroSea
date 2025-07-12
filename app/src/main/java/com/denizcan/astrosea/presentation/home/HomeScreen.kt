@@ -63,10 +63,10 @@ fun HomeScreen(
     onNavigateToGeneralReadings: () -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
     onNavigateToDailyReadingInfo: () -> Unit,
+    onNavigateToNotifications: () -> Unit,
     onSignOut: () -> Unit
 ) {
     val profileState = viewModel.profileState
-    var showNotifications by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val dailyTarotViewModel: DailyTarotViewModel = viewModel(factory = DailyTarotViewModel.Factory(context))
 
@@ -149,7 +149,7 @@ fun HomeScreen(
                                 )
                             }
                             IconButton(
-                                onClick = { showNotifications = true },
+                                onClick = onNavigateToNotifications,
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(
@@ -489,12 +489,6 @@ fun HomeScreen(
                 }
             }
         }
-    }
-
-    if (showNotifications) {
-        NotificationsPopup(
-            onDismiss = { showNotifications = false }
-        )
     }
 }
 
