@@ -1,7 +1,6 @@
 package com.denizcan.astrosea.presentation.general
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,8 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.util.JsonLoader
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -36,17 +33,31 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         JsonLoader(context).loadTarotCards()
     }
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        context.getSharedPreferences("tarot_readings", Context.MODE_PRIVATE)
-    }
-
-    private val gson = Gson()
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val userId: String? get() = auth.currentUser?.uid
+    
+
 
     init {
         Log.d("GeneralReadingViewModel", "ViewModel initialized.")
+        // Kullanıcı değişikliklerini dinle
+        checkUserChange()
+    }
+    
+    private fun checkUserChange() {
+        // Kullanıcı değiştiğinde verileri temizle
+        auth.addAuthStateListener { firebaseAuth ->
+            val currentUser = firebaseAuth.currentUser
+            Log.d("GeneralReadingViewModel", "User changed: ${currentUser?.uid}")
+            
+            // Kullanıcı değiştiğinde state'i temizle
+            if (currentUser != null) {
+                drawnCards = emptyList()
+                isCardsDrawn = false
+                isLoading = false
+            }
+        }
     }
 
     private fun getCardCountForReading(readingType: String): Int {
@@ -63,32 +74,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 if (readingType.trim() == "GÜNLÜK AÇILIM") {
                     drawDailyCardForPosition(position)
                 } else {
-                    // Diğer açılımlar için normal mantık
-                    val usedCardIds = drawnCards.map { it.card.id }
-                    val availableCards = allTarotCards.filter { it.id !in usedCardIds }
-
-                    if (availableCards.isEmpty()) {
-                        Log.w("GeneralReadingVM", "No more unique cards to draw.")
-                        return@launch
-                    }
-
-                    val randomCard = availableCards.shuffled().first()
-
-                    val newCardState = ReadingCardState(
-                        index = position,
-                        card = randomCard,
-                        isRevealed = true
-                    )
-
-                    val updatedList = (drawnCards + newCardState).sortedBy { it.index }
-                    drawnCards = updatedList
-
-                    if (drawnCards.size == getCardCountForReading(readingType)) {
-                        isCardsDrawn = true
-                    }
-
-                    // Durumu kaydet
-                    saveReadingState(readingType)
+                    // Diğer açılımlar için Firebase kullan
+                    drawOtherReadingCardForPosition(readingType, position)
                 }
 
             } catch (e: Exception) {
@@ -96,6 +83,58 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             } finally {
                 isLoading = false
             }
+        }
+    }
+    
+    private suspend fun drawOtherReadingCardForPosition(readingType: String, position: Int) {
+        if (userId == null) return
+        
+        try {
+            // Firebase'den mevcut açılımı kontrol et
+            val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
+            val userDoc = firestore.collection("users").document(userId!!).get().await()
+            val readingData = userDoc.get("reading_$normalizedReadingType") as? Map<String, Any>
+            
+            val usedCardIds = drawnCards.map { it.card.id }
+            val availableCards = allTarotCards.filter { it.id !in usedCardIds }
+
+            if (availableCards.isEmpty()) {
+                Log.w("GeneralReadingVM", "No more unique cards to draw.")
+                return
+            }
+
+            val randomCard = availableCards.shuffled().first()
+
+            val newCardState = ReadingCardState(
+                index = position,
+                card = randomCard,
+                isRevealed = true
+            )
+
+            val updatedList = (drawnCards + newCardState).sortedBy { it.index }
+            drawnCards = updatedList
+
+            if (drawnCards.size == getCardCountForReading(readingType)) {
+                isCardsDrawn = true
+            }
+
+            // Firebase'e kaydet
+            val readingMap = readingData?.toMutableMap() ?: mutableMapOf()
+            readingMap["cards"] = drawnCards.map { 
+                mapOf(
+                    "index" to it.index,
+                    "cardId" to it.card.id,
+                    "isRevealed" to it.isRevealed
+                )
+            }
+            readingMap["isDrawn"] = isCardsDrawn
+            
+            firestore.collection("users").document(userId!!)
+                .update("reading_$normalizedReadingType", readingMap)
+                .await()
+                
+        } catch (e: Exception) {
+            Log.e("GeneralReadingVM", "Error drawing other reading card", e)
         }
     }
 
@@ -109,27 +148,36 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
 
             if (lastDrawDate != currentDate) {
-                // Bugün henüz kart çekilmemiş, sadece tıklanan pozisyon için kart çek
-                val randomCard = allTarotCards.shuffled().first()
+                // Bugün henüz kart çekilmemiş, 3 kartı birden çek
+                val randomCards = allTarotCards.shuffled().take(3)
                 
-                val cardsData = mapOf(
-                    "card_${position}_id" to randomCard.id,
+                val cardsData = randomCards.mapIndexed { index, card ->
+                    "card_${index}_id" to card.id
+                }.toMap() + mapOf(
                     "last_draw_date" to currentDate,
-                    "card_${position}_revealed" to true
+                    "card_0_revealed" to false,
+                    "card_1_revealed" to false,
+                    "card_2_revealed" to false
                 )
 
                 firestore.collection("users").document(userId!!)
                     .set(cardsData, SetOptions.merge()).await()
 
-                // Sadece tıklanan kartı ekle
+                // Sadece tıklanan kartı aç
+                val clickedCard = randomCards[position]
                 val newCardState = ReadingCardState(
                     index = position,
-                    card = randomCard,
+                    card = clickedCard,
                     isRevealed = true
                 )
                 
                 val updatedList = (drawnCards + newCardState).sortedBy { it.index }
                 drawnCards = updatedList
+
+                // Firebase'e güncelleme
+                firestore.collection("users").document(userId!!)
+                    .update("card_${position}_revealed", true)
+                    .await()
             } else {
                 // Bugün kartlar zaten çekilmiş, sadece tıklanan pozisyonu kontrol et
                 val cardId = userDoc.getString("card_${position}_id") ?: ""
@@ -199,6 +247,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             }
 
             drawnCards = loadedCards.sortedBy { it.index }
+            Log.d("GeneralReadingVM", "Loaded ${loadedCards.size} daily cards from Firebase")
         } catch (e: Exception) {
             Log.e("GeneralReadingVM", "Error loading daily cards from Firebase", e)
         }
@@ -208,34 +257,41 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         drawnCards = emptyList()
         isCardsDrawn = false
         
-        // Günlük açılım için Firebase'den temizle
-        if (readingType.trim() == "GÜNLÜK AÇILIM") {
-            clearDailyCardsFromFirebase()
-        } else {
-            // Diğer açılımlar için SharedPreferences'tan temizle
-            clearReadingState(readingType)
-        }
+        // Tüm açılımlar için Firebase'den temizle
+        clearReadingFromFirebase(readingType)
     }
 
-    private fun clearDailyCardsFromFirebase() {
+    private fun clearReadingFromFirebase(readingType: String) {
         if (userId == null) return
 
         viewModelScope.launch {
             try {
-                firestore.collection("users").document(userId!!)
-                    .update(
-                        mapOf(
-                            "last_draw_date" to "",
-                            "card_0_id" to "",
-                            "card_1_id" to "",
-                            "card_2_id" to "",
-                            "card_0_revealed" to false,
-                            "card_1_revealed" to false,
-                            "card_2_revealed" to false
-                        )
-                    ).await()
+                val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
+                
+                if (readingType.trim() == "GÜNLÜK AÇILIM") {
+                    // Günlük açılım için özel temizleme
+                    firestore.collection("users").document(userId!!)
+                        .update(
+                            mapOf(
+                                "last_draw_date" to "",
+                                "card_0_id" to "",
+                                "card_1_id" to "",
+                                "card_2_id" to "",
+                                "card_0_revealed" to false,
+                                "card_1_revealed" to false,
+                                "card_2_revealed" to false
+                            )
+                        ).await()
+                } else {
+                    // Diğer açılımlar için temizleme
+                    firestore.collection("users").document(userId!!)
+                        .update("reading_$normalizedReadingType", null)
+                        .await()
+                }
+                
+                Log.d("GeneralReadingViewModel", "Cleared reading state for $readingType from Firebase")
             } catch (e: Exception) {
-                Log.e("GeneralReadingVM", "Error clearing daily cards from Firebase", e)
+                Log.e("GeneralReadingViewModel", "Error clearing reading state from Firebase", e)
             }
         }
     }
@@ -249,74 +305,64 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             return
         }
 
-        // Diğer açılımlar için SharedPreferences'tan yükle
-        val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
-        val isDrawnKey = "is_drawn_$normalizedReadingType"
-        val cardsKey = "cards_$normalizedReadingType"
+        // Diğer açılımlar için Firebase'den yükle
+        viewModelScope.launch {
+            loadOtherReadingFromFirebase(readingType)
+        }
+    }
+    
+    private suspend fun loadOtherReadingFromFirebase(readingType: String) {
+        if (userId == null) return
         
         try {
-            val isDrawn = sharedPreferences.getBoolean(isDrawnKey, false)
-            val cardsJson = sharedPreferences.getString(cardsKey, null)
+            val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
+            val userDoc = firestore.collection("users").document(userId!!).get().await()
+            val readingData = userDoc.get("reading_$normalizedReadingType") as? Map<String, Any>
             
-            if (cardsJson != null) {
-                val type = object : TypeToken<List<ReadingCardState>>() {}.type
-                val loadedCards = gson.fromJson<List<ReadingCardState>>(cardsJson, type)
-                drawnCards = loadedCards ?: emptyList()
-                isCardsDrawn = isDrawn
+            if (readingData != null) {
+                val cardsData = readingData["cards"] as? List<Map<String, Any>>
+                val isDrawn = readingData["isDrawn"] as? Boolean ?: false
                 
-                Log.d("GeneralReadingViewModel", "Loaded reading state for $readingType. Cards: ${drawnCards.size}, isDrawn: $isCardsDrawn")
+                if (cardsData != null) {
+                    val loadedCards = mutableListOf<ReadingCardState>()
+                    
+                    for (cardData in cardsData) {
+                        val index = (cardData["index"] as? Long)?.toInt() ?: 0
+                        val cardId = cardData["cardId"] as? String ?: ""
+                        val isRevealed = cardData["isRevealed"] as? Boolean ?: false
+                        
+                        val card = allTarotCards.find { it.id == cardId }
+                        if (card != null) {
+                            loadedCards.add(
+                                ReadingCardState(
+                                    index = index,
+                                    card = card,
+                                    isRevealed = isRevealed
+                                )
+                            )
+                        }
+                    }
+                    
+                    drawnCards = loadedCards.sortedBy { it.index }
+                    isCardsDrawn = isDrawn
+                    
+                    Log.d("GeneralReadingViewModel", "Loaded reading state for $readingType from Firebase. Cards: ${drawnCards.size}, isDrawn: $isCardsDrawn")
+                } else {
+                    drawnCards = emptyList()
+                    isCardsDrawn = false
+                }
             } else {
-                // İlk kez açılıyorsa temiz durum
                 drawnCards = emptyList()
                 isCardsDrawn = false
             }
         } catch (e: Exception) {
-            Log.e("GeneralReadingViewModel", "Error loading reading state", e)
+            Log.e("GeneralReadingViewModel", "Error loading reading state from Firebase", e)
             drawnCards = emptyList()
             isCardsDrawn = false
         }
     }
 
-    private fun saveReadingState(readingType: String) {
-        // Günlük açılım için Firebase kullanılıyor, SharedPreferences'a kaydetmeye gerek yok
-        if (readingType.trim() == "GÜNLÜK AÇILIM") {
-            return
-        }
 
-        val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
-        val isDrawnKey = "is_drawn_$normalizedReadingType"
-        val cardsKey = "cards_$normalizedReadingType"
-        
-        try {
-            sharedPreferences.edit().apply {
-                putBoolean(isDrawnKey, isCardsDrawn)
-                putString(cardsKey, gson.toJson(drawnCards))
-                apply()
-            }
-            
-            Log.d("GeneralReadingViewModel", "Saved reading state for $readingType. Cards: ${drawnCards.size}, isDrawn: $isCardsDrawn")
-        } catch (e: Exception) {
-            Log.e("GeneralReadingViewModel", "Error saving reading state", e)
-        }
-    }
-
-    private fun clearReadingState(readingType: String) {
-        val normalizedReadingType = readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
-        val isDrawnKey = "is_drawn_$normalizedReadingType"
-        val cardsKey = "cards_$normalizedReadingType"
-        
-        try {
-            sharedPreferences.edit().apply {
-                remove(isDrawnKey)
-                remove(cardsKey)
-                apply()
-            }
-            
-            Log.d("GeneralReadingViewModel", "Cleared reading state for $readingType")
-        } catch (e: Exception) {
-            Log.e("GeneralReadingViewModel", "Error clearing reading state", e)
-        }
-    }
 
     private fun getCurrentDateString(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

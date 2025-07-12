@@ -126,12 +126,14 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                             isRevealed = false
                         )
                     }
+                    
+                    hasDrawnToday = true
                 } else {
                     // Bugün kartlar zaten çekilmiş, mevcut durumu yükle
                     loadSavedCards()
+                    hasDrawnToday = true
                 }
                 
-                hasDrawnToday = true
                 isLoading = false
             } catch (e: Exception) {
                 Log.e("DailyTarotViewModel", "Error drawing daily cards", e)
@@ -226,7 +228,26 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     fun refreshCards() {
         if (userId != null) {
             viewModelScope.launch {
-                loadSavedCards()
+                // Önce günlük durumu kontrol et
+                val currentDate = getCurrentDateString()
+                val userDoc = firestore.collection("users").document(userId!!).get().await()
+                val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
+                
+                if (lastDrawDate == currentDate) {
+                    // Bugün kartlar çekilmiş, yükle
+                    loadSavedCards()
+                    hasDrawnToday = true
+                } else {
+                    // Yeni gün, kartları sıfırla
+                    dailyCards = List(3) { index ->
+                        DailyCardState(
+                            index = index,
+                            card = null,
+                            isRevealed = false
+                        )
+                    }
+                    hasDrawnToday = false
+                }
             }
         }
     }

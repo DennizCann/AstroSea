@@ -42,6 +42,13 @@ fun GeneralReadingDetailScreen(
         viewModel.loadReadingState(readingType)
     }
     
+    // Günlük açılım için özel durum - sayfa açıldığında mevcut kartları yükle
+    LaunchedEffect(readingType) {
+        if (readingType.trim() == "GÜNLÜK AÇILIM") {
+            viewModel.loadReadingState(readingType)
+        }
+    }
+    
     val readingInfo = remember(readingType) {
         getReadingInfo(readingType)
     }

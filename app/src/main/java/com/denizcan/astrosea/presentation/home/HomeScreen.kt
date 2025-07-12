@@ -76,10 +76,14 @@ fun HomeScreen(
 
     // Günlük kartları periyodik olarak yenile (detay sayfasından döndüğünde güncel olsun)
     LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.delay(1000) // 1 saniyede bir kontrol et
-            dailyTarotViewModel.refreshCards()
-        }
+        // Sadece bir kez yükle, sürekli refresh yapma
+        dailyTarotViewModel.refreshCards()
+    }
+    
+    // Ana sayfaya dönüldüğünde kartları yenile
+    LaunchedEffect(Unit) {
+        // Sayfa aktif olduğunda kartları yenile
+        dailyTarotViewModel.refreshCards()
     }
 
     // Menü seçeneklerini güncelliyoruz

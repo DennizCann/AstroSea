@@ -47,6 +47,7 @@ import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
 import androidx.navigation.navArgument
 import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
 import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
+import com.denizcan.astrosea.navigation.SmartNavigationHelper
 
 
 class MainActivity : ComponentActivity() {
@@ -121,6 +122,12 @@ class MainActivity : ComponentActivity() {
             if (startDestination == null) {
                 Box(Modifier.fillMaxSize()) { /* Splash veya boş ekran */ }
             } else {
+                val context = LocalContext.current
+                val smartNavigation = SmartNavigationHelper(context, navController)
+                
+                // Test için info ekranı kayıtlarını temizle (geliştirme aşamasında)
+                // smartNavigation.clearInfoScreenRecords()
+                
                 NavHost(
                     navController = navController,
                     startDestination = startDestination!!
@@ -184,7 +191,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.Motivation.route)
                             },
                             onNavigateToYesNo = {
-                                navController.navigate(Screen.GeneralReadingInfo.createRoute("EVET – HAYIR AÇILIMI"))
+                                smartNavigation.navigateToReading("EVET – HAYIR AÇILIMI")
                             },
                             onNavigateToRelationshipReadings = {
                                 navController.navigate("relationship_readings")
@@ -202,7 +209,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("tarot_detail/$cardId")
                             },
                             onNavigateToDailyReadingInfo = {
-                                navController.navigate(Screen.GeneralReadingInfo.createRoute("GÜNLÜK AÇILIM"))
+                                smartNavigation.navigateToReading("GÜNLÜK AÇILIM")
                             },
                             onSignOut = {
                                 FirebaseAuth.getInstance().signOut()
@@ -265,7 +272,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
                             onNavigateToCareerReadings = { navController.navigate("career_reading") },
                             onNavigateToReadingDetail = { readingType ->
-                                navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
+                                smartNavigation.navigateToReading(readingType)
                             }
                         )
                     }
@@ -275,7 +282,7 @@ class MainActivity : ComponentActivity() {
                             onNavigateToGeneralReadings = { navController.navigate("general_readings") },
                             onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
                             onNavigateToReadingDetail = { readingType ->
-                                navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
+                                smartNavigation.navigateToReading(readingType)
                             },
                             navController = navController
                         )
@@ -299,7 +306,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate("career_reading")
                             },
                             onNavigateToReadingDetail = { readingType ->
-                                navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
+                                smartNavigation.navigateToReading(readingType)
                             }
                         )
                     }
@@ -316,7 +323,7 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             },
                             onNavigateToReadingDetail = { readingType ->
-                                navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+                                smartNavigation.navigateFromInfoToDetail(readingType)
                             }
                         )
                     }
@@ -330,7 +337,7 @@ class MainActivity : ComponentActivity() {
                         GeneralReadingDetailScreen(
                             readingType = readingType,
                             onNavigateBack = {
-                                navController.popBackStack()
+                                smartNavigation.navigateBackFromDetail(readingType)
                             },
                             onNavigateToCardDetail = { cardId ->
                                 navController.navigate("tarot_detail/$cardId")
