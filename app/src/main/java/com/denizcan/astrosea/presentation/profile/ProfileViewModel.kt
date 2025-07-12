@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ProfileViewModel : ViewModel() {
     var profileState by mutableStateOf(ProfileState())
@@ -116,21 +119,23 @@ class ProfileViewModel : ViewModel() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         profileState = profileState.copy(isLoading = true)
 
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(userId)
-            .set(profileState.profileData)
-            .addOnSuccessListener {
+        viewModelScope.launch {
+            try {
+                FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(userId)
+                    .set(profileState.profileData)
+                    .await()
                 loadProfile(userId)
                 onSuccess()
-            }
-            .addOnFailureListener { e ->
+            } catch (e: Exception) {
                 profileState = profileState.copy(
                     error = e.localizedMessage,
                     isLoading = false
                 )
                 Log.e("ProfileViewModel", "Error saving profile", e)
             }
+        }
     }
 
     fun startListeningToProfileChanges(userId: String) {
