@@ -49,6 +49,8 @@ import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
 import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
 import com.denizcan.astrosea.navigation.SmartNavigationHelper
 import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
+import com.denizcan.astrosea.workers.DailyNotificationWorker
+import com.denizcan.astrosea.workers.UnopenedCardsReminderWorker
 
 
 class MainActivity : ComponentActivity() {
@@ -77,8 +79,20 @@ class MainActivity : ComponentActivity() {
             if (user != null) {
                 // Log işlemi ekleyelim - hata ayıklama için
                 Log.d("Auth", "User logged in: ${user.uid}, email: ${user.email}")
+                
+                // Kullanıcı giriş yaptığında worker'ları başlat
+                DailyNotificationWorker.scheduleDailyNotification(this)
+                UnopenedCardsReminderWorker.scheduleUnopenedCardsReminder(this)
+                Log.d("Auth", "Daily notification worker scheduled")
+                Log.d("Auth", "Unopened cards reminder worker scheduled")
             } else {
                 Log.d("Auth", "User logged out")
+                
+                // Kullanıcı çıkış yaptığında worker'ları durdur
+                DailyNotificationWorker.cancelDailyNotification(this)
+                UnopenedCardsReminderWorker.cancelUnopenedCardsReminder(this)
+                Log.d("Auth", "Daily notification worker cancelled")
+                Log.d("Auth", "Unopened cards reminder worker cancelled")
             }
         }
 

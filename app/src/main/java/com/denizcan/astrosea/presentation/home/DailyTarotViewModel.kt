@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.denizcan.astrosea.util.JsonLoader
 import com.denizcan.astrosea.model.TarotCard
-import com.denizcan.astrosea.presentation.notifications.sendDailyTarotNotification
+import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -37,6 +37,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val userId: String? get() = auth.currentUser?.uid
+    private val notificationManager = NotificationManager(context)
     
     init {
         if (userId != null) {
@@ -75,8 +76,30 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         )
                     }
                     hasDrawnToday = false
-                    // Bildirim gönder (kart isimleri bilinmediği için boş string)
-                    sendDailyTarotNotification(userId!!, listOf("Gizli Kart", "Gizli Kart", "Gizli Kart"))
+                    
+                    // Günlük kartlar çekildi bildirimi gönder
+                    if (userId != null) {
+                        try {
+                            val notification = com.denizcan.astrosea.presentation.notifications.Notification(
+                                id = "",
+                                title = "Günlük Açılım Kartlarınız Hazır",
+                                message = "Bugün için 3 kart çekildi. Kartlarınızı açarak günlük yorumunuzu okuyabilirsiniz.",
+                                timestamp = System.currentTimeMillis(),
+                                isRead = false,
+                                type = com.denizcan.astrosea.presentation.notifications.NotificationType.DAILY_TAROT
+                            )
+                            
+                            val docRef = firestore.collection("users")
+                                .document(userId!!)
+                                .collection("notifications")
+                                .add(notification)
+                                .await()
+                            
+                            Log.d("DailyTarotViewModel", "Daily cards drawn notification sent: ${docRef.id}")
+                        } catch (e: Exception) {
+                            Log.e("DailyTarotViewModel", "Error sending daily notification", e)
+                        }
+                    }
                 } else {
                     // Bugün kartlar zaten çekilmiş, kaydedilen verileri yükle
                     loadSavedCards()
@@ -134,7 +157,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     
                     // Bildirim gönder
                     val cardNames = randomCards.map { it.name }
-                    sendDailyTarotNotification(userId!!, cardNames)
+                    notificationManager.sendDailyCardsRenewedNotification(userId!!, cardNames)
                 } else {
                     // Bugün kartlar zaten çekilmiş, mevcut durumu yükle
                     loadSavedCards()
@@ -174,6 +197,12 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         firestore.collection("users").document(userId!!)
                             .update("card_${index}_revealed", true)
                             .await()
+                        
+                        // Tüm kartlar açıldıysa bildirim sayacını güncelle
+                        val allCardsRevealed = dailyCards.all { it.isRevealed }
+                        if (allCardsRevealed) {
+                            Log.d("DailyTarotViewModel", "All cards revealed, notification count should update")
+                        }
                     }
                 }
             } catch (e: Exception) {

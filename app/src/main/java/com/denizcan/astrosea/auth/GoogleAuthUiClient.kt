@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
+import com.denizcan.astrosea.presentation.notifications.NotificationManager
 
 class GoogleAuthUiClient(
     private val context: Context,
@@ -63,18 +64,52 @@ class GoogleAuthUiClient(
             
             // Kullanıcı giriş yaptığında Firestore'a bilgileri kaydet
             user?.let { firebaseUser ->
-                FirebaseFirestore.getInstance().collection("users")
-                    .document(firebaseUser.uid)
-                    .set(
-                        mapOf(
-                            "email" to firebaseUser.email,
-                            "displayName" to firebaseUser.displayName,
-                            "photoUrl" to (firebaseUser.photoUrl?.toString() ?: ""),
-                            "auth_type" to "google",
-                            "last_login" to FieldValue.serverTimestamp()
-                        ),
-                        SetOptions.merge()
-                    )
+                val firestore = FirebaseFirestore.getInstance()
+                val userRef = firestore.collection("users").document(firebaseUser.uid)
+                
+                // Mevcut kullanıcı bilgilerini kontrol et
+                val userDoc = userRef.get().await()
+                val isFirstTime = !userDoc.exists() || userDoc.getLong("login_count") == null
+                
+                android.util.Log.d("GoogleAuth", "User exists: ${userDoc.exists()}, isFirstTime: $isFirstTime")
+                
+                // Kullanıcı bilgilerini güncelle
+                val updateData = mutableMapOf<String, Any>(
+                    "email" to (firebaseUser.email ?: ""),
+                    "displayName" to (firebaseUser.displayName ?: ""),
+                    "photoUrl" to (firebaseUser.photoUrl?.toString() ?: ""),
+                    "auth_type" to "google",
+                    "last_login" to FieldValue.serverTimestamp()
+                )
+                
+                if (isFirstTime) {
+                    // İlk kez giriş yapıyorsa login_count'u 1 yap
+                    updateData["login_count"] = 1L
+                    android.util.Log.d("GoogleAuth", "First time user, setting login_count to 1")
+                } else {
+                    // Daha önce giriş yapmışsa login_count'u artır
+                    val currentCount = userDoc.getLong("login_count") ?: 0L
+                    updateData["login_count"] = currentCount + 1L
+                    android.util.Log.d("GoogleAuth", "Returning user, login_count: $currentCount -> ${currentCount + 1}")
+                }
+                
+                userRef.set(updateData, SetOptions.merge()).await()
+                android.util.Log.d("GoogleAuth", "User data saved to Firestore")
+                
+                // İlk kez kullanıcı ise bildirim gönder
+                if (isFirstTime) {
+                    android.util.Log.d("GoogleAuth", "Sending first daily reading notification")
+                    try {
+                        val notificationManager = NotificationManager(context)
+                        notificationManager.sendFirstDailyReadingNotification(firebaseUser.uid)
+                        android.util.Log.d("GoogleAuth", "First daily reading notification sent successfully")
+                    } catch (e: Exception) {
+                        android.util.Log.e("GoogleAuth", "Error sending first daily reading notification", e)
+                        e.printStackTrace()
+                    }
+                } else {
+                    android.util.Log.d("GoogleAuth", "Not a first time user, skipping notification")
+                }
             }
             
             SignInResult(

@@ -39,6 +39,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.sp
+import com.denizcan.astrosea.presentation.notifications.NotificationManager
+import kotlinx.coroutines.launch
 
 // MenuItem data class'ını ekle
 data class MenuItem(
@@ -69,6 +75,49 @@ fun HomeScreen(
     val profileState = viewModel.profileState
     val context = LocalContext.current
     val dailyTarotViewModel: DailyTarotViewModel = viewModel(factory = DailyTarotViewModel.Factory(context))
+    
+    // Bildirim yöneticisi ve sayacı
+    val notificationManager = remember { NotificationManager(context) }
+    var unreadNotificationCount by remember { mutableStateOf(0) }
+    val scope = rememberCoroutineScope()
+    
+    // Okunmamış bildirim sayısını yükle ve periyodik olarak güncelle
+    LaunchedEffect(Unit) {
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            scope.launch {
+                try {
+                    unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
+                    android.util.Log.d("HomeScreen", "Initial notification count: $unreadNotificationCount")
+                } catch (e: Exception) {
+                    android.util.Log.e("HomeScreen", "Error loading initial notification count", e)
+                }
+            }
+        } else {
+            android.util.Log.d("HomeScreen", "No user logged in")
+        }
+    }
+    
+    // Bildirim sayacını periyodik olarak güncelle (her 10 saniyede bir)
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(10000) // 10 saniye
+            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                scope.launch {
+                    try {
+                        val newCount = notificationManager.getUnreadNotificationCount(userId)
+                        if (newCount != unreadNotificationCount) {
+                            android.util.Log.d("HomeScreen", "Notification count updated: $unreadNotificationCount -> $newCount")
+                            unreadNotificationCount = newCount
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeScreen", "Error updating notification count", e)
+                    }
+                }
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         // viewModel init bloğunda loadProfile() çağrılıyor
@@ -148,15 +197,41 @@ fun HomeScreen(
                                     tint = Color.White
                                 )
                             }
-                            IconButton(
-                                onClick = onNavigateToNotifications,
-                                modifier = Modifier.weight(1f)
+                            Box(
+                                modifier = Modifier.weight(1f),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Bildirimler",
-                                    tint = Color.White
-                                )
+                                IconButton(
+                                    onClick = onNavigateToNotifications
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Notifications,
+                                        contentDescription = "Bildirimler",
+                                        tint = Color.White
+                                    )
+                                }
+                                
+                                // Okunmamış bildirim sayacı
+                                if (unreadNotificationCount > 0) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFFFFD700))
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = 8.dp, y = (-4).dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = if (unreadNotificationCount > 99) "99+" else unreadNotificationCount.toString(),
+                                            color = Color.Black,
+                                            fontSize = 10.sp,
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                                            )
+                                        )
+                                    }
+                                }
                             }
                             IconButton(
                                 onClick = onSignOut,
@@ -410,6 +485,18 @@ fun HomeScreen(
                                     }
                                     // Sonra kartı açalım
                                     dailyTarotViewModel.revealCard(cardState.index)
+                                    
+                                    // Kart açıldıktan sonra bildirim sayacını güncelle
+                                    scope.launch {
+                                        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                                        if (userId != null) {
+                                            try {
+                                                unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
+                                            } catch (e: Exception) {
+                                                android.util.Log.e("HomeScreen", "Error updating notification count after card reveal", e)
+                                            }
+                                        }
+                                    }
                                 } else {
                                     // Kart zaten açıksa, günlük açılım info sayfasına git
                                     onNavigateToDailyReadingInfo()

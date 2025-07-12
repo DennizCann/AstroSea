@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import com.google.firebase.auth.FirebaseAuth
@@ -66,22 +67,15 @@ fun NotificationsScreen(
     val firestore = remember { FirebaseFirestore.getInstance() }
     val auth = remember { FirebaseAuth.getInstance() }
     val userId = auth.currentUser?.uid
+    val context = LocalContext.current
+    val notificationManager = remember { NotificationManager(context) }
     
     // Bildirimleri yükle
     LaunchedEffect(userId) {
         if (userId != null) {
             try {
                 isLoading = true
-                val snapshot = firestore.collection("users")
-                    .document(userId)
-                    .collection("notifications")
-                    .orderBy("timestamp", Query.Direction.DESCENDING)
-                    .get()
-                    .await()
-                
-                val loadedNotifications = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(Notification::class.java)?.copy(id = doc.id)
-                }
+                val loadedNotifications = notificationManager.getAllNotifications(userId)
                 
                 notifications.clear()
                 notifications.addAll(loadedNotifications)
@@ -235,14 +229,9 @@ fun NotificationsScreen(
                                     onNotificationClick = {
                                         scope.launch {
                                             // Bildirimi okundu olarak işaretle
-                                            if (!notification.isRead) {
+                                            if (!notification.isRead && userId != null) {
                                                 try {
-                                                    firestore.collection("users")
-                                                        .document(userId!!)
-                                                        .collection("notifications")
-                                                        .document(notification.id)
-                                                        .update("isRead", true)
-                                                        .await()
+                                                    notificationManager.markNotificationAsRead(userId, notification.id)
                                                     
                                                     // Yerel listeyi güncelle
                                                     val index = notifications.indexOfFirst { it.id == notification.id }
@@ -419,26 +408,4 @@ private fun formatTimestamp(timestamp: Long): String {
     }
 }
 
-// Bildirim gönderme fonksiyonu - DailyTarotViewModel'den çağrılacak
-suspend fun sendDailyTarotNotification(userId: String, cardNames: List<String>) {
-    val firestore = FirebaseFirestore.getInstance()
-    
-    val notification = Notification(
-        id = "", // Firestore otomatik ID verecek
-        title = "Günlük Açılım Kartlarınız Yenilendi",
-        message = "Bugün için ${cardNames.joinToString(", ")} kartları çekildi. Kartlarınızı açarak günlük yorumunuzu okuyabilirsiniz.",
-        timestamp = System.currentTimeMillis(),
-        isRead = false,
-        type = NotificationType.DAILY_TAROT
-    )
-    
-    try {
-        firestore.collection("users")
-            .document(userId)
-            .collection("notifications")
-            .add(notification)
-            .await()
-    } catch (e: Exception) {
-        // Hata durumunda sessizce devam et
-    }
-} 
+ 
