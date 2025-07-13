@@ -71,6 +71,19 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
+        
+        // Bildirimden gelen navigasyonu kontrol et
+        val navigateTo = intent.getStringExtra("navigate_to")
+        if (navigateTo == "notifications") {
+            // Bildirimden geldiğinde bildirimler sayfasına yönlendir
+            android.util.Log.d("MainActivity", "Navigating to notifications from notification")
+        }
+        
+        // Bildirim izinlerini kontrol et ve iste
+        val notificationManager = com.denizcan.astrosea.presentation.notifications.NotificationManager(this)
+        if (!notificationManager.checkNotificationPermission()) {
+            notificationManager.requestNotificationPermission(this)
+        }
 
         // Auth state listener oluşturalım
         authStateListener = FirebaseAuth.AuthStateListener { auth ->

@@ -179,41 +179,42 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     .update("card_${position}_revealed", true)
                     .await()
             } else {
-                // Bugün kartlar zaten çekilmiş, sadece tıklanan pozisyonu kontrol et
-                val cardId = userDoc.getString("card_${position}_id") ?: ""
-                val isRevealed = userDoc.getBoolean("card_${position}_revealed") ?: false
+                // Bugün kartlar zaten çekilmiş, tüm kartları yükle ve tıklanan pozisyonu aç
+                val allCards = mutableListOf<ReadingCardState>()
                 
-                if (cardId.isNotEmpty() && !isRevealed) {
-                    // Kart çekilmiş ama açılmamış, şimdi aç
+                for (i in 0 until 3) {
+                    val cardId = userDoc.getString("card_${i}_id") ?: ""
+                    val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
+                    
                     val card = allTarotCards.find { it.id == cardId }
-                    if (card != null) {
-                        val newCardState = ReadingCardState(
-                            index = position,
-                            card = card,
-                            isRevealed = true
-                        )
-                        
-                        val updatedList = (drawnCards + newCardState).sortedBy { it.index }
-                        drawnCards = updatedList
-
-                        // Firebase'e güncelleme
-                        firestore.collection("users").document(userId!!)
-                            .update("card_${position}_revealed", true)
-                            .await()
+                    if (cardId.isNotEmpty() && card != null) {
+                        val cardState = if (i == position && !isRevealed) {
+                            // Tıklanan kart açılmamışsa, şimdi aç
+                            ReadingCardState(
+                                index = i,
+                                card = card,
+                                isRevealed = true
+                            )
+                        } else {
+                            // Diğer kartlar mevcut durumlarında
+                            ReadingCardState(
+                                index = i,
+                                card = card,
+                                isRevealed = isRevealed
+                            )
+                        }
+                        allCards.add(cardState)
                     }
-                } else if (cardId.isNotEmpty() && isRevealed) {
-                    // Kart zaten açılmış, yükle
-                    val card = allTarotCards.find { it.id == cardId }
-                    if (card != null) {
-                        val newCardState = ReadingCardState(
-                            index = position,
-                            card = card,
-                            isRevealed = true
-                        )
-                        
-                        val updatedList = (drawnCards + newCardState).sortedBy { it.index }
-                        drawnCards = updatedList
-                    }
+                }
+                
+                drawnCards = allCards.sortedBy { it.index }
+                
+                // Eğer tıklanan kart açılmamışsa Firebase'e güncelleme yap
+                val clickedCardRevealed = userDoc.getBoolean("card_${position}_revealed") ?: false
+                if (!clickedCardRevealed) {
+                    firestore.collection("users").document(userId!!)
+                        .update("card_${position}_revealed", true)
+                        .await()
                 }
             }
 
@@ -234,13 +235,13 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
 
                 val card = allTarotCards.find { it.id == cardId }
-                if (card != null && isRevealed) {
-                    // Sadece açılmış kartları yükle
+                if (cardId.isNotEmpty() && card != null) {
+                    // Tüm çekilmiş kartları yükle (açık veya kapalı)
                     loadedCards.add(
                         ReadingCardState(
                             index = i,
                             card = card,
-                            isRevealed = true
+                            isRevealed = isRevealed
                         )
                     )
                 }

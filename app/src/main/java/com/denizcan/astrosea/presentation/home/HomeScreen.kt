@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.home
 
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
@@ -43,6 +44,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.graphicsLayer
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import kotlinx.coroutines.launch
 
@@ -81,6 +83,18 @@ fun HomeScreen(
     var unreadNotificationCount by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
     
+    // Pulse animasyonu için
+    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.3f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(1000),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "pulse"
+    )
+    
     // Okunmamış bildirim sayısını yükle ve periyodik olarak güncelle
     LaunchedEffect(Unit) {
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
@@ -98,10 +112,10 @@ fun HomeScreen(
         }
     }
     
-    // Bildirim sayacını periyodik olarak güncelle (her 10 saniyede bir)
+    // Bildirim sayacını periyodik olarak güncelle (her 5 saniyede bir)
     LaunchedEffect(Unit) {
         while (true) {
-            kotlinx.coroutines.delay(10000) // 10 saniye
+            kotlinx.coroutines.delay(5000) // 5 saniye
             val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
             if (userId != null) {
                 scope.launch {
@@ -229,6 +243,22 @@ fun HomeScreen(
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontFamily = FontFamily(Font(R.font.cinzel_bold))
                                             )
+                                        )
+                                    }
+                                    
+                                    // Animasyonlu pulse efekti
+                                    if (unreadNotificationCount > 0) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clip(CircleShape)
+                                                .background(Color(0xFFFFD700).copy(alpha = 0.3f))
+                                                .align(Alignment.TopEnd)
+                                                .offset(x = 6.dp, y = (-6).dp)
+                                                .graphicsLayer {
+                                                    scaleX = pulseScale
+                                                    scaleY = pulseScale
+                                                }
                                         )
                                     }
                                 }

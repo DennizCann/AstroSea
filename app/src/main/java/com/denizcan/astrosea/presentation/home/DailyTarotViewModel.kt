@@ -80,22 +80,9 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     // Günlük kartlar çekildi bildirimi gönder
                     if (userId != null) {
                         try {
-                            val notification = com.denizcan.astrosea.presentation.notifications.Notification(
-                                id = "",
-                                title = "Günlük Açılım Kartlarınız Hazır",
-                                message = "Bugün için 3 kart çekildi. Kartlarınızı açarak günlük yorumunuzu okuyabilirsiniz.",
-                                timestamp = System.currentTimeMillis(),
-                                isRead = false,
-                                type = com.denizcan.astrosea.presentation.notifications.NotificationType.DAILY_TAROT
-                            )
-                            
-                            val docRef = firestore.collection("users")
-                                .document(userId!!)
-                                .collection("notifications")
-                                .add(notification)
-                                .await()
-                            
-                            Log.d("DailyTarotViewModel", "Daily cards drawn notification sent: ${docRef.id}")
+                            // İlk günlük açılım bildirimi gönder
+                            notificationManager.sendFirstDailyReadingNotification(userId!!)
+                            Log.d("DailyTarotViewModel", "First daily reading notification sent")
                         } catch (e: Exception) {
                             Log.e("DailyTarotViewModel", "Error sending daily notification", e)
                         }
@@ -104,6 +91,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     // Bugün kartlar zaten çekilmiş, kaydedilen verileri yükle
                     loadSavedCards()
                     hasDrawnToday = true
+                    Log.d("DailyTarotViewModel", "Today's cards already drawn, loading saved state")
                 }
                 
                 isLoading = false
@@ -148,7 +136,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     dailyCards = randomCards.mapIndexed { index, card ->
                         DailyCardState(
                             index = index,
-                            card = null, // Kapalı kartlar için null
+                            card = card, // Kartı göster ama kapalı olarak
                             isRevealed = false
                         )
                     }
@@ -224,22 +212,13 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                 val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
                 
                 val card = allTarotCards.find { it.id == cardId }
-                if (card != null && isRevealed) {
-                    // Sadece açılmış kartları yükle
+                if (cardId.isNotEmpty() && card != null) {
+                    // Kart çekilmiş, açık veya kapalı olarak göster
                     loadedCards.add(
                         DailyCardState(
                             index = i,
-                            card = card,
-                            isRevealed = true
-                        )
-                    )
-                } else if (cardId.isNotEmpty()) {
-                    // Kart çekilmiş ama açılmamış, kapalı olarak göster
-                    loadedCards.add(
-                        DailyCardState(
-                            index = i,
-                            card = null,
-                            isRevealed = false
+                            card = card, // Kartı her zaman göster (açık/kapalı durumu isRevealed ile kontrol edilir)
+                            isRevealed = isRevealed
                         )
                     )
                 } else {
@@ -255,6 +234,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
             }
             
             dailyCards = loadedCards
+            Log.d("DailyTarotViewModel", "Loaded cards: ${loadedCards.map { "${it.index}: revealed=${it.isRevealed}, card=${it.card?.name ?: "null"}" }}")
         } catch (e: Exception) {
             Log.e("DailyTarotViewModel", "Error loading saved cards", e)
         }
@@ -273,6 +253,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     // Bugün kartlar çekilmiş, yükle
                     loadSavedCards()
                     hasDrawnToday = true
+                    Log.d("DailyTarotViewModel", "Refreshed cards for today")
                 } else {
                     // Yeni gün, kartları sıfırla
                     dailyCards = List(3) { index ->
@@ -283,6 +264,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         )
                     }
                     hasDrawnToday = false
+                    Log.d("DailyTarotViewModel", "Reset cards for new day")
                 }
             }
         }

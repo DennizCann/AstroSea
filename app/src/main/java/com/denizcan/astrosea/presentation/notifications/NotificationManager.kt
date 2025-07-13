@@ -1,6 +1,14 @@
 package com.denizcan.astrosea.presentation.notifications
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.denizcan.astrosea.MainActivity
+import com.denizcan.astrosea.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -11,6 +19,62 @@ import java.util.*
 class NotificationManager(private val context: Context) {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    
+    companion object {
+        private const val CHANNEL_ID = "daily_tarot_channel"
+        private const val CHANNEL_NAME = "Günlük Tarot Açılımları"
+        private const val CHANNEL_DESCRIPTION = "Günlük tarot kartı açılımları ve hatırlatmalar"
+        private const val NOTIFICATION_ID = 1001
+    }
+    
+    init {
+        createNotificationChannel()
+    }
+    
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = CHANNEL_DESCRIPTION
+                enableVibration(true)
+                enableLights(true)
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+    
+    /**
+     * Gerçek push notification gönderir
+     */
+    private fun sendPushNotification(title: String, message: String) {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("navigate_to", "notifications")
+        }
+        
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.astrosea_icon)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .build()
+        
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
     
     /**
      * Yeni kullanıcı için ilk günlük açılım bildirimi gönderir
@@ -31,6 +95,9 @@ class NotificationManager(private val context: Context) {
                 .collection("notifications")
                 .add(notification)
                 .await()
+            
+            // Gerçek push notification gönder
+            sendPushNotification(notification.title, notification.message)
             
             android.util.Log.d("NotificationManager", "First daily reading notification sent successfully: ${docRef.id}")
         } catch (e: Exception) {
@@ -58,6 +125,9 @@ class NotificationManager(private val context: Context) {
                 .collection("notifications")
                 .add(notification)
                 .await()
+            
+            // Gerçek push notification gönder
+            sendPushNotification(notification.title, notification.message)
             
             android.util.Log.d("NotificationManager", "Daily cards renewed notification sent successfully: ${docRef.id}")
         } catch (e: Exception) {
@@ -234,6 +304,31 @@ class NotificationManager(private val context: Context) {
         }
     }
     
+    /**
+     * Bildirim izinlerini kontrol eder
+     */
+    fun checkNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        } else {
+            true // Android 13'ten önceki sürümlerde otomatik olarak izin verilir
+        }
+    }
+    
+    /**
+     * Bildirim izinlerini ister
+     */
+    fun requestNotificationPermission(activity: android.app.Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                activity.requestPermissions(
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    100
+                )
+            }
+        }
+    }
+
     private fun getCurrentDateString(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(Date())
