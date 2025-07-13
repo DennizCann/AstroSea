@@ -245,23 +245,30 @@ private fun CardView(
 ) {
     Box(modifier = modifier) {
         if (cardState != null) {
-            ReadingFlippableCard(
+            AnimatedReadingCard(
                 cardState = cardState,
                 onCardClick = {
-                    if (cardState.isRevealed) {
-                        onNavigateToCardDetail(cardState.card.id)
-                    }
+                    // Bu callback artık kullanılmıyor, AnimatedReadingCard kendi mantığını kullanıyor
                 },
+                onDrawCard = onDrawCard,
+                onNavigateToCardDetail = onNavigateToCardDetail,
                 modifier = Modifier.fillMaxSize()
             )
         } else {
-            Image(
-                painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                contentDescription = "Kapalı Kart",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable { onDrawCard() }
+            // Kart henüz çekilmemişse boş bir ReadingCardState ile AnimatedReadingCard kullan
+            val emptyCardState = ReadingCardState(
+                card = null,
+                isRevealed = false,
+                index = -1
+            )
+            AnimatedReadingCard(
+                cardState = emptyCardState,
+                onCardClick = {
+                    // Bu callback artık kullanılmıyor, AnimatedReadingCard kendi mantığını kullanıyor
+                },
+                onDrawCard = onDrawCard,
+                onNavigateToCardDetail = onNavigateToCardDetail,
+                modifier = Modifier.fillMaxSize()
             )
         }
     }

@@ -475,9 +475,16 @@ fun HomeScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     dailyTarotViewModel.dailyCards.forEach { cardState ->
-                        FlippableCard(
+                        AnimatedCardReveal(
                             cardState = cardState,
                             onCardClick = {
+                                // Kart zaten açıksa, günlük açılım info sayfasına git
+                                onNavigateToDailyReadingInfo()
+                            },
+                            onCardDetailClick = { cardId ->
+                                onNavigateToCardDetail(cardId)
+                            },
+                            onDrawCard = {
                                 if (!cardState.isRevealed) {
                                     // Eğer kart daha önce çekilmediyse, önce çekelim
                                     if (!dailyTarotViewModel.hasDrawnToday) {
@@ -497,13 +504,7 @@ fun HomeScreen(
                                             }
                                         }
                                     }
-                                } else {
-                                    // Kart zaten açıksa, günlük açılım info sayfasına git
-                                    onNavigateToDailyReadingInfo()
                                 }
-                            },
-                            onCardDetailClick = { cardId ->
-                                onNavigateToCardDetail(cardId)
                             },
                             modifier = Modifier
                                 .height(160.dp)

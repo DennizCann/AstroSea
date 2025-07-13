@@ -95,7 +95,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             val userDoc = firestore.collection("users").document(userId!!).get().await()
             val readingData = userDoc.get("reading_$normalizedReadingType") as? Map<String, Any>
             
-            val usedCardIds = drawnCards.map { it.card.id }
+            val usedCardIds = drawnCards.map { it.card?.id }
             val availableCards = allTarotCards.filter { it.id !in usedCardIds }
 
             if (availableCards.isEmpty()) {
@@ -123,7 +123,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             readingMap["cards"] = drawnCards.map { 
                 mapOf(
                     "index" to it.index,
-                    "cardId" to it.card.id,
+                    "cardId" to it.card?.id,
                     "isRevealed" to it.isRevealed
                 )
             }
@@ -382,6 +382,6 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
 
 data class ReadingCardState(
     val index: Int,
-    val card: TarotCard,
+    val card: TarotCard?,
     val isRevealed: Boolean
 ) 

@@ -101,6 +101,6 @@ class RelationshipReadingViewModel(private val context: Context) : ViewModel() {
 
 data class ReadingCardState(
     val index: Int,
-    val card: TarotCard,
+    val card: TarotCard?,
     val isRevealed: Boolean
 ) 
