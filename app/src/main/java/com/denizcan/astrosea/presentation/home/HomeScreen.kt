@@ -45,6 +45,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.zIndex
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import kotlinx.coroutines.launch
 
@@ -182,6 +185,8 @@ fun HomeScreen(
             route = "more"
         )
     )
+
+    var parentContainerSize by remember { mutableStateOf(IntSize.Zero) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
@@ -498,48 +503,52 @@ fun HomeScreen(
                 }
 
                 // Tarot kartları
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .padding(horizontal = 12.dp)
+                        .onGloballyPositioned { coordinates ->
+                            parentContainerSize = coordinates.size
+                        }
                 ) {
-                    dailyTarotViewModel.dailyCards.forEach { cardState ->
-                        AnimatedCardReveal(
-                            cardState = cardState,
-                            onCardClick = {
-                                // Kart zaten açıksa, günlük açılım info sayfasına git
-                                onNavigateToDailyReadingInfo()
-                            },
-                            onCardDetailClick = { cardId ->
-                                onNavigateToCardDetail(cardId)
-                            },
-                            onDrawCard = {
-                                if (!cardState.isRevealed) {
-                                    // Eğer kart daha önce çekilmediyse, önce çekelim
-                                    if (!dailyTarotViewModel.hasDrawnToday) {
-                                        dailyTarotViewModel.drawDailyCards()
-                                    }
-                                    // Sonra kartı açalım
-                                    dailyTarotViewModel.revealCard(cardState.index)
-                                    
-                                    // Kart açıldıktan sonra bildirim sayacını güncelle
-                                    scope.launch {
-                                        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-                                        if (userId != null) {
-                                            try {
-                                                unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
-                                            } catch (e: Exception) {
-                                                android.util.Log.e("HomeScreen", "Error updating notification count after card reveal", e)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        dailyTarotViewModel.dailyCards.forEach { cardState ->
+                            AnimatedCardReveal(
+                                cardState = cardState,
+                                onCardClick = {
+                                    // Kart zaten açıksa, günlük açılım info sayfasına git
+                                    onNavigateToDailyReadingInfo()
+                                },
+                                onCardDetailClick = { cardId ->
+                                    onNavigateToCardDetail(cardId)
+                                },
+                                onDrawCard = {
+                                    if (!cardState.isRevealed) {
+                                        if (!dailyTarotViewModel.hasDrawnToday) {
+                                            dailyTarotViewModel.drawDailyCards()
+                                        }
+                                        dailyTarotViewModel.revealCard(cardState.index)
+                                        scope.launch {
+                                            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                                            if (userId != null) {
+                                                try {
+                                                    unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
+                                                } catch (e: Exception) {
+                                                    android.util.Log.e("HomeScreen", "Error updating notification count after card reveal", e)
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            },
-                            modifier = Modifier
-                                .height(160.dp)
-                                .width(95.dp)
-                        )
+                                },
+                                modifier = Modifier
+                                    .height(160.dp)
+                                    .width(95.dp),
+                                parentSize = parentContainerSize
+                            )
+                        }
                     }
                 }
 

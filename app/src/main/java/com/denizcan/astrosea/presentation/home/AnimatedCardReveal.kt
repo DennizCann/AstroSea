@@ -19,6 +19,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.positionInParent
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.util.TarotCard
 import kotlinx.coroutines.delay
@@ -30,19 +36,25 @@ fun AnimatedCardReveal(
     onCardClick: () -> Unit,
     onCardDetailClick: (String) -> Unit,
     onDrawCard: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    parentSize: IntSize = IntSize.Zero
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
     
     // Animasyon durumları
     var isRevealing by remember { mutableStateOf(false) }
     var isExpanded by remember { mutableStateOf(false) }
-    var isFlipped by remember { mutableStateOf(cardState.isRevealed) } // Kart zaten açıksa başlangıçta çevrilmiş olsun
+    var isFlipped by remember { mutableStateOf(cardState.isRevealed) }
+    
+    // Kart pozisyonu için state'ler
+    var cardSize by remember { mutableStateOf(IntSize.Zero) }
+    var cardOffset by remember { mutableStateOf(IntOffset.Zero) }
     
     // Animasyon değerleri
     val scale by animateFloatAsState(
-        targetValue = if (isExpanded) 2.5f else 1f,
+        targetValue = if (isExpanded) 3.0f else 1f,
         animationSpec = tween(600, easing = FastOutSlowInEasing),
         label = "scale"
     )
@@ -54,9 +66,30 @@ fun AnimatedCardReveal(
     )
     
     val zIndex by animateFloatAsState(
-        targetValue = if (isExpanded) 9999f else 1f,
+        targetValue = if (isExpanded) 99999f else 1f,
         animationSpec = tween(600, easing = FastOutSlowInEasing),
         label = "zindex"
+    )
+    
+    // Offset animasyonu - kartı ekranın ortasına taşır
+    val offsetX by animateFloatAsState(
+        targetValue = if (isExpanded && parentSize.width > 0) {
+            val screenCenterX = parentSize.width / 2f
+            val cardCenterX = cardOffset.x + (cardSize.width / 2f)
+            screenCenterX - cardCenterX
+        } else 0f,
+        animationSpec = tween(600, easing = FastOutSlowInEasing),
+        label = "offsetX"
+    )
+    
+    val offsetY by animateFloatAsState(
+        targetValue = if (isExpanded && parentSize.height > 0) {
+            val screenCenterY = (parentSize.height / 2f) - 100f
+            val cardCenterY = cardOffset.y + (cardSize.height / 2f)
+            screenCenterY - cardCenterY
+        } else 0f,
+        animationSpec = tween(600, easing = FastOutSlowInEasing),
+        label = "offsetY"
     )
     
     // Kart durumu değiştiğinde isFlipped'i güncelle
@@ -71,33 +104,19 @@ fun AnimatedCardReveal(
             Log.d("AnimatedCardReveal", "🎴 Starting card reveal animation for card ${cardState.index}")
             scope.launch {
                 isRevealing = true
-                
-                // 1. Arka yüzü dönük kart büyür
                 isExpanded = true
-                delay(600) // Büyüme animasyonunu bekle
-                
-                // 2. Büyük halde arka → ön çevrilir
+                delay(600)
                 isFlipped = true
-                delay(400) // Çevirme animasyonunun yarısı
-                
-                // 3. Kartı çek ve aç
-                onDrawCard()
-                
-                // 4. Çevirme animasyonunun bitmesini bekle
                 delay(400)
-                
-                // 5. 1 saniye bekle
+                onDrawCard()
+                delay(400)
                 delay(1000)
-                
-                // 6. Eski boyutuna küçülür
                 isExpanded = false
-                delay(600) // Küçülme animasyonunu bekle
-                
+                delay(600)
                 isRevealing = false
                 Log.d("AnimatedCardReveal", "🎉 Animation completed for card ${cardState.index}")
             }
         } else if (cardState.isRevealed && !isRevealing) {
-            // Kart ön yüzü dönükken direkt detay sayfasına git
             cardState.card?.let { card ->
                 onCardDetailClick(card.id)
             }
@@ -106,17 +125,23 @@ fun AnimatedCardReveal(
     
     Box(
         modifier = modifier
+            .onGloballyPositioned { coordinates ->
+                cardSize = coordinates.size
+                cardOffset = coordinates.positionInParent().let { 
+                    IntOffset(it.x.toInt(), it.y.toInt()) 
+                }
+            }
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
                 rotationY = rotation
-                cameraDistance = 12f * density
+                cameraDistance = 12f * density.density
+                translationX = offsetX
+                translationY = offsetY
             }
             .zIndex(zIndex)
     ) {
-        // Kart ön yüz veya arka yüz gösterme
         if (rotation < 90f) {
-            // Arka yüz - kapalı kart
             Card(
                 modifier = Modifier
                     .fillMaxSize()
@@ -137,12 +162,11 @@ fun AnimatedCardReveal(
                 )
             }
         } else {
-            // Ön yüz - açık kart
             Card(
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        rotationY = 180f // Ters çevirme düzeltmesi
+                        rotationY = 180f
                     }
                     .clickable(onClick = handleCardClick),
                 colors = CardDefaults.cardColors(
@@ -154,7 +178,6 @@ fun AnimatedCardReveal(
                 )
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    // Kart çekildiyse ve geçerli bir kart varsa
                     if (cardState.card != null) {
                         val imageName = cardState.card.imageResName
                             .replace("ace", "one")
@@ -166,7 +189,6 @@ fun AnimatedCardReveal(
                             "drawable",
                             context.packageName
                         )
-                        
                         if (imageResId != 0) {
                             Image(
                                 painter = painterResource(id = imageResId),
@@ -175,7 +197,6 @@ fun AnimatedCardReveal(
                                 contentScale = ContentScale.Fit
                             )
                         } else {
-                            // Resim bulunamadıysa varsayılan
                             Image(
                                 painter = painterResource(id = R.drawable.placeholder_card),
                                 contentDescription = "Kart bulunamadı",
