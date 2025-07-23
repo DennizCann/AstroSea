@@ -527,10 +527,13 @@ fun HomeScreen(
                                 },
                                 onDrawCard = {
                                     if (!cardState.isRevealed) {
+                                        // Önce kartları çek (eğer henüz çekilmemişse)
                                         if (!dailyTarotViewModel.hasDrawnToday) {
                                             dailyTarotViewModel.drawDailyCards()
                                         }
+                                        // Sonra kartı aç
                                         dailyTarotViewModel.revealCard(cardState.index)
+                                        // Bildirim sayısını güncelle
                                         scope.launch {
                                             val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
                                             if (userId != null) {

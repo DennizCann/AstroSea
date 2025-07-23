@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
@@ -92,14 +94,24 @@ fun GeneralReadingDetailScreen(
                     )
 
                     // Kartların yerleşeceği alan
-                    CardLayoutContainer(
-                        readingInfo = readingInfo,
-                        drawnCardMap = viewModel.drawnCards.associateBy { it.index },
-                        onDrawCard = { index ->
-                            viewModel.drawCardForPosition(readingType, index)
-                        },
-                        onNavigateToCardDetail = onNavigateToCardDetail
-                    )
+                    var parentContainerSize by remember { mutableStateOf(IntSize.Zero) }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .onGloballyPositioned { coordinates ->
+                                parentContainerSize = coordinates.size
+                            }
+                    ) {
+                        CardLayoutContainer(
+                            readingInfo = readingInfo,
+                            drawnCardMap = viewModel.drawnCards.associateBy { it.index },
+                            onDrawCard = { index ->
+                                viewModel.drawCardForPosition(readingType, index)
+                            },
+                            onNavigateToCardDetail = onNavigateToCardDetail,
+                            parentSize = parentContainerSize
+                        )
+                    }
                 }
                 
                 // Kart Anlamları ve Butonlar
@@ -209,7 +221,8 @@ fun CardLayoutContainer(
     readingInfo: ReadingInfo,
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(
         modifier = Modifier
@@ -218,20 +231,20 @@ fun CardLayoutContainer(
         contentAlignment = Alignment.Center
     ) {
         when (readingInfo.layout) {
-            CardLayout.SINGLE -> SingleCardLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.HORIZONTAL_3 -> HorizontalLayout(3, drawnCardMap, onDrawCard, onNavigateToCardDetail, maxWidthFraction = 0.65f)
-            CardLayout.PYRAMID_3 -> Pyramid3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.CROSS_5 -> Cross5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.PYRAMID_6 -> Pyramid6Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.CROSS_7 -> Cross7Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.COMPATIBILITY_CROSS -> CompatibilityCrossLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.GRID_3x3 -> Grid3x3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.PATH_5 -> Path5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.FINANCIAL_4 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
-            CardLayout.FINANCIAL_6 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            CardLayout.SINGLE -> SingleCardLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.HORIZONTAL_3 -> HorizontalLayout(3, drawnCardMap, onDrawCard, onNavigateToCardDetail, maxWidthFraction = 0.65f, parentSize)
+            CardLayout.PYRAMID_3 -> Pyramid3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.CROSS_5 -> Cross5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.PYRAMID_6 -> Pyramid6Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.CROSS_7 -> Cross7Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.COMPATIBILITY_CROSS -> CompatibilityCrossLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.GRID_3x3 -> Grid3x3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.PATH_5 -> Path5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.FINANCIAL_4 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.FINANCIAL_6 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
             // Diğer layout'lar için varsayılan
-            else -> HorizontalLayout(readingInfo.cardCount, drawnCardMap, onDrawCard, onNavigateToCardDetail)
+            else -> HorizontalLayout(readingInfo.cardCount, drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize = parentSize)
         }
     }
 }
@@ -241,7 +254,8 @@ private fun CardView(
     modifier: Modifier,
     cardState: ReadingCardState?,
     onDrawCard: () -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = modifier) {
         if (cardState != null) {
@@ -252,7 +266,8 @@ private fun CardView(
                 },
                 onDrawCard = onDrawCard,
                 onNavigateToCardDetail = onNavigateToCardDetail,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                parentSize = parentSize
             )
         } else {
             // Kart henüz çekilmemişse boş bir ReadingCardState ile AnimatedReadingCard kullan
@@ -268,7 +283,8 @@ private fun CardView(
                 },
                 onDrawCard = onDrawCard,
                 onNavigateToCardDetail = onNavigateToCardDetail,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                parentSize = parentSize
             )
         }
     }
@@ -278,7 +294,8 @@ private fun CardView(
 fun SingleCardLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     val cardModifier = Modifier
         .width(130.dp)
@@ -287,7 +304,8 @@ fun SingleCardLayout(
         modifier = cardModifier,
         cardState = drawnCardMap[0],
         onDrawCard = { onDrawCard(0) },
-        onNavigateToCardDetail = onNavigateToCardDetail
+        onNavigateToCardDetail = onNavigateToCardDetail,
+        parentSize = parentSize
     )
 }
 
@@ -297,7 +315,8 @@ fun HorizontalLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    maxWidthFraction: Float = 1.0f
+    maxWidthFraction: Float = 1.0f,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(maxWidthFraction),
@@ -311,7 +330,8 @@ fun HorizontalLayout(
                     .aspectRatio(0.7f),
                 cardState = drawnCardMap[index],
                 onDrawCard = { onDrawCard(index) },
-                onNavigateToCardDetail = onNavigateToCardDetail
+                onNavigateToCardDetail = onNavigateToCardDetail,
+                parentSize = parentSize
             )
         }
     }
@@ -321,7 +341,8 @@ fun HorizontalLayout(
 fun Pyramid3Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     val cardModifier = Modifier
         .width(100.dp)
@@ -334,20 +355,23 @@ fun Pyramid3Layout(
             modifier = cardModifier,
             cardState = drawnCardMap[0],
             onDrawCard = { onDrawCard(0) },
-            onNavigateToCardDetail = onNavigateToCardDetail
+            onNavigateToCardDetail = onNavigateToCardDetail,
+            parentSize = parentSize
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CardView(
                 modifier = cardModifier,
                 cardState = drawnCardMap[1],
                 onDrawCard = { onDrawCard(1) },
-                onNavigateToCardDetail = onNavigateToCardDetail
+                onNavigateToCardDetail = onNavigateToCardDetail,
+                parentSize = parentSize
             )
             CardView(
                 modifier = cardModifier,
                 cardState = drawnCardMap[2],
                 onDrawCard = { onDrawCard(2) },
-                onNavigateToCardDetail = onNavigateToCardDetail
+                onNavigateToCardDetail = onNavigateToCardDetail,
+                parentSize = parentSize
             )
         }
     }
@@ -357,7 +381,8 @@ fun Pyramid3Layout(
 fun Cross5Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     val cardModifier = Modifier
         .width(85.dp)
@@ -366,13 +391,13 @@ fun Cross5Layout(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
-            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
-            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
         }
-        CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+        CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
     }
 }
 
@@ -380,7 +405,8 @@ fun Cross5Layout(
 fun Pyramid6Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = Modifier.padding(top = 16.dp), contentAlignment = Alignment.Center) {
         val cardModifier = Modifier
@@ -391,17 +417,17 @@ fun Pyramid6Layout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra (1 kart)
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
             // 2. sıra (2 kart)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
             }
             // 3. sıra (3 kart)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
             }
         }
     }
@@ -411,7 +437,8 @@ fun Pyramid6Layout(
 fun Cross7Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     val cardModifier = Modifier
         .width(80.dp)
@@ -420,16 +447,16 @@ fun Cross7Layout(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
         Row(horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)) {
-            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
-            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
-            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)) {
-            CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
-            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
-            CardView(cardModifier, drawnCardMap[6], { onDrawCard(6) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[6], { onDrawCard(6) }, onNavigateToCardDetail, parentSize)
         }
     }
 }
@@ -438,7 +465,8 @@ fun Cross7Layout(
 fun CompatibilityCrossLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = Modifier.fillMaxSize().padding(top = 24.dp), contentAlignment = Alignment.Center) {
         val cardModifier = Modifier
@@ -454,7 +482,8 @@ fun CompatibilityCrossLayout(
                 cardModifier,
                 drawnCardMap[0],
                 { onDrawCard(0) },
-                onNavigateToCardDetail
+                onNavigateToCardDetail,
+                parentSize
             )
 
             // Row 2: Cards 2 & 3 (indices 1, 2)
@@ -463,13 +492,15 @@ fun CompatibilityCrossLayout(
                     cardModifier,
                     drawnCardMap[1],
                     { onDrawCard(1) },
-                    onNavigateToCardDetail
+                    onNavigateToCardDetail,
+                    parentSize
                 )
                 CardView(
                     cardModifier,
                     drawnCardMap[2],
                     { onDrawCard(2) },
-                    onNavigateToCardDetail
+                    onNavigateToCardDetail,
+                    parentSize
                 )
             }
 
@@ -478,7 +509,8 @@ fun CompatibilityCrossLayout(
                 cardModifier,
                 drawnCardMap[3],
                 { onDrawCard(3) },
-                onNavigateToCardDetail
+                onNavigateToCardDetail,
+                parentSize
             )
 
             // Row 4: Cards 5 & 6 (indices 4, 5)
@@ -487,13 +519,15 @@ fun CompatibilityCrossLayout(
                     cardModifier,
                     drawnCardMap[4],
                     { onDrawCard(4) },
-                    onNavigateToCardDetail
+                    onNavigateToCardDetail,
+                    parentSize
                 )
                 CardView(
                     cardModifier,
                     drawnCardMap[5],
                     { onDrawCard(5) },
-                    onNavigateToCardDetail
+                    onNavigateToCardDetail,
+                    parentSize
                 )
             }
 
@@ -502,7 +536,8 @@ fun CompatibilityCrossLayout(
                 cardModifier,
                 drawnCardMap[6],
                 { onDrawCard(6) },
-                onNavigateToCardDetail
+                onNavigateToCardDetail,
+                parentSize
             )
         }
     }
@@ -512,7 +547,8 @@ fun CompatibilityCrossLayout(
 fun Grid3x3Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = Modifier.padding(top = 28.dp)) {
         val cardModifier = Modifier
@@ -530,7 +566,8 @@ fun Grid3x3Layout(
                             modifier = cardModifier,
                             cardState = drawnCardMap[index],
                             onDrawCard = { onDrawCard(index) },
-                            onNavigateToCardDetail = onNavigateToCardDetail
+                            onNavigateToCardDetail = onNavigateToCardDetail,
+                            parentSize = parentSize
                         )
                     }
                 }
@@ -543,7 +580,8 @@ fun Grid3x3Layout(
 fun Path5Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
@@ -554,14 +592,14 @@ fun Path5Layout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra (1 kart)
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
             // 2. sıra (1 kart)
-            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
             // 3. sıra (3 kart)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
             }
         }
     }
@@ -571,7 +609,8 @@ fun Path5Layout(
 fun WorkProblemLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
@@ -582,18 +621,18 @@ fun WorkProblemLayout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
             
             // 2. sıra: 4 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
             }
             
             // 3. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
         }
     }
 }
@@ -602,7 +641,8 @@ fun WorkProblemLayout(
 fun FinancialLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    parentSize: IntSize = IntSize.Zero
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
@@ -613,17 +653,17 @@ fun FinancialLayout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
             // 2. sıra: 3 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
             }
             // 3. sıra: 2 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail)
-                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
             }
         }
     }

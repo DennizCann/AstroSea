@@ -172,7 +172,12 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                 if (cardId.isNotEmpty()) {
                     val card = allTarotCards.find { it.id == cardId }
                     if (card != null) {
-                        // Kartı aç
+                        // Firestore'a güncelleme (önce)
+                        firestore.collection("users").document(userId!!)
+                            .update("card_${index}_revealed", true)
+                            .await()
+                        
+                        // Sonra local state'i güncelle
                         val updatedCards = dailyCards.toMutableList()
                         updatedCards[index] = DailyCardState(
                             index = index,
@@ -181,10 +186,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         )
                         dailyCards = updatedCards
                         
-                        // Firestore'a güncelleme
-                        firestore.collection("users").document(userId!!)
-                            .update("card_${index}_revealed", true)
-                            .await()
+                        Log.d("DailyTarotViewModel", "Card $index revealed: ${card.name}")
                         
                         // Tüm kartlar açıldıysa bildirim sayacını güncelle
                         val allCardsRevealed = dailyCards.all { it.isRevealed }
@@ -221,6 +223,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                             isRevealed = isRevealed
                         )
                     )
+                    Log.d("DailyTarotViewModel", "Card $i loaded: ${card.name}, revealed: $isRevealed")
                 } else {
                     // Kart henüz çekilmemiş
                     loadedCards.add(
@@ -230,11 +233,12 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                             isRevealed = false
                         )
                     )
+                    Log.d("DailyTarotViewModel", "Card $i not drawn yet")
                 }
             }
             
             dailyCards = loadedCards
-            Log.d("DailyTarotViewModel", "Loaded cards: ${loadedCards.map { "${it.index}: revealed=${it.isRevealed}, card=${it.card?.name ?: "null"}" }}")
+            Log.d("DailyTarotViewModel", "All cards loaded successfully")
         } catch (e: Exception) {
             Log.e("DailyTarotViewModel", "Error loading saved cards", e)
         }

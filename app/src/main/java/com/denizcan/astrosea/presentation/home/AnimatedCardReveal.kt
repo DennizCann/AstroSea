@@ -45,56 +45,28 @@ fun AnimatedCardReveal(
     
     // Animasyon durumları
     var isRevealing by remember { mutableStateOf(false) }
-    var isExpanded by remember { mutableStateOf(false) }
     var isFlipped by remember { mutableStateOf(cardState.isRevealed) }
     
-    // Kart pozisyonu için state'ler
-    var cardSize by remember { mutableStateOf(IntSize.Zero) }
-    var cardOffset by remember { mutableStateOf(IntOffset.Zero) }
-    
     // Animasyon değerleri
-    val scale by animateFloatAsState(
-        targetValue = if (isExpanded) 3.0f else 1f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
-        label = "scale"
-    )
-    
     val rotation by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
         animationSpec = tween(800, easing = FastOutSlowInEasing),
         label = "rotation"
     )
     
-    val zIndex by animateFloatAsState(
-        targetValue = if (isExpanded) 99999f else 1f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
-        label = "zindex"
-    )
-    
-    // Offset animasyonu - kartı ekranın ortasına taşır
-    val offsetX by animateFloatAsState(
-        targetValue = if (isExpanded && parentSize.width > 0) {
-            val screenCenterX = parentSize.width / 2f
-            val cardCenterX = cardOffset.x + (cardSize.width / 2f)
-            screenCenterX - cardCenterX
-        } else 0f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
-        label = "offsetX"
-    )
-    
-    val offsetY by animateFloatAsState(
-        targetValue = if (isExpanded && parentSize.height > 0) {
-            val screenCenterY = (parentSize.height / 2f) - 100f
-            val cardCenterY = cardOffset.y + (cardSize.height / 2f)
-            screenCenterY - cardCenterY
-        } else 0f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
-        label = "offsetY"
-    )
-    
     // Kart durumu değiştiğinde isFlipped'i güncelle
     LaunchedEffect(cardState.isRevealed) {
-        isFlipped = cardState.isRevealed
+        // Animasyon sırasında state değişikliklerini engelle
+        if (!isRevealing) {
+            isFlipped = cardState.isRevealed
+        }
+    }
+    
+    // Kart state'i değiştiğinde isFlipped'i güncelle (animasyon dışında)
+    LaunchedEffect(cardState) {
+        if (!isRevealing) {
+            isFlipped = cardState.isRevealed
+        }
     }
     
     // Kart tıklama işleyicisi
@@ -104,19 +76,19 @@ fun AnimatedCardReveal(
             Log.d("AnimatedCardReveal", "🎴 Starting card reveal animation for card ${cardState.index}")
             scope.launch {
                 isRevealing = true
-                isExpanded = true
-                delay(600)
-                isFlipped = true
-                delay(400)
+                
+                // Kartı çek
                 onDrawCard()
-                delay(400)
-                delay(1000)
-                isExpanded = false
-                delay(600)
+                
+                // Kartı çevir
+                isFlipped = true
+                delay(800) // Çevirme animasyonunun tamamını bekle
+                
                 isRevealing = false
                 Log.d("AnimatedCardReveal", "🎉 Animation completed for card ${cardState.index}")
             }
         } else if (cardState.isRevealed && !isRevealing) {
+            // Kart zaten açıksa direkt detay sayfasına git
             cardState.card?.let { card ->
                 onCardDetailClick(card.id)
             }
@@ -125,21 +97,10 @@ fun AnimatedCardReveal(
     
     Box(
         modifier = modifier
-            .onGloballyPositioned { coordinates ->
-                cardSize = coordinates.size
-                cardOffset = coordinates.positionInParent().let { 
-                    IntOffset(it.x.toInt(), it.y.toInt()) 
-                }
-            }
             .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
                 rotationY = rotation
                 cameraDistance = 12f * density.density
-                translationX = offsetX
-                translationY = offsetY
             }
-            .zIndex(zIndex)
     ) {
         if (rotation < 90f) {
             Card(
@@ -151,7 +112,7 @@ fun AnimatedCardReveal(
                 ),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (isExpanded) 16.dp else 4.dp
+                    defaultElevation = 4.dp
                 )
             ) {
                 Image(
@@ -174,7 +135,7 @@ fun AnimatedCardReveal(
                 ),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (isExpanded) 16.dp else 4.dp
+                    defaultElevation = 4.dp
                 )
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -197,6 +158,7 @@ fun AnimatedCardReveal(
                                 contentScale = ContentScale.Fit
                             )
                         } else {
+                            // Resim bulunamadıysa varsayılan
                             Image(
                                 painter = painterResource(id = R.drawable.placeholder_card),
                                 contentDescription = "Kart bulunamadı",
@@ -204,6 +166,14 @@ fun AnimatedCardReveal(
                                 contentScale = ContentScale.Fit
                             )
                         }
+                    } else {
+                        // Kart henüz çekilmemişse arka yüzü göster
+                        Image(
+                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                            contentDescription = "Kapalı Kart",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit
+                        )
                     }
                 }
             }

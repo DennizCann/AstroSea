@@ -19,6 +19,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.positionInParent
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.model.TarotCard
 import kotlinx.coroutines.delay
@@ -30,33 +36,22 @@ fun AnimatedReadingCard(
     onCardClick: () -> Unit,
     onDrawCard: () -> Unit = {},
     onNavigateToCardDetail: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    parentSize: IntSize = IntSize.Zero
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
     
     // Animasyon durumları
     var isRevealing by remember { mutableStateOf(false) }
-    var isExpanded by remember { mutableStateOf(false) }
-    var isFlipped by remember { mutableStateOf(cardState.isRevealed) } // Kart zaten açıksa başlangıçta çevrilmiş olsun
+    var isFlipped by remember { mutableStateOf(cardState.isRevealed) }
     
     // Animasyon değerleri
-    val scale by animateFloatAsState(
-        targetValue = if (isExpanded) 2.5f else 1f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
-        label = "scale"
-    )
-    
     val rotation by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
         animationSpec = tween(800, easing = FastOutSlowInEasing),
         label = "rotation"
-    )
-    
-    val zIndex by animateFloatAsState(
-        targetValue = if (isExpanded) 9999f else 1f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
-        label = "zindex"
     )
     
     // Kart durumu değiştiğinde isFlipped'i güncelle
@@ -72,26 +67,12 @@ fun AnimatedReadingCard(
             scope.launch {
                 isRevealing = true
                 
-                // 1. Arka yüzü dönük kart büyür
-                isExpanded = true
-                delay(600) // Büyüme animasyonunu bekle
-                
-                // 2. Büyük halde arka → ön çevrilir
-                isFlipped = true
-                delay(400) // Çevirme animasyonunun yarısı
-                
-                // 3. Kartı çek ve aç
+                // Kartı çek
                 onDrawCard()
                 
-                // 4. Çevirme animasyonunun bitmesini bekle
-                delay(400)
-                
-                // 5. 1 saniye bekle
-                delay(1000)
-                
-                // 6. Eski boyutuna küçülür
-                isExpanded = false
-                delay(600) // Küçülme animasyonunu bekle
+                // Kartı çevir
+                isFlipped = true
+                delay(800) // Çevirme animasyonunun tamamını bekle
                 
                 isRevealing = false
                 Log.d("AnimatedReadingCard", "🎉 Animation completed for card ${cardState.index}")
@@ -107,12 +88,9 @@ fun AnimatedReadingCard(
     Box(
         modifier = modifier
             .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
                 rotationY = rotation
-                cameraDistance = 12f * density
+                cameraDistance = 12f * density.density
             }
-            .zIndex(zIndex)
     ) {
         // Kart ön yüz veya arka yüz gösterme
         if (rotation < 90f) {
@@ -126,7 +104,7 @@ fun AnimatedReadingCard(
                 ),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (isExpanded) 16.dp else 4.dp
+                    defaultElevation = 4.dp
                 )
             ) {
                 Image(
@@ -150,7 +128,7 @@ fun AnimatedReadingCard(
                 ),
                 shape = RoundedCornerShape(8.dp),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (isExpanded) 16.dp else 4.dp
+                    defaultElevation = 4.dp
                 )
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
