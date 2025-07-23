@@ -26,7 +26,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +45,12 @@ fun GeneralReadingDetailScreen(
         factory = GeneralReadingViewModel.Factory(context)
     )
     
+    // Günlük açılım için DailyTarotViewModel'i al
+    val dailyTarotViewModel: DailyTarotViewModel = viewModel(
+        key = "DailyTarotViewModel",
+        factory = DailyTarotViewModel.Factory(context)
+    )
+    
     // Ekran durumları
     var currentScreen by remember { mutableStateOf("detail") } // "detail", "loading", "interpretation"
     
@@ -48,9 +58,12 @@ fun GeneralReadingDetailScreen(
         viewModel.loadReadingState(readingType)
     }
     
-    // Günlük açılım için özel durum - sayfa açıldığında mevcut kartları yükle
+    // Günlük açılım için özel durum - DailyTarotViewModel'i set et
     LaunchedEffect(readingType) {
         if (readingType.trim() == "GÜNLÜK AÇILIM") {
+            viewModel.setDailyTarotViewModel(dailyTarotViewModel)
+            // DailyTarotViewModel set edildikten sonra state'i yükle
+            delay(200)
             viewModel.loadReadingState(readingType)
         }
     }
@@ -176,6 +189,15 @@ fun GeneralReadingDetailScreen(
                                             } else {
                                                 // Kart henüz çekilmemişse veya açılmamışsa, tıklandığında çek
                                                 viewModel.drawCardForPosition(readingType, index)
+                                                
+                                                // Günlük açılım için state'i güncelle
+                                                if (readingType.trim() == "GÜNLÜK AÇILIM") {
+                                                    // State güncellemesini bekle
+                                                    CoroutineScope(Dispatchers.Main).launch {
+                                                        delay(1500)
+                                                        viewModel.loadReadingState(readingType)
+                                                    }
+                                                }
                                             }
                                         },
                                         isSelected = isCardRevealed,
@@ -257,7 +279,18 @@ fun GeneralReadingInterpretationScreen(
         factory = GeneralReadingViewModel.Factory(context)
     )
     
+    // Günlük açılım için DailyTarotViewModel'i al
+    val dailyTarotViewModel: DailyTarotViewModel = viewModel(
+        key = "DailyTarotViewModel",
+        factory = DailyTarotViewModel.Factory(context)
+    )
+    
     LaunchedEffect(readingType) {
+        if (readingType.trim() == "GÜNLÜK AÇILIM") {
+            viewModel.setDailyTarotViewModel(dailyTarotViewModel)
+            // DailyTarotViewModel set edildikten sonra state'i yükle
+            delay(200)
+        }
         viewModel.loadReadingState(readingType)
     }
     

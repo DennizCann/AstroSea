@@ -25,7 +25,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
         private set
     
     var hasDrawnToday by mutableStateOf(false)
-        private set
+        set
     
     var isLoading by mutableStateOf(true)
         private set
@@ -119,9 +119,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     val randomCards = allTarotCards.shuffled().take(3)
                     
                     Log.d("DailyTarotViewModel", "=== Drawing new daily cards ===")
-                    randomCards.forEachIndexed { index, card ->
-                        Log.d("DailyTarotViewModel", "Drew card $index: ${card.name} (ID: ${card.id})")
-                    }
+                    Log.d("DailyTarotViewModel", "Drew cards: ${randomCards.mapIndexed { index, card -> "$index:${card.name}" }}")
                     
                     // Firestore'a kaydet
                     val userRef = firestore.collection("users").document(userId!!)
@@ -142,7 +140,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     dailyCards = randomCards.mapIndexed { index, card ->
                         DailyCardState(
                             index = index,
-                            card = card, // Kartı göster ama kapalı olarak
+                            card = card,
                             isRevealed = false
                         )
                     }.sortedBy { it.index }
@@ -315,12 +313,6 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
             viewModelScope.launch {
                 Log.d("DailyTarotViewModel", "=== Refreshing cards ===")
                 Log.d("DailyTarotViewModel", "Current state - hasDrawnToday: $hasDrawnToday, cards count: ${dailyCards.size}")
-                
-                // Eğer kartlar zaten yüklenmişse ve bugünün kartlarıysa, tekrar yükleme
-                if (dailyCards.isNotEmpty() && hasDrawnToday) {
-                    Log.d("DailyTarotViewModel", "Cards already loaded for today, skipping refresh")
-                    return@launch
-                }
                 
                 // Önce günlük durumu kontrol et
                 val currentDate = getCurrentDateString()

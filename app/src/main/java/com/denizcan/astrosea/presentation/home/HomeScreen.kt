@@ -460,7 +460,11 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 48.dp)
-                        .clickable { onNavigateToDailyReadingInfo() },
+                        .clickable { 
+                            // Günlük açılım detayına gitmeden önce kartları yenile
+                            dailyTarotViewModel.refreshCards()
+                            onNavigateToDailyReadingInfo() 
+                        },
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     ),
