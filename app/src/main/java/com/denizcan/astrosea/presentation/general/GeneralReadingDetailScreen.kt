@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +41,9 @@ fun GeneralReadingDetailScreen(
         factory = GeneralReadingViewModel.Factory(context)
     )
     
+    // Ekran durumları
+    var currentScreen by remember { mutableStateOf("detail") } // "detail", "loading", "interpretation"
+    
     LaunchedEffect(readingType) {
         viewModel.loadReadingState(readingType)
     }
@@ -53,6 +57,240 @@ fun GeneralReadingDetailScreen(
     
     val readingInfo = remember(readingType) {
         getReadingInfo(readingType)
+    }
+    
+    when (currentScreen) {
+        "loading" -> {
+            LoadingScreen(
+                onLoadingComplete = {
+                    currentScreen = "interpretation"
+                }
+            )
+        }
+        "interpretation" -> {
+            GeneralReadingInterpretationScreen(
+                readingType = readingType,
+                onNavigateBack = {
+                    currentScreen = "detail"
+                }
+            )
+        }
+        else -> {
+            // Ana detay ekranı
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = R.drawable.acilimlararkaplan),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                
+                Scaffold(
+                    topBar = {
+                        AstroTopBar(
+                            title = readingType,
+                            onBackClick = onNavigateBack
+                        )
+                    },
+                    containerColor = Color.Transparent
+                ) { paddingValues ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // Çerçeve ve Kartlar
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.98f)
+                                .weight(6.5f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.acilimlarsayfasitak),
+                                contentDescription = "Çerçeve",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.FillBounds
+                            )
+
+                            // Kartların yerleşeceği alan
+                            var parentContainerSize by remember { mutableStateOf(IntSize.Zero) }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .onGloballyPositioned { coordinates ->
+                                        parentContainerSize = coordinates.size
+                                    }
+                            ) {
+                                CardLayoutContainer(
+                                    readingInfo = readingInfo,
+                                    drawnCardMap = viewModel.drawnCards.associateBy { it.index },
+                                    onDrawCard = { index ->
+                                        viewModel.drawCardForPosition(readingType, index)
+                                    },
+                                    onNavigateToCardDetail = onNavigateToCardDetail,
+                                    parentSize = parentContainerSize
+                                )
+                            }
+                        }
+                        
+                        // Kart Anlamları ve Butonlar
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp)
+                                .weight(3.5f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            // Kart Anlamları - Her zaman görünür
+                            LazyColumn(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                itemsIndexed(readingInfo.cardMeanings) { index, meaning ->
+                                    val card = viewModel.drawnCards.find { it.index == index }?.card
+                                    val isCardDrawn = card != null
+                                    val isCardRevealed = card != null && viewModel.drawnCards.find { it.index == index }?.isRevealed == true
+                                    
+                                    // Günlük açılım için özel mantık: kart açılmışsa ismini göster, açılmamışsa sadece anlamı göster
+                                    val displayText = if (readingType.trim() == "GÜNLÜK AÇILIM") {
+                                        if (isCardRevealed) {
+                                            "${index + 1}. $meaning: ${card?.name ?: ""}"
+                                        } else {
+                                            "${index + 1}. $meaning"
+                                        }
+                                    } else {
+                                        // Diğer açılımlar için normal mantık
+                                        "${index + 1}. $meaning: ${card?.name ?: "..."}"
+                                    }
+                                    
+                                    MeaningCard(
+                                        text = displayText,
+                                        onClick = { 
+                                            if (isCardDrawn && isCardRevealed) {
+                                                onNavigateToCardDetail(card.id)
+                                            } else {
+                                                // Kart henüz çekilmemişse veya açılmamışsa, tıklandığında çek
+                                                viewModel.drawCardForPosition(readingType, index)
+                                            }
+                                        },
+                                        isSelected = isCardRevealed,
+                                        enabled = true
+                                    )
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            // Yeniden Çek ve Yorumunu Gör Butonları - Yan yana
+                            val isDailyReading = readingType.trim() == "GÜNLÜK AÇILIM"
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                // Yeniden Çek Butonu
+                                Button(
+                                    onClick = { viewModel.resetAndDrawNew(readingType) },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = !isDailyReading,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (isDailyReading) Color.Gray.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.6f)
+                                    ),
+                                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                                ) {
+                                    Text(
+                                        text = if (isDailyReading) "Günlük Açılım - Günde Bir Kez" else "Yeniden Çek",
+                                        color = if (isDailyReading) Color.Gray else Color.White,
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                
+                                // Yorumunu Gör Butonu
+                                Button(
+                                    onClick = { 
+                                        // Sadece tüm kartlar açıldığında yorum ekranına git
+                                        val totalCards = readingInfo.cardCount
+                                        val revealedCards = viewModel.drawnCards.filter { it.isRevealed }
+                                        if (revealedCards.size == totalCards) {
+                                            currentScreen = "loading"
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount) 
+                                            Color.Black.copy(alpha = 0.6f) 
+                                        else 
+                                            Color.Gray.copy(alpha = 0.3f)
+                                    ),
+                                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                                ) {
+                                    Text(
+                                        text = "Yorumunu Gör",
+                                        color = if (viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount) Color.White else Color.Gray,
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun GeneralReadingInterpretationScreen(
+    readingType: String,
+    onNavigateBack: () -> Unit
+) {
+    val context = LocalContext.current
+    val viewModel: GeneralReadingViewModel = viewModel(
+        key = "GeneralReadingViewModel_$readingType",
+        factory = GeneralReadingViewModel.Factory(context)
+    )
+    
+    LaunchedEffect(readingType) {
+        viewModel.loadReadingState(readingType)
+    }
+    
+    val readingInfo = remember(readingType) {
+        getReadingInfo(readingType)
+    }
+    
+    // Tüm kartların anlamlarını birleştir
+    val fullInterpretation = remember(viewModel.drawnCards, readingInfo) {
+        val drawnCards = viewModel.drawnCards.filter { it.isRevealed }
+        if (drawnCards.isNotEmpty()) {
+            val interpretation = StringBuilder()
+            interpretation.append("$readingType Yorumu\n\n")
+            
+            drawnCards.forEachIndexed { index, cardState ->
+                val meaning = readingInfo.cardMeanings.getOrNull(index) ?: "Kart ${index + 1}"
+                val cardName = cardState.card?.turkishName ?: cardState.card?.name ?: "Bilinmeyen Kart"
+                val cardMeaning = cardState.card?.description ?: "Bu kart henüz yorumlanmamış."
+                
+                interpretation.append("$meaning: $cardName\n")
+                interpretation.append("$cardMeaning\n\n")
+            }
+            
+            // Genel yorum ekle
+            interpretation.append("Genel Yorum:\n")
+            interpretation.append("Bu açılım size hayatınızın bu alanında rehberlik etmek için tasarlanmıştır. ")
+            interpretation.append("Çektiğiniz kartların anlamlarını dikkatlice değerlendirin ve iç sesinizi dinleyin. ")
+            interpretation.append("Her kart size özel bir mesaj taşımaktadır.\n\n")
+            
+            interpretation.toString()
+        } else {
+            "Henüz kart çekilmemiş. Lütfen önce kartlarınızı çekin."
+        }
     }
     
     Box(modifier = Modifier.fillMaxSize()) {
@@ -79,7 +317,7 @@ fun GeneralReadingDetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Çerçeve ve Kartlar
+                // Çerçeve ve Açık Kartlar
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.98f)
@@ -93,7 +331,7 @@ fun GeneralReadingDetailScreen(
                         contentScale = ContentScale.FillBounds
                     )
 
-                    // Kartların yerleşeceği alan
+                    // Açık kartların yerleşeceği alan
                     var parentContainerSize by remember { mutableStateOf(IntSize.Zero) }
                     Box(
                         modifier = Modifier
@@ -102,19 +340,20 @@ fun GeneralReadingDetailScreen(
                                 parentContainerSize = coordinates.size
                             }
                     ) {
+                        // Açık kartları göster
+                        val revealedCards = viewModel.drawnCards.filter { it.isRevealed }
                         CardLayoutContainer(
                             readingInfo = readingInfo,
-                            drawnCardMap = viewModel.drawnCards.associateBy { it.index },
-                            onDrawCard = { index ->
-                                viewModel.drawCardForPosition(readingType, index)
-                            },
-                            onNavigateToCardDetail = onNavigateToCardDetail,
-                            parentSize = parentContainerSize
+                            drawnCardMap = revealedCards.associateBy { it.index },
+                            onDrawCard = { /* Kartlar zaten açık */ },
+                            onNavigateToCardDetail = { /* Yorum ekranında kart detayına gitme */ },
+                            parentSize = parentContainerSize,
+                            forceRevealed = true // Yorum ekranında kartları zorla açık göster
                         )
                     }
                 }
                 
-                // Kart Anlamları ve Butonlar
+                // Yorum Kutusu - Kaydırılabilir
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,65 +362,79 @@ fun GeneralReadingDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Kart Anlamları - Her zaman görünür
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        itemsIndexed(readingInfo.cardMeanings) { index, meaning ->
-                            val card = viewModel.drawnCards.find { it.index == index }?.card
-                            val isCardDrawn = card != null
-                            val isCardRevealed = card != null && viewModel.drawnCards.find { it.index == index }?.isRevealed == true
-                            
-                            // Günlük açılım için özel mantık: kart açılmışsa ismini göster, açılmamışsa sadece anlamı göster
-                            val displayText = if (readingType.trim() == "GÜNLÜK AÇILIM") {
-                                if (isCardRevealed) {
-                                    "${index + 1}. $meaning: ${card?.name ?: ""}"
-                                } else {
-                                    "${index + 1}. $meaning"
-                                }
-                            } else {
-                                // Diğer açılımlar için normal mantık
-                                "${index + 1}. $meaning: ${card?.name ?: "..."}"
-                            }
-                            
-                            MeaningCard(
-                                text = displayText,
-                                onClick = { 
-                                    if (isCardDrawn && isCardRevealed) {
-                                        onNavigateToCardDetail(card.id)
-                                    } else {
-                                        // Kart henüz çekilmemişse veya açılmamışsa, tıklandığında çek
-                                        viewModel.drawCardForPosition(readingType, index)
-                                    }
-                                },
-                                isSelected = isCardRevealed,
-                                enabled = true
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Yeniden Çek Butonu - Günlük açılım için inaktif
-                    val isDailyReading = readingType.trim() == "GÜNLÜK AÇILIM"
-                    Button(
-                        onClick = { viewModel.resetAndDrawNew(readingType) },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isDailyReading,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isDailyReading) Color.Gray.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.6f)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Black.copy(alpha = 0.6f)
                         ),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                     ) {
-                        Text(
-                            text = if (isDailyReading) "Günlük Açılım - Günde Bir Kez" else "Yeniden Çek",
-                            color = if (isDailyReading) Color.Gray else Color.White
-                        )
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            item {
+                                Text(
+                                    text = fullInterpretation,
+                                    color = Color.White,
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 18.sp,
+                                    lineHeight = 28.sp,
+                                    textAlign = TextAlign.Start
+                                )
+                            }
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LoadingScreen(
+    onLoadingComplete: () -> Unit
+) {
+    var isLoading by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(Unit) {
+        delay(2000) // 2 saniye bekle
+        isLoading = false
+        onLoadingComplete()
+    }
+    
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.acilimlararkaplan),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(
+                color = Color.White,
+                modifier = Modifier.size(60.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "Yorumunuz hazırlanıyor...",
+                color = Color.White,
+                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -222,7 +475,8 @@ fun CardLayoutContainer(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(
         modifier = Modifier
@@ -231,20 +485,20 @@ fun CardLayoutContainer(
         contentAlignment = Alignment.Center
     ) {
         when (readingInfo.layout) {
-            CardLayout.SINGLE -> SingleCardLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.HORIZONTAL_3 -> HorizontalLayout(3, drawnCardMap, onDrawCard, onNavigateToCardDetail, maxWidthFraction = 0.65f, parentSize)
-            CardLayout.PYRAMID_3 -> Pyramid3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.CROSS_5 -> Cross5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.PYRAMID_6 -> Pyramid6Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.CROSS_7 -> Cross7Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.COMPATIBILITY_CROSS -> CompatibilityCrossLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.GRID_3x3 -> Grid3x3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.PATH_5 -> Path5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.FINANCIAL_4 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
-            CardLayout.FINANCIAL_6 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize)
+            CardLayout.SINGLE -> SingleCardLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.HORIZONTAL_3 -> HorizontalLayout(3, drawnCardMap, onDrawCard, onNavigateToCardDetail, maxWidthFraction = 0.65f, parentSize, forceRevealed)
+            CardLayout.PYRAMID_3 -> Pyramid3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.CROSS_5 -> Cross5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.PYRAMID_6 -> Pyramid6Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.CROSS_7 -> Cross7Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.COMPATIBILITY_CROSS -> CompatibilityCrossLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.GRID_3x3 -> Grid3x3Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.PATH_5 -> Path5Layout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.WORK_PROBLEM_6 -> WorkProblemLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.FINANCIAL_4 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardLayout.FINANCIAL_6 -> FinancialLayout(drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize, forceRevealed)
             // Diğer layout'lar için varsayılan
-            else -> HorizontalLayout(readingInfo.cardCount, drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize = parentSize)
+            else -> HorizontalLayout(readingInfo.cardCount, drawnCardMap, onDrawCard, onNavigateToCardDetail, parentSize = parentSize, forceRevealed = forceRevealed)
         }
     }
 }
@@ -255,12 +509,20 @@ private fun CardView(
     cardState: ReadingCardState?,
     onDrawCard: () -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = modifier) {
         if (cardState != null) {
+            // forceRevealed true ise kartı zorla açık göster
+            val modifiedCardState = if (forceRevealed) {
+                cardState.copy(isRevealed = true)
+            } else {
+                cardState
+            }
+            
             AnimatedReadingCard(
-                cardState = cardState,
+                cardState = modifiedCardState,
                 onCardClick = {
                     // Bu callback artık kullanılmıyor, AnimatedReadingCard kendi mantığını kullanıyor
                 },
@@ -295,7 +557,8 @@ fun SingleCardLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     val cardModifier = Modifier
         .width(130.dp)
@@ -305,7 +568,8 @@ fun SingleCardLayout(
         cardState = drawnCardMap[0],
         onDrawCard = { onDrawCard(0) },
         onNavigateToCardDetail = onNavigateToCardDetail,
-        parentSize = parentSize
+        parentSize = parentSize,
+        forceRevealed = forceRevealed
     )
 }
 
@@ -316,7 +580,8 @@ fun HorizontalLayout(
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
     maxWidthFraction: Float = 1.0f,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(maxWidthFraction),
@@ -331,7 +596,8 @@ fun HorizontalLayout(
                 cardState = drawnCardMap[index],
                 onDrawCard = { onDrawCard(index) },
                 onNavigateToCardDetail = onNavigateToCardDetail,
-                parentSize = parentSize
+                parentSize = parentSize,
+                forceRevealed = forceRevealed
             )
         }
     }
@@ -342,7 +608,8 @@ fun Pyramid3Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     val cardModifier = Modifier
         .width(100.dp)
@@ -356,7 +623,8 @@ fun Pyramid3Layout(
             cardState = drawnCardMap[0],
             onDrawCard = { onDrawCard(0) },
             onNavigateToCardDetail = onNavigateToCardDetail,
-            parentSize = parentSize
+            parentSize = parentSize,
+            forceRevealed = forceRevealed
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             CardView(
@@ -364,14 +632,16 @@ fun Pyramid3Layout(
                 cardState = drawnCardMap[1],
                 onDrawCard = { onDrawCard(1) },
                 onNavigateToCardDetail = onNavigateToCardDetail,
-                parentSize = parentSize
+                parentSize = parentSize,
+                forceRevealed = forceRevealed
             )
             CardView(
                 modifier = cardModifier,
                 cardState = drawnCardMap[2],
                 onDrawCard = { onDrawCard(2) },
                 onNavigateToCardDetail = onNavigateToCardDetail,
-                parentSize = parentSize
+                parentSize = parentSize,
+                forceRevealed = forceRevealed
             )
         }
     }
@@ -382,7 +652,8 @@ fun Cross5Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     val cardModifier = Modifier
         .width(85.dp)
@@ -391,13 +662,13 @@ fun Cross5Layout(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
+        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize, forceRevealed)
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
-            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
-            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize, forceRevealed)
         }
-        CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
+        CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize, forceRevealed)
     }
 }
 
@@ -406,7 +677,8 @@ fun Pyramid6Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = Modifier.padding(top = 16.dp), contentAlignment = Alignment.Center) {
         val cardModifier = Modifier
@@ -417,17 +689,17 @@ fun Pyramid6Layout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra (1 kart)
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize, forceRevealed)
             // 2. sıra (2 kart)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize, forceRevealed)
             }
             // 3. sıra (3 kart)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize, forceRevealed)
             }
         }
     }
@@ -438,7 +710,8 @@ fun Cross7Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     val cardModifier = Modifier
         .width(80.dp)
@@ -447,16 +720,16 @@ fun Cross7Layout(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
+        CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize, forceRevealed)
         Row(horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)) {
-            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
-            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
-            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize, forceRevealed)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally)) {
-            CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
-            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
-            CardView(cardModifier, drawnCardMap[6], { onDrawCard(6) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize, forceRevealed)
+            CardView(cardModifier, drawnCardMap[6], { onDrawCard(6) }, onNavigateToCardDetail, parentSize, forceRevealed)
         }
     }
 }
@@ -466,7 +739,8 @@ fun CompatibilityCrossLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = Modifier.fillMaxSize().padding(top = 24.dp), contentAlignment = Alignment.Center) {
         val cardModifier = Modifier
@@ -483,7 +757,8 @@ fun CompatibilityCrossLayout(
                 drawnCardMap[0],
                 { onDrawCard(0) },
                 onNavigateToCardDetail,
-                parentSize
+                parentSize,
+                forceRevealed
             )
 
             // Row 2: Cards 2 & 3 (indices 1, 2)
@@ -493,14 +768,16 @@ fun CompatibilityCrossLayout(
                     drawnCardMap[1],
                     { onDrawCard(1) },
                     onNavigateToCardDetail,
-                    parentSize
+                    parentSize,
+                    forceRevealed
                 )
                 CardView(
                     cardModifier,
                     drawnCardMap[2],
                     { onDrawCard(2) },
                     onNavigateToCardDetail,
-                    parentSize
+                    parentSize,
+                    forceRevealed
                 )
             }
 
@@ -510,7 +787,8 @@ fun CompatibilityCrossLayout(
                 drawnCardMap[3],
                 { onDrawCard(3) },
                 onNavigateToCardDetail,
-                parentSize
+                parentSize,
+                forceRevealed
             )
 
             // Row 4: Cards 5 & 6 (indices 4, 5)
@@ -520,14 +798,16 @@ fun CompatibilityCrossLayout(
                     drawnCardMap[4],
                     { onDrawCard(4) },
                     onNavigateToCardDetail,
-                    parentSize
+                    parentSize,
+                    forceRevealed
                 )
                 CardView(
                     cardModifier,
                     drawnCardMap[5],
                     { onDrawCard(5) },
                     onNavigateToCardDetail,
-                    parentSize
+                    parentSize,
+                    forceRevealed
                 )
             }
 
@@ -537,7 +817,8 @@ fun CompatibilityCrossLayout(
                 drawnCardMap[6],
                 { onDrawCard(6) },
                 onNavigateToCardDetail,
-                parentSize
+                parentSize,
+                forceRevealed
             )
         }
     }
@@ -548,7 +829,8 @@ fun Grid3x3Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = Modifier.padding(top = 28.dp)) {
         val cardModifier = Modifier
@@ -567,7 +849,8 @@ fun Grid3x3Layout(
                             cardState = drawnCardMap[index],
                             onDrawCard = { onDrawCard(index) },
                             onNavigateToCardDetail = onNavigateToCardDetail,
-                            parentSize = parentSize
+                            parentSize = parentSize,
+                            forceRevealed = forceRevealed
                         )
                     }
                 }
@@ -581,7 +864,8 @@ fun Path5Layout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
@@ -592,14 +876,14 @@ fun Path5Layout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra (1 kart)
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize, forceRevealed)
             // 2. sıra (1 kart)
-            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize, forceRevealed)
             // 3. sıra (3 kart)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize, forceRevealed)
             }
         }
     }
@@ -610,7 +894,8 @@ fun WorkProblemLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
@@ -621,18 +906,18 @@ fun WorkProblemLayout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize, forceRevealed)
             
             // 2. sıra: 4 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize, forceRevealed)
             }
             
             // 3. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize, forceRevealed)
         }
     }
 }
@@ -642,7 +927,8 @@ fun FinancialLayout(
     drawnCardMap: Map<Int, ReadingCardState>,
     onDrawCard: (Int) -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    parentSize: IntSize = IntSize.Zero
+    parentSize: IntSize = IntSize.Zero,
+    forceRevealed: Boolean = false
 ) {
     Box(modifier = Modifier.padding(top = 16.dp)) {
         val cardModifier = Modifier
@@ -653,17 +939,17 @@ fun FinancialLayout(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // 1. sıra: 1 kart
-            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize)
+            CardView(cardModifier, drawnCardMap[0], { onDrawCard(0) }, onNavigateToCardDetail, parentSize, forceRevealed)
             // 2. sıra: 3 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[1], { onDrawCard(1) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[2], { onDrawCard(2) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[3], { onDrawCard(3) }, onNavigateToCardDetail, parentSize, forceRevealed)
             }
             // 3. sıra: 2 kart
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize)
-                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize)
+                CardView(cardModifier, drawnCardMap[4], { onDrawCard(4) }, onNavigateToCardDetail, parentSize, forceRevealed)
+                CardView(cardModifier, drawnCardMap[5], { onDrawCard(5) }, onNavigateToCardDetail, parentSize, forceRevealed)
             }
         }
     }
