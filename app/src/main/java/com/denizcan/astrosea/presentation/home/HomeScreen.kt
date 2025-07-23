@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.home
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
@@ -140,15 +141,9 @@ fun HomeScreen(
         // viewModel init bloğunda loadProfile() çağrılıyor
     }
 
-    // Günlük kartları periyodik olarak yenile (detay sayfasından döndüğünde güncel olsun)
+    // Günlük kartları sadece bir kez yükle
     LaunchedEffect(Unit) {
         // Sadece bir kez yükle, sürekli refresh yapma
-        dailyTarotViewModel.refreshCards()
-    }
-    
-    // Ana sayfaya dönüldüğünde kartları yenile
-    LaunchedEffect(Unit) {
-        // Sayfa aktif olduğunda kartları yenile
         dailyTarotViewModel.refreshCards()
     }
 
@@ -515,7 +510,10 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        dailyTarotViewModel.dailyCards.forEach { cardState ->
+                        val sortedCards = dailyTarotViewModel.dailyCards.sortedBy { it.index }
+                        Log.d("HomeScreen", "Rendering cards: ${sortedCards.map { "${it.index}:${it.card?.name ?: "null"}" }}")
+                        
+                        sortedCards.forEach { cardState ->
                             AnimatedCardReveal(
                                 cardState = cardState,
                                 onCardClick = {
