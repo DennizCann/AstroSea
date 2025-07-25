@@ -172,13 +172,13 @@ fun GeneralReadingDetailScreen(
                                     // Günlük açılım için özel mantık: kart açılmışsa ismini göster, açılmamışsa sadece anlamı göster
                                     val displayText = if (readingType.trim() == "GÜNLÜK AÇILIM") {
                                         if (isCardRevealed) {
-                                            "${index + 1}. $meaning: ${card?.name ?: ""}"
+                                            "${index + 1}. $meaning: ${card?.turkishName ?: card?.name ?: ""}"
                                         } else {
                                             "${index + 1}. $meaning"
                                         }
                                     } else {
                                         // Diğer açılımlar için normal mantık
-                                        "${index + 1}. $meaning: ${card?.name ?: "..."}"
+                                        "${index + 1}. $meaning: ${card?.turkishName ?: card?.name ?: "..."}"
                                     }
                                     
                                     MeaningCard(
