@@ -75,18 +75,19 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     }
 
     fun drawCardForPosition(readingType: String, position: Int) {
+        if (readingType.trim() == "GÜNLÜK AÇILIM") {
+            viewModelScope.launch {
+                drawDailyCardForPosition(position)
+            }
+            return
+        }
         if (drawnCards.any { it.index == position } || isLoading) return
 
         viewModelScope.launch {
             isLoading = true
             try {
-                // Günlük açılım özel durumu
-                if (readingType.trim() == "GÜNLÜK AÇILIM") {
-                    drawDailyCardForPosition(position)
-                } else {
-                    // Diğer açılımlar için Firebase kullan
-                    drawOtherReadingCardForPosition(readingType, position)
-                }
+                // Diğer açılımlar için Firebase kullan
+                drawOtherReadingCardForPosition(readingType, position)
 
             } catch (e: Exception) {
                 Log.e("GeneralReadingVM", "Error drawing card for position $position", e)
@@ -150,177 +151,38 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
 
     private suspend fun drawDailyCardForPosition(position: Int) {
         if (userId == null) return
-        
         try {
             Log.d("GeneralReadingVM", "=== Drawing daily card for position $position ===")
-            
             // DailyTarotViewModel varsa onu kullan
-            if (dailyTarotViewModel != null) {
-                Log.d("GeneralReadingVM", "Using DailyTarotViewModel for position $position")
-                
-                // Önce kartları çek (eğer henüz çekilmemişse)
-                if (!dailyTarotViewModel!!.hasDrawnToday) {
-                    Log.d("GeneralReadingVM", "Cards not drawn today, drawing new cards")
-                    dailyTarotViewModel!!.drawDailyCards()
-                    // Kartların çekilmesini bekle
+            dailyTarotViewModel?.let { dailyVM ->
+                // Eğer kartlar çekilmemişse, kartları çek
+                if (!dailyVM.hasDrawnToday) {
+                    dailyVM.drawDailyCards()
                     delay(1500)
                 }
-                
-                // Sonra kartı aç
-                Log.d("GeneralReadingVM", "Revealing card at position $position")
-                dailyTarotViewModel!!.revealCard(position)
-                
-                // Kartın açılmasını bekle
-                delay(1000)
-                
-                // DailyTarotViewModel'den güncel durumu al
+                // Sadece ilgili kartı aç (kartın kendisi değişmeyecek)
+                dailyVM.revealCard(position)
+                delay(500)
+                // State'i güncelle
                 updateDrawnCardsFromDailyViewModel()
-                
                 Log.d("GeneralReadingVM", "Updated from DailyTarotViewModel for position $position")
-            } else {
-                // Fallback: Eski mantık
-                Log.d("GeneralReadingVM", "DailyTarotViewModel not available, using fallback logic")
-                drawDailyCardForPositionFallback(position)
             }
-
         } catch (e: Exception) {
             Log.e("GeneralReadingVM", "Error drawing daily card for position $position", e)
-        }
-    }
-    
-    private suspend fun drawDailyCardForPositionFallback(position: Int) {
-        val userDoc = firestore.collection("users").document(userId!!).get().await()
-        val currentDate = getCurrentDateString()
-        val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
-        
-        if (lastDrawDate != currentDate) {
-            // Yeni gün - önce mevcut kartları kontrol et
-            Log.d("GeneralReadingVM", "New day, checking if cards already drawn")
-            
-            val existingCard0 = userDoc.getString("card_0_id")
-            val existingCard1 = userDoc.getString("card_1_id")
-            val existingCard2 = userDoc.getString("card_2_id")
-            
-            if (existingCard0?.isNotEmpty() == true && existingCard1?.isNotEmpty() == true && existingCard2?.isNotEmpty() == true) {
-                // Kartlar zaten çekilmiş, mevcut kartları kullan
-                Log.d("GeneralReadingVM", "Cards already drawn, using existing cards")
-                
-                val allCards = mutableListOf<ReadingCardState>()
-                for (i in 0 until 3) {
-                    val cardId = userDoc.getString("card_${i}_id") ?: ""
-                    val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
-                    
-                    val card = allTarotCards.find { it.id == cardId }
-                    if (card != null) {
-                        val newRevealed = if (i == position) true else isRevealed
-                        allCards.add(
-                            ReadingCardState(
-                                index = i,
-                                card = card,
-                                isRevealed = newRevealed
-                            )
-                        )
-                        Log.d("GeneralReadingVM", "Using existing card $i: ${card.name}, revealed: $newRevealed")
-                    }
-                }
-                
-                drawnCards = allCards.sortedBy { it.index }
-                
-                // Firebase'e güncelleme yap
-                firestore.collection("users").document(userId!!)
-                    .update("card_${position}_revealed", true)
-                    .await()
-                    
-                Log.d("GeneralReadingVM", "Updated Firebase for position $position")
-                
-            } else {
-                // Kartlar henüz çekilmemiş, 3 kart çek
-                Log.d("GeneralReadingVM", "No existing cards, drawing 3 new cards")
-                
-                val randomCards = allTarotCards.shuffled().take(3)
-                Log.d("GeneralReadingVM", "Drew cards: ${randomCards.mapIndexed { index, card -> "$index:${card.name}" }}")
-                
-                // Firebase'e kaydet
-                val userRef = firestore.collection("users").document(userId!!)
-                val cardsData = randomCards.mapIndexed { index, card ->
-                    "card_${index}_id" to card.id
-                }.toMap() + mapOf(
-                    "last_draw_date" to currentDate,
-                    "card_0_revealed" to (position == 0),
-                    "card_1_revealed" to (position == 1),
-                    "card_2_revealed" to (position == 2)
-                )
-                
-                Log.d("GeneralReadingVM", "Saving to Firebase: $cardsData")
-                userRef.set(cardsData, SetOptions.merge()).await()
-                
-                // Kartları güncelle - tıklanan kart açık, diğerleri kapalı
-                drawnCards = randomCards.mapIndexed { index, card ->
-                    ReadingCardState(
-                        index = index,
-                        card = card,
-                        isRevealed = (index == position)
-                    )
-                }.sortedBy { it.index }
-                
-                isCardsDrawn = true
-                Log.d("GeneralReadingVM", "Cards set: ${drawnCards.map { "${it.index}:${it.card?.name}:${it.isRevealed}" }}")
-            }
-            
-        } else {
-            // Bugün kartlar zaten çekilmiş - sadece tıklanan kartı aç
-            Log.d("GeneralReadingVM", "Today's cards already drawn, revealing position $position")
-            
-            val allCards = mutableListOf<ReadingCardState>()
-            
-            for (i in 0 until 3) {
-                val cardId = userDoc.getString("card_${i}_id") ?: ""
-                val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
-                
-                val card = allTarotCards.find { it.id == cardId }
-                if (cardId.isNotEmpty() && card != null) {
-                    val newRevealed = if (i == position) true else isRevealed
-                    allCards.add(
-                        ReadingCardState(
-                            index = i,
-                            card = card,
-                            isRevealed = newRevealed
-                        )
-                    )
-                    Log.d("GeneralReadingVM", "Card $i: ${card.name}, revealed: $newRevealed")
-                }
-            }
-            
-            drawnCards = allCards.sortedBy { it.index }
-            
-            // Firebase'e güncelleme yap
-            firestore.collection("users").document(userId!!)
-                .update("card_${position}_revealed", true)
-                .await()
-                
-            Log.d("GeneralReadingVM", "Updated Firebase for position $position")
         }
     }
     
     private fun updateDrawnCardsFromDailyViewModel() {
         dailyTarotViewModel?.let { dailyVM ->
             val dailyCards = dailyVM.dailyCards.sortedBy { it.index }
-            if (dailyCards.isNotEmpty()) {
-                drawnCards = dailyCards.map { dailyCardState ->
-                    ReadingCardState(
-                        index = dailyCardState.index,
-                        card = dailyCardState.card,
-                        isRevealed = dailyCardState.isRevealed
-                    )
-                }
-                isCardsDrawn = dailyVM.hasDrawnToday
-                
-                Log.d("GeneralReadingVM", "Updated drawnCards from DailyTarotViewModel: ${drawnCards.map { "${it.index}:${it.card?.name}:${it.isRevealed}" }}")
-            } else {
-                Log.d("GeneralReadingVM", "DailyTarotViewModel has no cards yet")
+            drawnCards = dailyCards.map { dailyCardState ->
+                ReadingCardState(
+                    index = dailyCardState.index,
+                    card = dailyCardState.card,
+                    isRevealed = dailyCardState.isRevealed
+                )
             }
-        } ?: run {
-            Log.d("GeneralReadingVM", "DailyTarotViewModel is null")
+            isCardsDrawn = dailyVM.hasDrawnToday
         }
     }
 
@@ -449,12 +311,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     }
 
     fun loadReadingState(readingType: String) {
-        // Günlük açılım için Firebase'den yükle
         if (readingType.trim() == "GÜNLÜK AÇILIM") {
-            viewModelScope.launch {
-                Log.d("GeneralReadingVM", "=== Loading daily reading state ===")
-                loadDailyCardsFromFirebase()
-            }
+            updateDrawnCardsFromDailyViewModel()
             return
         }
 

@@ -189,15 +189,7 @@ fun GeneralReadingDetailScreen(
                                             } else {
                                                 // Kart henüz çekilmemişse veya açılmamışsa, tıklandığında çek
                                                 viewModel.drawCardForPosition(readingType, index)
-                                                
-                                                // Günlük açılım için state'i güncelle
-                                                if (readingType.trim() == "GÜNLÜK AÇILIM") {
-                                                    // State güncellemesini bekle
-                                                    CoroutineScope(Dispatchers.Main).launch {
-                                                        delay(1500)
-                                                        viewModel.loadReadingState(readingType)
-                                                    }
-                                                }
+                                                // Günlük açılım için ek state güncellemesi kaldırıldı
                                             }
                                         },
                                         isSelected = isCardRevealed,

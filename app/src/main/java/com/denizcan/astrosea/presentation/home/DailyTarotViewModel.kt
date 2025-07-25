@@ -104,26 +104,15 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     
     fun drawDailyCards() {
         if (hasDrawnToday || userId == null) return
-        
         viewModelScope.launch {
             try {
                 isLoading = true
-                
-                // Firebase'den mevcut durumu kontrol et
                 val userDoc = firestore.collection("users").document(userId!!).get().await()
                 val currentDate = getCurrentDateString()
                 val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
-                
                 if (lastDrawDate != currentDate) {
-                    // Bugün henüz kart çekilmemiş, 3 kart çek
                     val randomCards = allTarotCards.shuffled().take(3)
-                    
-                    Log.d("DailyTarotViewModel", "=== Drawing new daily cards ===")
-                    Log.d("DailyTarotViewModel", "Drew cards: ${randomCards.mapIndexed { index, card -> "$index:${card.name}" }}")
-                    
-                    // Firestore'a kaydet
                     val userRef = firestore.collection("users").document(userId!!)
-                    
                     val cardsData = randomCards.mapIndexed { index, card ->
                         "card_${index}_id" to card.id
                     }.toMap() + mapOf(
@@ -132,11 +121,8 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         "card_1_revealed" to false,
                         "card_2_revealed" to false
                     )
-                    
-                    Log.d("DailyTarotViewModel", "Saving to Firebase: $cardsData")
                     userRef.set(cardsData, SetOptions.merge()).await()
-                    
-                    // Kartları güncelle (kapalı olarak)
+                    // Sadece burada local state güncelleniyor
                     dailyCards = randomCards.mapIndexed { index, card ->
                         DailyCardState(
                             index = index,
@@ -144,18 +130,8 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                             isRevealed = false
                         )
                     }.sortedBy { it.index }
-                    
-                    hasDrawnToday = true
-                    
-                    // Bildirim gönder
-                    val cardNames = randomCards.map { it.name }
-                    notificationManager.sendDailyCardsRenewedNotification(userId!!, cardNames)
-                } else {
-                    // Bugün kartlar zaten çekilmiş, mevcut durumu yükle
-                    loadSavedCards()
                     hasDrawnToday = true
                 }
-                
                 isLoading = false
             } catch (e: Exception) {
                 Log.e("DailyTarotViewModel", "Error drawing daily cards", e)
@@ -166,74 +142,21 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     
     fun revealCard(index: Int) {
         if (index < 0 || index >= dailyCards.size || userId == null) return
-        
         viewModelScope.launch {
             try {
-                Log.d("DailyTarotViewModel", "=== Revealing card at index $index ===")
-                Log.d("DailyTarotViewModel", "Current cards before reveal: ${dailyCards.map { "${it.index}:${it.card?.name ?: "null"}" }}")
-                
-                // Mevcut local state'teki kartı kullan
                 val currentCard = dailyCards[index].card
                 if (currentCard != null) {
-                    Log.d("DailyTarotViewModel", "Using local card: ${currentCard.name} (ID: ${currentCard.id})")
-                    
-                    // Firestore'a güncelleme
                     firestore.collection("users").document(userId!!)
                         .update("card_${index}_revealed", true)
                         .await()
-                    
-                    // Local state'i güncelle - sadece isRevealed durumunu değiştir
+                    // Sadece isRevealed güncelleniyor, kart değişmiyor
                     val updatedCards = dailyCards.toMutableList()
                     updatedCards[index] = DailyCardState(
                         index = index,
-                        card = currentCard, // Aynı kartı kullan
+                        card = currentCard,
                         isRevealed = true
                     )
                     dailyCards = updatedCards
-                    
-                    Log.d("DailyTarotViewModel", "Card $index revealed: ${currentCard.name} (ID: ${currentCard.id})")
-                    Log.d("DailyTarotViewModel", "Cards after reveal: ${dailyCards.map { "${it.index}:${it.card?.name ?: "null"}" }}")
-                    
-                    // Tüm kartlar açıldıysa bildirim sayacını güncelle
-                    val allCardsRevealed = dailyCards.all { it.isRevealed }
-                    if (allCardsRevealed) {
-                        Log.d("DailyTarotViewModel", "All cards revealed, notification count should update")
-                    }
-                } else {
-                    Log.e("DailyTarotViewModel", "No card found in local state for index $index")
-                    
-                    // Fallback: Firebase'den kart bilgisini al
-                    val userDoc = firestore.collection("users").document(userId!!).get().await()
-                    val cardId = userDoc.getString("card_${index}_id") ?: ""
-                    
-                    Log.d("DailyTarotViewModel", "Fallback - Firebase card ID for index $index: $cardId")
-                    
-                    if (cardId.isNotEmpty()) {
-                        val card = allTarotCards.find { it.id == cardId }
-                        if (card != null) {
-                            Log.d("DailyTarotViewModel", "Fallback - Found card: ${card.name} (ID: ${card.id})")
-                            
-                            // Firestore'a güncelleme
-                            firestore.collection("users").document(userId!!)
-                                .update("card_${index}_revealed", true)
-                                .await()
-                            
-                            // Local state'i güncelle
-                            val updatedCards = dailyCards.toMutableList()
-                            updatedCards[index] = DailyCardState(
-                                index = index,
-                                card = card,
-                                isRevealed = true
-                            )
-                            dailyCards = updatedCards
-                            
-                            Log.d("DailyTarotViewModel", "Card $index revealed via fallback: ${card.name} (ID: ${card.id})")
-                        } else {
-                            Log.e("DailyTarotViewModel", "Fallback - Card not found for ID: $cardId")
-                        }
-                    } else {
-                        Log.e("DailyTarotViewModel", "Fallback - No card ID found for index $index")
-                    }
                 }
             } catch (e: Exception) {
                 Log.e("DailyTarotViewModel", "Error revealing card", e)
