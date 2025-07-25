@@ -60,10 +60,7 @@ fun GeneralReadingDetailScreen(
             // Günlük açılım için DailyTarotViewModel'i set et
             Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set ediliyor")
             viewModel.setDailyTarotViewModel(dailyTarotViewModel)
-            // State'i yükle
-            Log.d("GeneralReadingDetailScreen", "Günlük açılım state'i yükleniyor")
-            viewModel.loadReadingState(readingType)
-            Log.d("GeneralReadingDetailScreen", "Günlük açılım state'i yüklendi. Kart sayısı: ${viewModel.drawnCards.size}")
+            Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set edildi")
         } else {
             viewModel.loadReadingState(readingType)
         }

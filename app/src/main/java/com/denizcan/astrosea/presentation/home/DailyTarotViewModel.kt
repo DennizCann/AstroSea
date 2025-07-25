@@ -30,6 +30,14 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     var isLoading by mutableStateOf(true)
         private set
     
+    // Kartlar yüklendiğinde çağrılacak callback
+    private var onCardsLoaded: (() -> Unit)? = null
+    
+    // Callback'i set etmek için fonksiyon
+    fun setOnCardsLoadedCallback(callback: () -> Unit) {
+        onCardsLoaded = callback
+    }
+    
     private val allTarotCards: List<TarotCard> by lazy {
         JsonLoader(context).loadTarotCards()
     }
@@ -181,6 +189,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     
     private suspend fun loadSavedCards() {
         try {
+            Log.d("DailyTarotViewModel", "loadSavedCards çağrıldı")
             val userDoc = userId?.let {
                 firestore.collection("users").document(it).get().await()
             } ?: return
@@ -191,6 +200,8 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                 val cardId = userDoc.getString("card_${i}_id") ?: ""
                 val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
                 
+                Log.d("DailyTarotViewModel", "Firebase'den yüklenen kart $i: cardId=$cardId, isRevealed=$isRevealed")
+                
                 val card = allTarotCards.find { it.id == cardId }
                 if (cardId.isNotEmpty() && card != null) {
                     loadedCards.add(
@@ -200,6 +211,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                             isRevealed = isRevealed
                         )
                     )
+                    Log.d("DailyTarotViewModel", "Kart $i yüklendi: ${card.name}, isRevealed=$isRevealed")
                 } else {
                     loadedCards.add(
                         DailyCardState(
@@ -208,11 +220,19 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                             isRevealed = false
                         )
                     )
+                    Log.d("DailyTarotViewModel", "Kart $i boş olarak yüklendi")
                 }
             }
             
             val sortedCards = loadedCards.sortedBy { it.index }
             dailyCards = sortedCards
+            Log.d("DailyTarotViewModel", "dailyCards güncellendi. Toplam kart sayısı: ${dailyCards.size}")
+            dailyCards.forEach { cardState ->
+                Log.d("DailyTarotViewModel", "Kart ${cardState.index}: ${cardState.card?.name ?: "null"}, isRevealed=${cardState.isRevealed}")
+            }
+           
+            // Kartlar yüklendiğinde callback'i çağır
+            onCardsLoaded?.invoke()
             
         } catch (e: Exception) {
             Log.e("DailyTarotViewModel", "Error loading saved cards", e)

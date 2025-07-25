@@ -31,6 +31,9 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
 
     var isLoading by mutableStateOf(false)
         private set
+    
+    // Günlük açılım state'inin yüklenip yüklenmediğini kontrol etmek için
+    private var dailyStateLoaded = false
 
     private val allTarotCards: List<TarotCard> by lazy {
         JsonLoader(context).loadTarotCards()
@@ -53,7 +56,22 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     fun setDailyTarotViewModel(dailyViewModel: DailyTarotViewModel) {
         Log.d("GeneralReadingVM", "setDailyTarotViewModel çağrıldı. dailyViewModel: $dailyViewModel")
         dailyTarotViewModel = dailyViewModel
+        dailyStateLoaded = false // Yeni DailyTarotViewModel set edildiğinde flag'i sıfırla
         Log.d("GeneralReadingVM", "DailyTarotViewModel set edildi. dailyTarotViewModel: $dailyTarotViewModel")
+        
+        // DailyTarotViewModel'e callback set et
+        dailyViewModel.setOnCardsLoadedCallback {
+            Log.d("GeneralReadingVM", "DailyTarotViewModel kartları yüklendi, state güncelleniyor")
+            updateDrawnCardsFromDailyViewModel()
+            dailyStateLoaded = true
+        }
+        
+        // Eğer kartlar zaten yüklüyse hemen güncelle
+        if (dailyViewModel.dailyCards.isNotEmpty()) {
+            Log.d("GeneralReadingVM", "DailyTarotViewModel kartları zaten yüklü, hemen güncelleniyor")
+            updateDrawnCardsFromDailyViewModel()
+            dailyStateLoaded = true
+        }
     }
     
     private fun checkUserChange() {
@@ -172,6 +190,10 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         Log.d("GeneralReadingVM", "updateDrawnCardsFromDailyViewModel çağrıldı")
         dailyTarotViewModel?.let { dailyVM ->
             Log.d("GeneralReadingVM", "DailyTarotViewModel mevcut. Kart sayısı: ${dailyVM.dailyCards.size}")
+            Log.d("GeneralReadingVM", "DailyTarotViewModel kartları:")
+            dailyVM.dailyCards.forEach { cardState ->
+                Log.d("GeneralReadingVM", "  Kart ${cardState.index}: ${cardState.card?.name ?: "null"}, isRevealed=${cardState.isRevealed}")
+            }
             val dailyCards = dailyVM.dailyCards.sortedBy { it.index }
             drawnCards = dailyCards.map { dailyCardState ->
                 ReadingCardState(
@@ -182,6 +204,10 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             }
             isCardsDrawn = dailyVM.hasDrawnToday
             Log.d("GeneralReadingVM", "drawnCards güncellendi. Yeni kart sayısı: ${drawnCards.size}")
+            Log.d("GeneralReadingVM", "GeneralReadingViewModel kartları:")
+            drawnCards.forEach { cardState ->
+                Log.d("GeneralReadingVM", "  Kart ${cardState.index}: ${cardState.card?.name ?: "null"}, isRevealed=${cardState.isRevealed}")
+            }
         } ?: run {
             Log.e("GeneralReadingVM", "DailyTarotViewModel null!")
         }
@@ -313,7 +339,14 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
 
     fun loadReadingState(readingType: String) {
         if (readingType.trim() == "GÜNLÜK AÇILIM") {
-            updateDrawnCardsFromDailyViewModel()
+            // Günlük açılım için state'i sadece bir kere yükle
+            if (!dailyStateLoaded) {
+                updateDrawnCardsFromDailyViewModel()
+                dailyStateLoaded = true
+                Log.d("GeneralReadingVM", "Günlük açılım state'i ilk kez yüklendi")
+            } else {
+                Log.d("GeneralReadingVM", "Günlük açılım state'i zaten yüklü, tekrar yüklenmiyor")
+            }
         } else {
             viewModelScope.launch {
                 loadOtherReadingFromFirebase(readingType)

@@ -50,7 +50,7 @@ fun AnimatedReadingCard(
     // Animasyon değerleri
     val rotation by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
-        animationSpec = tween(800, easing = FastOutSlowInEasing),
+        animationSpec = tween(0, easing = FastOutSlowInEasing), // Animasyon yok
         label = "rotation"
     )
     
