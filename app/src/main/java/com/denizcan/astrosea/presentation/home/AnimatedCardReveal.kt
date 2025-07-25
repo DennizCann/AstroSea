@@ -56,10 +56,7 @@ fun AnimatedCardReveal(
     
     // Kart durumu değiştiğinde isFlipped'i güncelle
     LaunchedEffect(cardState.isRevealed) {
-        // Animasyon sırasında state değişikliklerini engelle
-        if (!isRevealing) {
-            isFlipped = cardState.isRevealed
-        }
+        isFlipped = cardState.isRevealed
     }
     
     // Kart state'i değiştiğinde isFlipped'i güncelle (animasyon dışında)

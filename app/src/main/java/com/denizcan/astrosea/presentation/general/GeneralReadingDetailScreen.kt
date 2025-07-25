@@ -54,16 +54,17 @@ fun GeneralReadingDetailScreen(
     // Ekran durumları
     var currentScreen by remember { mutableStateOf("detail") } // "detail", "loading", "interpretation"
     
-    LaunchedEffect(readingType) {
-        viewModel.loadReadingState(readingType)
-    }
-    
-    // Günlük açılım için özel durum - DailyTarotViewModel'i set et
+    // Sayfa yüklendiğinde state'i yükle
     LaunchedEffect(readingType) {
         if (readingType.trim() == "GÜNLÜK AÇILIM") {
+            // Günlük açılım için DailyTarotViewModel'i set et
+            Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set ediliyor")
             viewModel.setDailyTarotViewModel(dailyTarotViewModel)
-            // DailyTarotViewModel set edildikten sonra state'i yükle
-            delay(200)
+            // State'i yükle
+            Log.d("GeneralReadingDetailScreen", "Günlük açılım state'i yükleniyor")
+            viewModel.loadReadingState(readingType)
+            Log.d("GeneralReadingDetailScreen", "Günlük açılım state'i yüklendi. Kart sayısı: ${viewModel.drawnCards.size}")
+        } else {
             viewModel.loadReadingState(readingType)
         }
     }
@@ -548,10 +549,7 @@ private fun CardView(
             
             AnimatedReadingCard(
                 cardState = modifiedCardState,
-                onCardClick = {
-                    // Bu callback artık kullanılmıyor, AnimatedReadingCard kendi mantığını kullanıyor
-                },
-                onDrawCard = onDrawCard,
+                onCardClick = { onDrawCard() },
                 onNavigateToCardDetail = onNavigateToCardDetail,
                 modifier = Modifier.fillMaxSize(),
                 parentSize = parentSize
@@ -565,10 +563,7 @@ private fun CardView(
             )
             AnimatedReadingCard(
                 cardState = emptyCardState,
-                onCardClick = {
-                    // Bu callback artık kullanılmıyor, AnimatedReadingCard kendi mantığını kullanıyor
-                },
-                onDrawCard = onDrawCard,
+                onCardClick = { onDrawCard() },
                 onNavigateToCardDetail = onNavigateToCardDetail,
                 modifier = Modifier.fillMaxSize(),
                 parentSize = parentSize

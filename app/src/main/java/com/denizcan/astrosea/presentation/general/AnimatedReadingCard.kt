@@ -34,7 +34,6 @@ import kotlinx.coroutines.launch
 fun AnimatedReadingCard(
     cardState: ReadingCardState,
     onCardClick: () -> Unit,
-    onDrawCard: () -> Unit = {},
     onNavigateToCardDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     parentSize: IntSize = IntSize.Zero
@@ -45,6 +44,7 @@ fun AnimatedReadingCard(
     
     // Animasyon durumları
     var isRevealing by remember { mutableStateOf(false) }
+    // Kart animasyonu için state
     var isFlipped by remember { mutableStateOf(cardState.isRevealed) }
     
     // Animasyon değerleri
@@ -54,29 +54,19 @@ fun AnimatedReadingCard(
         label = "rotation"
     )
     
-    // Kart durumu değiştiğinde isFlipped'i güncelle
+    // Basit state senkronizasyonu
     LaunchedEffect(cardState.isRevealed) {
         isFlipped = cardState.isRevealed
     }
     
-    // Kart tıklama işleyicisi
+    // Kart tıklama işleyicisi - onCardClick parametresini kullan
     val handleCardClick: () -> Unit = {
         // Sadece kapalı kartlara tıklanabilir ve animasyon çalışmıyorsa
         if (!cardState.isRevealed && !isRevealing) {
             Log.d("AnimatedReadingCard", "🎴 Starting card reveal animation for card ${cardState.index}")
-            scope.launch {
-                isRevealing = true
-                
-                // Kartı çek
-                onDrawCard()
-                
-                // Kartı çevir
-                isFlipped = true
-                delay(800) // Çevirme animasyonunun tamamını bekle
-                
-                isRevealing = false
-                Log.d("AnimatedReadingCard", "🎉 Animation completed for card ${cardState.index}")
-            }
+            isRevealing = true
+            onCardClick() // onCardClick parametresini kullan
+            isRevealing = false
         } else if (cardState.isRevealed && !isRevealing) {
             // Kart ön yüzü dönükken direkt detay sayfasına git
             cardState.card?.let { card ->

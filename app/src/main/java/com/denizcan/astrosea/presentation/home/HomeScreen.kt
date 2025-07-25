@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.zIndex
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 // MenuItem data class'ını ekle
 data class MenuItem(
@@ -86,6 +87,18 @@ fun HomeScreen(
     val notificationManager = remember { NotificationManager(context) }
     var unreadNotificationCount by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+    
+    // Çıkış yapma animasyonu için state
+    var showLogoutAnimation by remember { mutableStateOf(false) }
+    
+    // Çıkış yapma işleyicisi
+    val handleSignOut: () -> Unit = {
+        showLogoutAnimation = true
+        scope.launch {
+            delay(1000) // 1 saniye animasyon
+            onSignOut()
+        }
+    }
     
     // Pulse animasyonu için
     val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "pulse")
@@ -264,7 +277,7 @@ fun HomeScreen(
                                 }
                             }
                             IconButton(
-                                onClick = onSignOut,
+                                onClick = handleSignOut,
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(
@@ -415,10 +428,13 @@ fun HomeScreen(
 
                 // Arama kısmı
                 var searchQuery by remember { mutableStateOf("") }
+                var showSearchAlert by remember { mutableStateOf(false) }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(56.dp)
+                        .clickable { showSearchAlert = true },
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Black.copy(alpha = 0.6f)
                     ),
@@ -451,7 +467,53 @@ fun HomeScreen(
                             color = Color.White,
                             fontSize = 18.sp
                         ),
-                        singleLine = true
+                        singleLine = true,
+                        enabled = false
+                    )
+                }
+
+                // Arama uyarı dialog'u
+                if (showSearchAlert) {
+                    AlertDialog(
+                        onDismissRequest = { showSearchAlert = false },
+                        title = {
+                            Text(
+                                "Yakında Hizmetinizde",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                    fontSize = 20.sp
+                                ),
+                                color = Color.Black
+                            )
+                        },
+                        text = {
+                            Text(
+                                "Bu özellik şu anda geliştirme aşamasındadır. Yakında aklınızdaki sorulara anında cevap alabileceksiniz!",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 16.sp
+                                ),
+                                color = Color.Black
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = { showSearchAlert = false },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF1A2236)
+                                )
+                            ) {
+                                Text(
+                                    "Tamam",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold))
+                                    )
+                                )
+                            }
+                        },
+                        containerColor = Color.White,
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
 
@@ -461,8 +523,7 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 48.dp)
                         .clickable { 
-                            // Günlük açılım detayına gitmeden önce kartları yenile
-                            dailyTarotViewModel.refreshCards()
+                            // Kartlar zaten doğru state'te, tekrar yüklemeye gerek yok
                             onNavigateToDailyReadingInfo() 
                         },
                     colors = CardDefaults.cardColors(
@@ -535,10 +596,10 @@ fun HomeScreen(
                                         }
                                         // Sonra kartı aç
                                         dailyTarotViewModel.revealCard(cardState.index)
-                                        // Bildirim sayısını güncelle
-                                        scope.launch {
-                                            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-                                            if (userId != null) {
+                                        // Bildirim sayısını güncelle (arka planda)
+                                        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                                        if (userId != null) {
+                                            scope.launch {
                                                 try {
                                                     unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
                                                 } catch (e: Exception) {
@@ -618,6 +679,43 @@ fun HomeScreen(
                             imageResId = menuItems[5].icon
                         )
                     }
+                }
+            }
+        }
+        
+        // Çıkış yapma animasyonu overlay'i
+        if (showLogoutAnimation) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(1000f),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.acilimlararkaplan),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(60.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Text(
+                        text = "Çıkış yapılıyor...",
+                        color = Color.White,
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
