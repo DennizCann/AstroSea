@@ -480,6 +480,46 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         return dateFormat.format(Date())
     }
     
+    private fun normalizeReadingType(readingType: String): String {
+        return readingType
+            .replace(" ", "_")
+            .replace("–", "_")  // en dash
+            .replace("-", "_")  // hyphen
+            .replace(",", "_")
+            .replace("?", "_")
+            .replace("!", "_")
+            .replace(".", "_")
+            .replace(":", "_")
+            .replace(";", "_")
+            .replace("'", "_")
+            .replace("\"", "_")
+            .replace("(", "_")
+            .replace(")", "_")
+            .replace("[", "_")
+            .replace("]", "_")
+            .replace("{", "_")
+            .replace("}", "_")
+            .replace("/", "_")
+            .replace("\\", "_")
+            .replace("|", "_")
+            .replace("`", "_")
+            .replace("~", "_")
+            .replace("@", "_")
+            .replace("#", "_")
+            .replace("$", "_")
+            .replace("%", "_")
+            .replace("^", "_")
+            .replace("&", "_")
+            .replace("*", "_")
+            .replace("+", "_")
+            .replace("=", "_")
+            .replace("<", "_")
+            .replace(">", "_")
+            .replace("__", "_")  // Çift alt çizgileri tek alt çizgiye çevir
+            .replace("__", "_")  // Tekrar kontrol et (3'lü alt çizgiler için)
+            .trim()
+    }
+    
     fun generateReading(readingType: String) {
         // Kartların çekilip çekilmediğini kontrol et
         val hasCards = drawnCards.isNotEmpty() && drawnCards.any { it.card != null }
@@ -501,7 +541,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 generatedReading = null
                 
                 // Reading format'ını al - readingType'ı JSON key formatına çevir
-                val normalizedReadingType = readingType.replace(" ", "_").replace("–", "_").replace("-", "_")
+                val normalizedReadingType = normalizeReadingType(readingType)
                 val format = readingFormats?.readingFormats?.get(normalizedReadingType)
                 if (format == null) {
                     readingError = "Bu açılım türü için format bulunamadı: $normalizedReadingType"
