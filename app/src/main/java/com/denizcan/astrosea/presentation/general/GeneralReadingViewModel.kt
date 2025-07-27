@@ -12,6 +12,8 @@ import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.util.JsonLoader
 import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
+import com.denizcan.astrosea.util.GeminiService
+import com.denizcan.astrosea.model.ReadingFormat
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,8 +34,25 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
     
+    var isGeneratingReading by mutableStateOf(false)
+        private set
+    
+    var generatedReading by mutableStateOf<String?>(null)
+        private set
+    
+    var readingError by mutableStateOf<String?>(null)
+        private set
+    
     // Günlük açılım state'inin yüklenip yüklenmediğini kontrol etmek için
     private var dailyStateLoaded = false
+    
+    // Gemini Service
+    private val geminiService = GeminiService()
+    
+    // Reading Formats
+    private val readingFormats by lazy {
+        JsonLoader(context).loadReadingFormats()
+    }
 
     private val allTarotCards: List<TarotCard> by lazy {
         JsonLoader(context).loadTarotCards()
@@ -202,7 +221,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     isRevealed = dailyCardState.isRevealed
                 )
             }
-            isCardsDrawn = dailyVM.hasDrawnToday
+            // Kartların çekilip çekilmediğini kontrol et
+            isCardsDrawn = dailyCards.isNotEmpty() && dailyCards.any { it.card != null }
             Log.d("GeneralReadingVM", "drawnCards güncellendi. Yeni kart sayısı: ${drawnCards.size}")
             Log.d("GeneralReadingVM", "GeneralReadingViewModel kartları:")
             drawnCards.forEach { cardState ->
@@ -458,6 +478,66 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     private fun getCurrentDateString(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(Date())
+    }
+    
+    fun generateReading(readingType: String) {
+        // Kartların çekilip çekilmediğini kontrol et
+        val hasCards = drawnCards.isNotEmpty() && drawnCards.any { it.card != null }
+        if (!hasCards) {
+            readingError = "Önce kartları çekmeniz gerekiyor."
+            return
+        }
+        
+        val revealedCards = drawnCards.filter { it.isRevealed && it.card != null }
+        if (revealedCards.isEmpty()) {
+            readingError = "En az bir kartı açmanız gerekiyor."
+            return
+        }
+        
+        viewModelScope.launch {
+            try {
+                isGeneratingReading = true
+                readingError = null
+                generatedReading = null
+                
+                // Reading format'ını al - readingType'ı JSON key formatına çevir
+                val normalizedReadingType = readingType.replace(" ", "_").replace("–", "_").replace("-", "_")
+                val format = readingFormats?.readingFormats?.get(normalizedReadingType)
+                if (format == null) {
+                    readingError = "Bu açılım türü için format bulunamadı: $normalizedReadingType"
+                    return@launch
+                }
+                
+                // Çekilen kartları TarotCard listesine dönüştür
+                val tarotCards = revealedCards.mapNotNull { it.card }
+                
+                if (tarotCards.isEmpty()) {
+                    readingError = "Geçerli kart bulunamadı."
+                    return@launch
+                }
+                
+                // Gemini'den yorum oluştur
+                val reading = geminiService.generateTarotReading(
+                    readingType = readingType,
+                    drawnCards = tarotCards,
+                    readingFormat = format
+                )
+                
+                generatedReading = reading
+                Log.d("GeneralReadingViewModel", "Yorum başarıyla oluşturuldu")
+                
+            } catch (e: Exception) {
+                Log.e("GeneralReadingViewModel", "Yorum oluşturulurken hata", e)
+                readingError = "Yorum oluşturulurken bir hata oluştu: ${e.message}"
+            } finally {
+                isGeneratingReading = false
+            }
+        }
+    }
+    
+    fun clearReading() {
+        generatedReading = null
+        readingError = null
     }
 
     class Factory(private val context: Context) : ViewModelProvider.Factory {

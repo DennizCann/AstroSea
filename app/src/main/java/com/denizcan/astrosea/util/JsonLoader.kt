@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.denizcan.astrosea.model.TarotCard
+import com.denizcan.astrosea.model.ReadingFormats
 
 class JsonLoader(private val context: Context) {
     fun loadTarotCards(): List<TarotCard> {
@@ -24,6 +25,16 @@ class JsonLoader(private val context: Context) {
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
+        }
+    }
+    
+    fun loadReadingFormats(): ReadingFormats? {
+        return try {
+            val jsonString = context.assets.open("reading_formats.json").bufferedReader().use { it.readText() }
+            Gson().fromJson(jsonString, ReadingFormats::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

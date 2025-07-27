@@ -32,6 +32,35 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// Varsayılan yorum oluşturma fonksiyonu
+fun generateDefaultInterpretation(readingType: String, drawnCards: List<ReadingCardState>, readingInfo: ReadingInfo): String {
+    val revealedCards = drawnCards.filter { it.isRevealed }
+    return if (revealedCards.isNotEmpty()) {
+        val interpretation = StringBuilder()
+        interpretation.append("$readingType Yorumu\n\n")
+        
+        // Eski format kullan (fallback)
+        revealedCards.forEachIndexed { index, cardState ->
+            val meaning = readingInfo.cardMeanings.getOrNull(index) ?: "Kart ${index + 1}"
+            val cardName = cardState.card?.turkishName ?: cardState.card?.name ?: "Bilinmeyen Kart"
+            val cardMeaning = cardState.card?.meaningUpright ?: "Bu kart henüz yorumlanmamış."
+            
+            interpretation.append("$meaning: $cardName\n")
+            interpretation.append("$cardMeaning\n\n")
+        }
+        
+        // Genel yorum ekle
+        interpretation.append("Genel Yorum:\n")
+        interpretation.append("Bu açılım size hayatınızın bu alanında rehberlik etmek için tasarlanmıştır. ")
+        interpretation.append("Çektiğiniz kartların anlamlarını dikkatlice değerlendirin ve iç sesinizi dinleyin. ")
+        interpretation.append("Her kart size özel bir mesaj taşımaktadır.\n\n")
+        
+        interpretation.toString()
+    } else {
+        "Henüz kart çekilmemiş. Lütfen önce kartlarınızı çekin."
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GeneralReadingDetailScreen(
@@ -73,6 +102,7 @@ fun GeneralReadingDetailScreen(
     when (currentScreen) {
         "loading" -> {
             LoadingScreen(
+                viewModel = viewModel,
                 onLoadingComplete = {
                     currentScreen = "interpretation"
                 }
@@ -225,12 +255,9 @@ fun GeneralReadingDetailScreen(
                                 // Yorumunu Gör Butonu
                                 Button(
                                     onClick = { 
-                                        // Sadece tüm kartlar açıldığında yorum ekranına git
-                                        val totalCards = readingInfo.cardCount
-                                        val revealedCards = viewModel.drawnCards.filter { it.isRevealed }
-                                        if (revealedCards.size == totalCards) {
-                                            currentScreen = "loading"
-                                        }
+                                        // Gemini ile yorum oluştur
+                                        viewModel.generateReading(readingType)
+                                        currentScreen = "loading"
                                     },
                                     modifier = Modifier.weight(1f),
                                     enabled = viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount,
@@ -288,31 +315,20 @@ fun GeneralReadingInterpretationScreen(
         getReadingInfo(readingType)
     }
     
-    // Tüm kartların anlamlarını birleştir
-    val fullInterpretation = remember(viewModel.drawnCards, readingInfo) {
-        val drawnCards = viewModel.drawnCards.filter { it.isRevealed }
-        if (drawnCards.isNotEmpty()) {
-            val interpretation = StringBuilder()
-            interpretation.append("$readingType Yorumu\n\n")
-            
-            drawnCards.forEachIndexed { index, cardState ->
-                val meaning = readingInfo.cardMeanings.getOrNull(index) ?: "Kart ${index + 1}"
-                val cardName = cardState.card?.turkishName ?: cardState.card?.name ?: "Bilinmeyen Kart"
-                val cardMeaning = cardState.card?.description ?: "Bu kart henüz yorumlanmamış."
-                
-                interpretation.append("$meaning: $cardName\n")
-                interpretation.append("$cardMeaning\n\n")
+    // Gemini yorumunu veya varsayılan yorumu kullan
+    val displayInterpretation = remember(viewModel.generatedReading, viewModel.readingError, viewModel.drawnCards, readingInfo) {
+        when {
+            viewModel.readingError != null -> {
+                "Hata: ${viewModel.readingError}\n\n" +
+                "Varsayılan yorum gösteriliyor:\n\n" +
+                generateDefaultInterpretation(readingType, viewModel.drawnCards, readingInfo)
             }
-            
-            // Genel yorum ekle
-            interpretation.append("Genel Yorum:\n")
-            interpretation.append("Bu açılım size hayatınızın bu alanında rehberlik etmek için tasarlanmıştır. ")
-            interpretation.append("Çektiğiniz kartların anlamlarını dikkatlice değerlendirin ve iç sesinizi dinleyin. ")
-            interpretation.append("Her kart size özel bir mesaj taşımaktadır.\n\n")
-            
-            interpretation.toString()
-        } else {
-            "Henüz kart çekilmemiş. Lütfen önce kartlarınızı çekin."
+            viewModel.generatedReading != null -> {
+                viewModel.generatedReading!!
+            }
+            else -> {
+                generateDefaultInterpretation(readingType, viewModel.drawnCards, readingInfo)
+            }
         }
     }
     
@@ -403,7 +419,7 @@ fun GeneralReadingInterpretationScreen(
                         ) {
                             item {
                                 Text(
-                                    text = fullInterpretation,
+                                    text = displayInterpretation,
                                     color = Color.White,
                                     fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                     fontSize = 18.sp,
@@ -421,14 +437,27 @@ fun GeneralReadingInterpretationScreen(
 
 @Composable
 fun LoadingScreen(
+    viewModel: GeneralReadingViewModel,
     onLoadingComplete: () -> Unit
 ) {
     var isLoading by remember { mutableStateOf(true) }
     
     LaunchedEffect(Unit) {
-        delay(2000) // 2 saniye bekle
-        isLoading = false
-        onLoadingComplete()
+        // Gemini yorum oluşturma durumunu kontrol et
+        while (viewModel.isGeneratingReading) {
+            delay(500)
+        }
+        
+        // Hata varsa veya yorum oluşturulduysa loading'i bitir
+        if (viewModel.readingError != null || viewModel.generatedReading != null) {
+            delay(1000) // Kısa bir bekleme
+            isLoading = false
+            onLoadingComplete()
+        } else {
+            delay(2000) // Varsayılan bekleme
+            isLoading = false
+            onLoadingComplete()
+        }
     }
     
     Box(modifier = Modifier.fillMaxSize()) {
