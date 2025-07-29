@@ -20,7 +20,7 @@ class GeminiService {
     init {
         try {
             generativeModel = GenerativeModel(
-                modelName = "gemini-1.5-flash",
+                modelName = "gemini-2.5-flash",
                 apiKey = API_KEY
             )
             Log.d(TAG, "Gemini model başarıyla başlatıldı")
