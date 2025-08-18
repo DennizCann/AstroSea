@@ -161,7 +161,14 @@ fun SignInScreen(
                                                 auth.signInWithEmailAndPassword(email, password)
                                                     .addOnCompleteListener { task ->
                                                         if (task.isSuccessful) {
-                                                            onSignInSuccess()
+                                                            val user = auth.currentUser
+                                                            if (user != null && user.isEmailVerified) {
+                                                                onSignInSuccess()
+                                                            } else {
+                                                                errorMessage = "Lütfen önce email adresinizi doğrulayın"
+                                                                // Email doğrulanmamış kullanıcıyı çıkış yaptır
+                                                                auth.signOut()
+                                                            }
                                                         } else {
                                                             errorMessage = when {
                                                                 task.exception?.message?.contains("password") == true -> "Şifre hatalı"
@@ -177,6 +184,7 @@ fun SignInScreen(
                                                     e.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
                                                     else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
                                                 }
+                                                isLoading = false
                                             }
                                         }
                                     }

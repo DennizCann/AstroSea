@@ -38,8 +38,8 @@ fun AuthScreen(
         ) {
             composable("auth_options") {
                 AuthOptionsScreen(
-                    onNavigateToSignIn = { navController.navigate("sign_in") },
                     onNavigateToSignUp = { navController.navigate("sign_up") },
+                    onNavigateToSignIn = { navController.navigate("sign_in") },
                     onGoogleSignIn = onGoogleSignIn
                 )
             }
@@ -63,10 +63,23 @@ fun AuthScreen(
                             popUpTo("auth_options")
                         }
                     },
-                    onSignUpSuccess = onNavigateToHome,
+                    onSignUpSuccess = { email, password ->
+                        navController.navigate("email_validation/$email/$password")
+                    },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+            
+            composable("email_validation/{email}/{password}") { backStackEntry ->
+                val email = backStackEntry.arguments?.getString("email") ?: ""
+                val password = backStackEntry.arguments?.getString("password") ?: ""
+                EmailValidationScreen(
+                    email = email,
+                    password = password,
+                    onEmailVerified = onNavigateToHome,
                     onBackClick = { navController.popBackStack() }
                 )
             }
         }
     }
-} 
+}

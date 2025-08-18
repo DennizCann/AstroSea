@@ -3,6 +3,9 @@ package com.denizcan.astrosea.navigation
 sealed class Screen(val route: String) {
     object Onboarding : Screen("onboarding")
     object Auth : Screen("auth")
+    object EmailValidation : Screen("email_validation/{email}/{password}") {
+        fun createRoute(email: String, password: String) = "email_validation/$email/$password"
+    }
     object Home : Screen("home")
     object Profile : Screen("profile")
     object Horoscope : Screen("horoscope")

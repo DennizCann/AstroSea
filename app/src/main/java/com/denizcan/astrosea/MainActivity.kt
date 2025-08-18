@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.denizcan.astrosea.auth.GoogleAuthUiClient
 import com.denizcan.astrosea.navigation.Screen
 import com.denizcan.astrosea.presentation.auth.AuthScreen
+import com.denizcan.astrosea.presentation.auth.EmailValidationScreen
 import com.denizcan.astrosea.presentation.home.HomeScreen
 import com.denizcan.astrosea.presentation.onboarding.OnboardingScreen
 import com.google.firebase.auth.FirebaseAuth
@@ -142,7 +143,8 @@ class MainActivity : ComponentActivity() {
 
                 startDestination = when {
                     !hasSeenOnboarding -> Screen.Onboarding.route
-                    user != null -> Screen.Home.route
+                    user != null && user.isEmailVerified -> Screen.Home.route
+                    user != null && !user.isEmailVerified -> Screen.Auth.route // Email doğrulanmamış kullanıcıları auth ekranına yönlendir
                     else -> Screen.Auth.route
                 }
             }
@@ -195,6 +197,25 @@ class MainActivity : ComponentActivity() {
                                             signInIntentSender ?: return@launch
                                         ).build()
                                     )
+                                }
+                            }
+                        )
+                    }
+                    
+                    composable(Screen.EmailValidation.route) { backStackEntry ->
+                        val email = backStackEntry.arguments?.getString("email") ?: ""
+                        val password = backStackEntry.arguments?.getString("password") ?: ""
+                        EmailValidationScreen(
+                            email = email,
+                            password = password,
+                            onEmailVerified = {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onBackClick = {
+                                navController.navigate(Screen.Auth.route) {
+                                    popUpTo(0) { inclusive = true }
                                 }
                             }
                         )

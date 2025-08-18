@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignUpScreen(
     onNavigateToSignIn: () -> Unit,
-    onSignUpSuccess: () -> Unit,
+    onSignUpSuccess: (String, String) -> Unit,
     onBackClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -180,35 +180,8 @@ fun SignUpScreen(
                                     password.length < 6 -> errorMessage = "Şifre en az 6 karakter olmalıdır"
                                     password != confirmPassword -> errorMessage = "Şifreler eşleşmiyor"
                                     else -> {
-                                        scope.launch {
-                                            isLoading = true
-                                            errorMessage = null
-                                            try {
-                                                auth.createUserWithEmailAndPassword(email, password).await()
-                                                val userId = auth.currentUser?.uid ?: return@launch
-                                                
-                                                // Firestore'da kullanıcı belgesi oluştur
-                                                FirebaseFirestore.getInstance().collection("users")
-                                                    .document(userId)
-                                                    .set(
-                                                        mapOf(
-                                                            "email" to email,
-                                                            "created_at" to FieldValue.serverTimestamp(),
-                                                            "auth_type" to "email"  // Bu kullanıcının email ile giriş yaptığını belirt
-                                                        )
-                                                    )
-                                                    .addOnSuccessListener {
-                                                        onSignUpSuccess()  // Ana sayfaya yönlendir
-                                                    }
-                                            } catch (e: Exception) {
-                                                errorMessage = when {
-                                                    e.message?.contains("email") == true -> "Bu e-posta adresi zaten kullanımda"
-                                                    else -> "Kayıt başarısız. Lütfen tekrar deneyin"
-                                                }
-                                            } finally {
-                                                isLoading = false
-                                            }
-                                        }
+                                        // Email doğrulama ekranına yönlendir
+                                        onSignUpSuccess(email, password)
                                     }
                                 }
                             },

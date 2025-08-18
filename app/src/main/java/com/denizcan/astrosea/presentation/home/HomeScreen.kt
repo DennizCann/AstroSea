@@ -305,38 +305,7 @@ fun HomeScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Profil Uyarı Kartı
-                if (!profileState.isLoading && profileState.profileData.hasIncompleteFields()) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                            .clickable { onNavigateToProfile() },
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Black.copy(alpha = 0.6f)
-                        ),
-                        border = BorderStroke(1.dp, Color(0xFFFFD700))  // Altın sarısı border
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = "Uyarı",
-                                tint = Color(0xFFFFD700)
-                            )
-                            Text(
-                                text = "Profil bilgilerinizi tamamlayarak daha doğru astrolojik yorumlar alabilirsiniz.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
+
 
                 // Hoş geldin kartı yerine basit bir layout
                 Column(
@@ -352,34 +321,8 @@ fun HomeScreen(
                         )
                     } else {
                         if (profileState.profileData.name.isNullOrEmpty()) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    "Profilinizi Tamamlayın",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = Color.White
-                                )
-                                Text(
-                                    "Kişiselleştirilmiş deneyim için lütfen profil bilgilerinizi doldurun.",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.White.copy(alpha = 0.9f)
-                                )
-                                Button(
-                                    onClick = { onNavigateToProfile() },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.White.copy(alpha = 0.2f)
-                                    )
-                                ) {
-                                    Text(
-                                        "Profile Git",
-                                        color = Color.White
-                                    )
-                                }
-                            }
+                            // Profil bilgileri eksikse boş bir alan bırak
+                            Spacer(modifier = Modifier.height(32.dp))
                         } else {
                             Text(
                                 text = buildAnnotatedString {

@@ -15,15 +15,6 @@ data class ProfileData(
     val card_2_revealed: Boolean? = null,
     val last_draw_date: String? = null
 ) {
-    fun hasIncompleteFields(): Boolean {
-        return name.isBlank() || 
-               surname.isBlank() || 
-               birthDate.isBlank() || 
-               birthTime.isBlank() || 
-               country.isBlank() || 
-               city.isBlank()
-    }
-
     // Firestore için boş constructor gerekli
     constructor() : this("", "", "", "", "", "", null, null, null, null, null, null, null)
 } 
