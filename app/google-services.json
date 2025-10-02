@@ -1,20 +1,20 @@
 {
   "project_info": {
-    "project_number": "675910266017",
-    "project_id": "astrosea-9a806",
-    "storage_bucket": "astrosea-9a806.firebasestorage.app"
+    "project_number": "14279256363",
+    "project_id": "astrosea-3de22",
+    "storage_bucket": "astrosea-3de22.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:675910266017:android:a5499ba5cd3623482d14e0",
+        "mobilesdk_app_id": "1:14279256363:android:0aaa83af020998aceabd6e",
         "android_client_info": {
           "package_name": "com.denizcan.astrosea"
         }
       },
       "oauth_client": [
         {
-          "client_id": "675910266017-umo2okbpcphg8msk25qd833shdkael5f.apps.googleusercontent.com",
+          "client_id": "14279256363-vi3ujouvls6afiemcdkgmbplcrneth0r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.denizcan.astrosea",
@@ -22,20 +22,20 @@
           }
         },
         {
-          "client_id": "675910266017-51es5ap1lrnum18onkhpb0eh5tl8ocpj.apps.googleusercontent.com",
+          "client_id": "14279256363-6decu5811cb5f6m8go83ipkpof35dh1h.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCeBFTUgDZR8KENFHMKppIXeA6dltnCXsM"
+          "current_key": "AIzaSyBPca9Ys-foBtth0I3RMqKvLLH6ALsQGtI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "675910266017-51es5ap1lrnum18onkhpb0eh5tl8ocpj.apps.googleusercontent.com",
+              "client_id": "14279256363-6decu5811cb5f6m8go83ipkpof35dh1h.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -14,7 +14,7 @@ class GeminiService {
     companion object {
         private const val TAG = "GeminiService"
         // API key'i güvenli bir şekilde saklamak için BuildConfig kullanılabilir
-        private const val API_KEY = "AIzaSyCrlcEsUsAEOGs6VJ3RzcJ3PVZhaa1V634" // TODO: API key'i ekleyin
+        private const val API_KEY = "AIzaSyAaDqQBEZ84Iw3nUKPfqMkybzxnRqYLiOw" // TODO: API key'i ekleyin
     }
     
     init {

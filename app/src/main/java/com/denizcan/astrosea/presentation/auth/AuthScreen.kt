@@ -77,7 +77,23 @@ fun AuthScreen(
                     email = email,
                     password = password,
                     onEmailVerified = onNavigateToHome,
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    onNavigateToTransition = {
+                        navController.navigate("transition_to_auth") {
+                            popUpTo("email_validation/{email}/{password}") { inclusive = true }
+                        }
+                    }
+                )
+            }
+            
+            composable("transition_to_auth") {
+                TransitionScreen(
+                    message = "Mail adresinizi kontrol edin.\nGiriş sayfasına yönlendiriliyorsunuz...",
+                    onTransitionComplete = {
+                        navController.navigate("sign_in") {
+                            popUpTo("auth_options") { inclusive = false }
+                        }
+                    }
                 )
             }
         }

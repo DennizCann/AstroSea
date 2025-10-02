@@ -52,6 +52,12 @@ import com.denizcan.astrosea.navigation.SmartNavigationHelper
 import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
 import com.denizcan.astrosea.workers.DailyNotificationWorker
 import com.denizcan.astrosea.workers.UnopenedCardsReminderWorker
+import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen1
+import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen2
+import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen3
+import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionViewModel
+import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionStatus
+import com.denizcan.astrosea.presentation.auth.TransitionScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -115,6 +121,38 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             var startDestination by remember { mutableStateOf<String?>(null) }
             val scope = rememberCoroutineScope()
+            var fallbackTried by remember { mutableStateOf(false) }
+
+            val googleLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult(),
+                onResult = { result ->
+                    if (result.resultCode == RESULT_OK && result.data != null) {
+                        scope.launch {
+                            val signInResult = googleAuthUiClient.signInWithIntent(result.data!!)
+                            if (signInResult.data != null) {
+                                // Google Sign-In başarılı, profil kontrolü yap
+                                val profileVM = ProfileCompletionViewModel()
+                                val completionStatus = profileVM.checkProfileCompletion()
+                                
+                                val destination = when (completionStatus) {
+                                    ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                                    ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
+                                    ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
+                                    ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                                    else -> Screen.Home.route
+                                }
+                                
+                                navController.navigate(destination) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            } else {
+                                Log.e("GoogleSignIn", "Giriş başarısız (fallback): ${signInResult.errorMessage}")
+                            }
+                        }
+                    }
+                }
+            )
+
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartIntentSenderForResult(),
                 onResult = { result ->
@@ -122,14 +160,36 @@ class MainActivity : ComponentActivity() {
                         scope.launch {
                             val signInResult = googleAuthUiClient.signInWithIntent(result.data!!)
                             if (signInResult.data != null) {
-                                // Giriş başarılı, ana ekrana yönlendir
-                                navController.navigate(Screen.Home.route) {
+                                // Google Sign-In başarılı, profil kontrolü yap
+                                val profileVM = ProfileCompletionViewModel()
+                                val completionStatus = profileVM.checkProfileCompletion()
+                                
+                                val destination = when (completionStatus) {
+                                    ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                                    ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
+                                    ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
+                                    ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                                    else -> Screen.Home.route
+                                }
+                                
+                                navController.navigate(destination) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             } else {
-                                // Hata varsa logla veya kullanıcıya göster
-                                Log.e("GoogleSignIn", "Giriş başarısız: ${signInResult.errorMessage}")
+                                Log.e("GoogleSignIn", "Giriş başarısız (one tap): ${signInResult.errorMessage}")
+                                if (!fallbackTried) {
+                                    fallbackTried = true
+                                    val fallbackIntent = googleAuthUiClient.getFallbackSignInIntent()
+                                    googleLauncher.launch(fallbackIntent)
+                                }
                             }
+                        }
+                    } else {
+                        // RESULT_CANCELED veya data null ise: fallback dene (bir kere)
+                        if (!fallbackTried) {
+                            fallbackTried = true
+                            val fallbackIntent = googleAuthUiClient.getFallbackSignInIntent()
+                            googleLauncher.launch(fallbackIntent)
                         }
                     }
                 }
@@ -143,8 +203,21 @@ class MainActivity : ComponentActivity() {
 
                 startDestination = when {
                     !hasSeenOnboarding -> Screen.Onboarding.route
-                    user != null && user.isEmailVerified -> Screen.Home.route
-                    user != null && !user.isEmailVerified -> Screen.Auth.route // Email doğrulanmamış kullanıcıları auth ekranına yönlendir
+                    user == null -> Screen.Auth.route
+                    user != null && !user.isEmailVerified -> Screen.Auth.route
+                    user != null && user.isEmailVerified -> {
+                        // Kullanıcı giriş yapmış ve email doğrulanmış, profil tamamlığını kontrol et
+                        val profileVM = ProfileCompletionViewModel()
+                        val completionStatus = profileVM.checkProfileCompletion()
+                        
+                        when (completionStatus) {
+                            ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                            ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
+                            ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
+                            ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                            else -> Screen.Home.route
+                        }
+                    }
                     else -> Screen.Auth.route
                 }
             }
@@ -185,18 +258,39 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Auth.route) {
                         AuthScreen(
                             onNavigateToHome = {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(0) { inclusive = true }
+                                // Başarılı giriş sonrası profil tamamlama kontrolü
+                                scope.launch {
+                                    val profileVM = ProfileCompletionViewModel()
+                                    val completionStatus = profileVM.checkProfileCompletion()
+                                    
+                                    val destination = when (completionStatus) {
+                                        ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                                        ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
+                                        ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
+                                        ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                                        else -> Screen.Home.route
+                                    }
+                                    
+                                    navController.navigate(destination) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
                                 }
                             },
                             onGoogleSignIn = {
                                 scope.launch {
+                                    Log.d("GoogleAuth", "UI: Google sign-in requested")
                                     val signInIntentSender = googleAuthUiClient.signIn()
-                                    launcher.launch(
-                                        IntentSenderRequest.Builder(
-                                            signInIntentSender ?: return@launch
-                                        ).build()
-                                    )
+                                    if (signInIntentSender != null) {
+                                        Log.d("GoogleAuth", "UI: Launching One Tap intent sender")
+                                        launcher.launch(
+                                            IntentSenderRequest.Builder(signInIntentSender).build()
+                                        )
+                                    } else {
+                                        // One Tap uygun kimlik bulamadı, GoogleSignIn fallback'ını başlat
+                                        Log.w("GoogleAuth", "UI: One Tap not available, launching GoogleSignIn fallback")
+                                        val fallbackIntent = googleAuthUiClient.getFallbackSignInIntent()
+                                        googleLauncher.launch(fallbackIntent)
+                                    }
                                 }
                             }
                         )
@@ -209,17 +303,86 @@ class MainActivity : ComponentActivity() {
                             email = email,
                             password = password,
                             onEmailVerified = {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(0) { inclusive = true }
+                                // Email doğrulandıktan sonra profil tamamlama kontrolü
+                                scope.launch {
+                                    val profileVM = ProfileCompletionViewModel()
+                                    val completionStatus = profileVM.checkProfileCompletion()
+                                    
+                                    val destination = when (completionStatus) {
+                                        ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                                        ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
+                                        ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
+                                        ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                                        else -> Screen.Home.route
+                                    }
+                                    
+                                    navController.navigate(destination) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
                                 }
                             },
                             onBackClick = {
                                 navController.navigate(Screen.Auth.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
+                            },
+                            onNavigateToTransition = {
+                                navController.navigate(Screen.TransitionToAuth.route) {
+                                    popUpTo(Screen.EmailValidation.route) { inclusive = true }
+                                }
                             }
                         )
                     }
+                    
+                    // Geçiş Ekranı
+                    composable(Screen.TransitionToAuth.route) {
+                        TransitionScreen(
+                            message = "Mail adresinizi kontrol edin.\nGiriş sayfasına yönlendiriliyorsunuz...",
+                            onTransitionComplete = {
+                                navController.navigate(Screen.Auth.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    
+                    // Profil Tamamlama Ekranları
+                    composable(Screen.ProfileCompletion1.route) {
+                        val profileVM: ProfileCompletionViewModel = viewModel()
+                        ProfileCompletionScreen1(
+                            viewModel = profileVM,
+                            onNavigateToNext = {
+                                navController.navigate(Screen.ProfileCompletion2.route) {
+                                    popUpTo(Screen.ProfileCompletion1.route) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    
+                    composable(Screen.ProfileCompletion2.route) {
+                        val profileVM: ProfileCompletionViewModel = viewModel()
+                        ProfileCompletionScreen2(
+                            viewModel = profileVM,
+                            onNavigateToNext = {
+                                navController.navigate(Screen.ProfileCompletion3.route) {
+                                    popUpTo(Screen.ProfileCompletion2.route) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    
+                    composable(Screen.ProfileCompletion3.route) {
+                        val profileVM: ProfileCompletionViewModel = viewModel()
+                        ProfileCompletionScreen3(
+                            viewModel = profileVM,
+                            onNavigateToHome = {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    
                     composable(Screen.Home.route) {
                         val viewModel: ProfileViewModel = viewModel()
                         HomeScreen(

@@ -6,6 +6,10 @@ sealed class Screen(val route: String) {
     object EmailValidation : Screen("email_validation/{email}/{password}") {
         fun createRoute(email: String, password: String) = "email_validation/$email/$password"
     }
+    object TransitionToAuth : Screen("transition_to_auth")
+    object ProfileCompletion1 : Screen("profile_completion_1")
+    object ProfileCompletion2 : Screen("profile_completion_2")
+    object ProfileCompletion3 : Screen("profile_completion_3")
     object Home : Screen("home")
     object Profile : Screen("profile")
     object Horoscope : Screen("horoscope")

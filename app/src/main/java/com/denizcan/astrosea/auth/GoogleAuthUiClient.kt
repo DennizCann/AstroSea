@@ -11,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
@@ -22,6 +23,22 @@ class GoogleAuthUiClient(
 ) {
     private val auth = FirebaseAuth.getInstance()
 
+    init {
+        logFirebaseOptions()
+    }
+
+    private fun logFirebaseOptions() {
+        try {
+            val opts = com.google.firebase.FirebaseApp.getInstance().options
+            android.util.Log.d(
+                "FB",
+                "projectId=${opts.projectId}, storage=${opts.storageBucket}, apiKey=${opts.apiKey}, appId=${opts.applicationId}, dbUrl=${opts.databaseUrl}"
+            )
+        } catch (e: Exception) {
+            android.util.Log.e("FB", "Failed to log Firebase options", e)
+        }
+    }
+
     suspend fun signIn(): IntentSender? {
         try {
             // Mevcut oturumları temizle
@@ -32,7 +49,7 @@ class GoogleAuthUiClient(
             GoogleSignIn.getClient(
                 context,
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken("675910266017-51es5ap1lrnum18onkhpb0eh5tl8ocpj.apps.googleusercontent.com")
+                    .requestIdToken(context.getString(com.denizcan.astrosea.R.string.default_web_client_id))
                     .requestEmail()
                     .build()
             ).signOut().await()
@@ -40,6 +57,7 @@ class GoogleAuthUiClient(
             e.printStackTrace()
         }
 
+        android.util.Log.d("GoogleAuth", "One Tap: beginSignIn...")
         val result = try {
             oneTapClient.beginSignIn(
                 buildSignInRequest()
@@ -47,16 +65,44 @@ class GoogleAuthUiClient(
         } catch(e: Exception) {
             e.printStackTrace()
             if(e is CancellationException) throw e
+            android.util.Log.w("GoogleAuth", "One Tap: beginSignIn failed: ${e.message}")
             null
         }
         
         // Sadece IntentSender döndürüyoruz, şu anda kullanıcı bilgilerine erişim yok
-        return result?.pendingIntent?.intentSender
+        val sender = result?.pendingIntent?.intentSender
+        if (sender == null) {
+            android.util.Log.w("GoogleAuth", "One Tap: no intent sender, will need fallback")
+        } else {
+            android.util.Log.d("GoogleAuth", "One Tap: intent sender ready")
+        }
+        return sender
     }
 
     suspend fun signInWithIntent(intent: Intent): SignInResult {
-        val credential = oneTapClient.getSignInCredentialFromIntent(intent)
-        val googleIdToken = credential.googleIdToken
+        // One Tap dene; başarısızsa GoogleSignIn fallback'ı işle
+        var googleIdToken: String? = null
+        try {
+            val credential = oneTapClient.getSignInCredentialFromIntent(intent)
+            googleIdToken = credential.googleIdToken
+            android.util.Log.d("GoogleAuth", "One Tap: credential received, token null? ${googleIdToken==null}")
+        } catch (e: Exception) {
+            // yoksay, fallback denenecek
+            android.util.Log.w("GoogleAuth", "One Tap: no credential from intent, trying GoogleSignIn: ${e.message}")
+        }
+
+        if (googleIdToken == null) {
+            try {
+                val account = GoogleSignIn.getSignedInAccountFromIntent(intent)
+                    .getResult(ApiException::class.java)
+                googleIdToken = account.idToken
+                android.util.Log.d("GoogleAuth", "GoogleSignIn: account received, token null? ${googleIdToken==null}")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.util.Log.e("GoogleAuth", "GoogleSignIn: failed to extract account: ${e.message}")
+            }
+        }
+
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         
         return try {
@@ -148,11 +194,19 @@ class GoogleAuthUiClient(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId("675910266017-51es5ap1lrnum18onkhpb0eh5tl8ocpj.apps.googleusercontent.com")
+                    .setServerClientId(context.getString(com.denizcan.astrosea.R.string.default_web_client_id))
                     .build()
             )
             .setAutoSelectEnabled(false)
             .build()
+    }
+
+    fun getFallbackSignInIntent(): Intent {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(com.denizcan.astrosea.R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        return GoogleSignIn.getClient(context, gso).signInIntent
     }
 }
 

@@ -28,7 +28,8 @@ fun EmailValidationScreen(
     email: String,
     password: String,
     onEmailVerified: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToTransition: () -> Unit
 ) {
     val viewModel: EmailValidationViewModel = viewModel()
     val scope = rememberCoroutineScope()
@@ -38,6 +39,14 @@ fun EmailValidationScreen(
         viewModel.setTempUserData(email, password)
         viewModel.sendVerificationEmail()
         viewModel.startPeriodicVerificationCheck(onEmailVerified)
+    }
+    
+    // Mail gönderildiğinde 3 saniye sonra geçiş sayfasına yönlendir
+    LaunchedEffect(viewModel.isEmailSent) {
+        if (viewModel.isEmailSent) {
+            delay(3000) // 3 saniye bekle
+            onNavigateToTransition()
+        }
     }
     
     Box(modifier = Modifier.fillMaxSize()) {
