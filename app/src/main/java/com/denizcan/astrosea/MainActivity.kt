@@ -367,6 +367,11 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.ProfileCompletion3.route) {
                                     popUpTo(Screen.ProfileCompletion2.route) { inclusive = true }
                                 }
+                            },
+                            onNavigateBack = {
+                                navController.navigate(Screen.ProfileCompletion1.route) {
+                                    popUpTo(Screen.ProfileCompletion2.route) { inclusive = true }
+                                }
                             }
                         )
                     }
@@ -378,6 +383,11 @@ class MainActivity : ComponentActivity() {
                             onNavigateToHome = {
                                 navController.navigate(Screen.Home.route) {
                                     popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onNavigateBack = {
+                                navController.navigate(Screen.ProfileCompletion2.route) {
+                                    popUpTo(Screen.ProfileCompletion3.route) { inclusive = true }
                                 }
                             }
                         )

@@ -2,6 +2,7 @@ package com.denizcan.astrosea.presentation.profileCompletion
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,19 +13,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.denizcan.astrosea.R
 import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
 fun ProfileCompletionScreen2(
     viewModel: ProfileCompletionViewModel = viewModel(),
-    onNavigateToNext: () -> Unit
+    onNavigateToNext: () -> Unit,
+    onNavigateBack: () -> Unit
 ) {
     val birthDate by viewModel.birthDate.collectAsState()
     val birthTime by viewModel.birthTime.collectAsState()
@@ -58,25 +66,19 @@ fun ProfileCompletionScreen2(
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1a0033),
-                        Color(0xFF2d1b69),
-                        Color(0xFF4a2f8f),
-                        Color(0xFF5d3fa8),
-                        Color(0xFF2a4f7f),
-                        Color(0xFF1a365d)
-                    )
-                )
-            )
+        modifier = Modifier.fillMaxSize()
     ) {
+        // Arka plan görseli
+        Image(
+            painter = painterResource(id = R.drawable.anabackground),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -84,105 +86,339 @@ fun ProfileCompletionScreen2(
             Text(
                 text = "Yıldızlar kaderinizi şekillendirsin.",
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontSize = 22.sp,
+                    fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 ),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 48.dp)
+                modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Doğum Tarihi Input (Tıklanabilir)
-            OutlinedTextField(
-                value = birthDate,
-                onValueChange = { },
-                label = { 
-                    Text(
-                        "Doğum tarihiniz...",
-                        color = Color.White.copy(alpha = 0.7f)
-                    ) 
-                },
-                readOnly = true,
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    disabledTextColor = Color.White,
-                    focusedBorderColor = Color.White.copy(alpha = 0.8f),
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                    cursorColor = Color.White
-                ),
+            // Doğum Tarihi Input - Kendi kutusunda
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                    .clickable { datePickerDialog.show() },
-                shape = RoundedCornerShape(12.dp),
-                enabled = false
-            )
+                    .background(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(20.dp)
+                    .clickable { datePickerDialog.show() }
+            ) {
+                OutlinedTextField(
+                        value = birthDate,
+                        onValueChange = { },
+                        label = { 
+                            Text(
+                                "Doğum tarihiniz...",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 18.sp
+                                ),
+                                color = Color.White.copy(alpha = 0.7f)
+                            ) 
+                        },
+                        readOnly = true,
+                        singleLine = true,
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 20.sp
+                        ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.White,
+                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        cursorColor = Color.White
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = false
+                )
+            }
 
-            // Doğum Saati Input (Tıklanabilir)
-            OutlinedTextField(
-                value = birthTime,
-                onValueChange = { },
-                label = { 
-                    Text(
-                        "Doğum saatiniz...",
-                        color = Color.White.copy(alpha = 0.7f)
-                    ) 
-                },
-                readOnly = true,
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    disabledTextColor = Color.White,
-                    focusedBorderColor = Color.White.copy(alpha = 0.8f),
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                    cursorColor = Color.White
-                ),
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Doğum Saati Input - Kendi kutusunda
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp)
-                    .clickable { timePickerDialog.show() },
-                shape = RoundedCornerShape(12.dp),
-                enabled = false
-            )
+                    .background(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(20.dp)
+                    .clickable { timePickerDialog.show() }
+            ) {
+                OutlinedTextField(
+                        value = birthTime,
+                        onValueChange = { },
+                        label = { 
+                            Text(
+                                "Doğum saatiniz...",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 18.sp
+                                ),
+                                color = Color.White.copy(alpha = 0.7f)
+                            ) 
+                        },
+                        readOnly = true,
+                        singleLine = true,
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 20.sp
+                        ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.White,
+                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        cursorColor = Color.White
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = false
+                )
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // İleri butonu
-            Button(
-                onClick = {
-                    if (birthDate.isNotBlank() && birthTime.isNotBlank()) {
-                        scope.launch {
-                            val success = viewModel.saveBirthData()
-                            if (success) {
-                                onNavigateToNext()
+            // Butonlar - Siyah arka plan
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Geri butonu
+                Button(
+                    onClick = onNavigateBack,
+                    enabled = !isLoading,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f),
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                    ),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    Text(
+                        text = "Geri",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.White
+                    )
+                }
+
+                // İleri butonu
+                Button(
+                    onClick = {
+                        if (birthDate.isNotBlank() && birthTime.isNotBlank()) {
+                            scope.launch {
+                                val success = viewModel.saveBirthData()
+                                if (success) {
+                                    onNavigateToNext()
+                                }
                             }
                         }
+                    },
+                    enabled = birthDate.isNotBlank() && birthTime.isNotBlank() && !isLoading,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black.copy(alpha = 0.7f),
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                    ),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "İleri",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.White
+                        )
                     }
-                },
-                enabled = birthDate.isNotBlank() && birthTime.isNotBlank() && !isLoading,
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6B4FA0).copy(alpha = 0.7f),
-                    disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
-                ),
-                shape = RoundedCornerShape(25.dp)
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ProfileCompletionScreen2Preview() {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Arka plan için placeholder
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1a0033),
+                            Color(0xFF2d1b69),
+                            Color(0xFF4a2f8f)
+                        )
                     )
-                } else {
+                )
+        )
+        
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Başlık
+            Text(
+                text = "Yıldızlar kaderinizi şekillendirsin.",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontFamily = FontFamily.Serif,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            // Doğum Tarihi Input
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(20.dp)
+            ) {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { 
+                        Text(
+                            "Doğum tarihiniz...",
+                            fontSize = 18.sp,
+                            color = Color.White.copy(alpha = 0.7f)
+                        ) 
+                    },
+                    readOnly = true,
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.White,
+                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        cursorColor = Color.White
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = false
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Doğum Saati Input
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = Color.Black.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(20.dp)
+            ) {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { 
+                        Text(
+                            "Doğum saatiniz...",
+                            fontSize = 18.sp,
+                            color = Color.White.copy(alpha = 0.7f)
+                        ) 
+                    },
+                    readOnly = true,
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.White,
+                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        cursorColor = Color.White
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = false
+                )
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // Butonlar
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Geri butonu
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    Text(
+                        text = "Geri",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                // İleri butonu
+                Button(
+                    onClick = {},
+                    enabled = false,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Black.copy(alpha = 0.7f),
+                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                    ),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
                     Text(
                         text = "İleri",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                 }
@@ -190,4 +426,3 @@ fun ProfileCompletionScreen2(
         }
     }
 }
-
