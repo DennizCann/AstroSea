@@ -212,9 +212,13 @@ class MainActivity : ComponentActivity() {
                         
                         when (completionStatus) {
                             ProfileCompletionStatus.COMPLETE -> Screen.Home.route
-                            ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
-                            ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
-                            ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                            ProfileCompletionStatus.INCOMPLETE_NAME, 
+                            ProfileCompletionStatus.INCOMPLETE_BIRTH, 
+                            ProfileCompletionStatus.INCOMPLETE_LOCATION -> {
+                                // Profil tamamlanmamış, kullanıcıyı çıkış yaptır
+                                FirebaseAuth.getInstance().signOut()
+                                Screen.Auth.route
+                            }
                             else -> Screen.Home.route
                         }
                     }
