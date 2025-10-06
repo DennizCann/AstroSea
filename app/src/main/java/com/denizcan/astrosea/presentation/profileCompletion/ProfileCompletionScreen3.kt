@@ -82,140 +82,133 @@ fun ProfileCompletionScreen3(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Ülke Dropdown - Kendi kutusunda
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color.Black.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(20.dp)
+            // Ülke Dropdown
+            ExposedDropdownMenuBox(
+                expanded = countryExpanded,
+                onExpandedChange = { countryExpanded = !countryExpanded }
             ) {
-                ExposedDropdownMenuBox(
+                OutlinedTextField(
+                    value = birthCountry,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = { 
+                        Text(
+                            "Doğduğunuz ülke...",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                fontSize = 18.sp
+                            ),
+                            color = Color.White.copy(alpha = 0.7f)
+                        ) 
+                    },
+                    trailingIcon = { 
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = countryExpanded) 
+                    },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 20.sp
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.White,
+                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        cursorColor = Color.White,
+                        focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                        unfocusedContainerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .background(
+                            color = Color.Black.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(12.dp)
+                        ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                ExposedDropdownMenu(
                     expanded = countryExpanded,
-                    onExpandedChange = { countryExpanded = !countryExpanded }
+                    onDismissRequest = { countryExpanded = false }
                 ) {
-                    OutlinedTextField(
-                        value = birthCountry,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { 
-                            Text(
-                                "Doğduğunuz ülke...",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 18.sp
-                                ),
-                                color = Color.White.copy(alpha = 0.7f)
-                            ) 
-                        },
-                        trailingIcon = { 
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = countryExpanded) 
-                        },
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            fontSize = 20.sp
-                        ),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            disabledTextColor = Color.White,
-                            focusedBorderColor = Color.White.copy(alpha = 0.8f),
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                            cursorColor = Color.White
-                        ),
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = countryExpanded,
-                        onDismissRequest = { countryExpanded = false }
-                    ) {
-                        countryList.forEach { country ->
-                            DropdownMenuItem(
-                                text = { Text(country) },
-                                onClick = {
-                                    viewModel.updateBirthCountry(country)
-                                    // Ülke değiştiğinde şehri temizle
-                                    viewModel.updateBirthCity("")
-                                    countryExpanded = false
-                                }
-                            )
-                        }
+                    countryList.forEach { country ->
+                        DropdownMenuItem(
+                            text = { Text(country) },
+                            onClick = {
+                                viewModel.updateBirthCountry(country)
+                                // Ülke değiştiğinde şehri temizle
+                                viewModel.updateBirthCity("")
+                                countryExpanded = false
+                            }
+                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Şehir Dropdown - Kendi kutusunda
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color.Black.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(20.dp)
+            // Şehir Dropdown
+            ExposedDropdownMenuBox(
+                expanded = cityExpanded,
+                onExpandedChange = { cityExpanded = !cityExpanded }
             ) {
-                ExposedDropdownMenuBox(
+                OutlinedTextField(
+                    value = birthCity,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = { 
+                        Text(
+                            "Doğduğunuz şehir...",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                fontSize = 18.sp
+                            ),
+                            color = Color.White.copy(alpha = 0.7f)
+                        ) 
+                    },
+                    trailingIcon = { 
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = cityExpanded) 
+                    },
+                    singleLine = true,
+                    enabled = birthCountry.isNotEmpty(),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 20.sp
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        disabledTextColor = Color.White.copy(alpha = 0.5f),
+                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        disabledBorderColor = Color.White.copy(alpha = 0.5f),
+                        cursorColor = Color.White,
+                        focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                        unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                        disabledContainerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .background(
+                            color = Color.Black.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(12.dp)
+                        ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                ExposedDropdownMenu(
                     expanded = cityExpanded,
-                    onExpandedChange = { cityExpanded = !cityExpanded }
+                    onDismissRequest = { cityExpanded = false }
                 ) {
-                    OutlinedTextField(
-                        value = birthCity,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { 
-                            Text(
-                                "Doğduğunuz şehir...",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 18.sp
-                                ),
-                                color = Color.White.copy(alpha = 0.7f)
-                            ) 
-                        },
-                        trailingIcon = { 
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = cityExpanded) 
-                        },
-                        singleLine = true,
-                        enabled = birthCountry.isNotEmpty(),
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            fontSize = 20.sp
-                        ),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            disabledTextColor = Color.White.copy(alpha = 0.5f),
-                            focusedBorderColor = Color.White.copy(alpha = 0.8f),
-                            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                            disabledBorderColor = Color.White.copy(alpha = 0.3f),
-                            cursorColor = Color.White
-                        ),
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = cityExpanded,
-                        onDismissRequest = { cityExpanded = false }
-                    ) {
-                        cityList.forEach { city ->
-                            DropdownMenuItem(
-                                text = { Text(city) },
-                                onClick = {
-                                    viewModel.updateBirthCity(city)
-                                    cityExpanded = false
-                                }
-                            )
-                        }
+                    cityList.forEach { city ->
+                        DropdownMenuItem(
+                            text = { Text(city) },
+                            onClick = {
+                                viewModel.updateBirthCity(city)
+                                cityExpanded = false
+                            }
+                        )
                     }
                 }
             }
@@ -235,8 +228,8 @@ fun ProfileCompletionScreen3(
                         .weight(1f)
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black.copy(alpha = 0.6f),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = Color.Black.copy(alpha = 0.7f),
+                        disabledContainerColor = Color.Black.copy(alpha = 0.55f)
                     ),
                     shape = RoundedCornerShape(28.dp)
                 ) {
@@ -269,7 +262,7 @@ fun ProfileCompletionScreen3(
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black.copy(alpha = 0.7f),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        disabledContainerColor = Color.Black.copy(alpha = 0.55f)
                     ),
                     shape = RoundedCornerShape(28.dp)
                 ) {
