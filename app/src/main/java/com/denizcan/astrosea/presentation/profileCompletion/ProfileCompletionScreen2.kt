@@ -2,6 +2,7 @@ package com.denizcan.astrosea.presentation.profileCompletion
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -198,13 +199,14 @@ fun ProfileCompletionScreen2(
                         .weight(1f)
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black.copy(alpha = 0.7f),
-                        disabledContainerColor = Color.Black.copy(alpha = 0.55f)
+                        containerColor = Color.Black.copy(alpha = 0.75f),
+                        disabledContainerColor = Color.Black.copy(alpha = 0.5f)
                     ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     Text(
-                        text = "Geri",
+                        text = "GERİ",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                             fontSize = 20.sp,
@@ -231,9 +233,10 @@ fun ProfileCompletionScreen2(
                         .weight(1f)
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black.copy(alpha = 0.7f),
-                        disabledContainerColor = Color.Black.copy(alpha = 0.55f)
+                        containerColor = Color.Black.copy(alpha = 0.75f),
+                        disabledContainerColor = Color.Black.copy(alpha = 0.5f)
                     ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     if (isLoading) {
@@ -244,7 +247,7 @@ fun ProfileCompletionScreen2(
                         )
                     } else {
                         Text(
-                            text = "İleri",
+                            text = "İLERİ",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                 fontSize = 20.sp,

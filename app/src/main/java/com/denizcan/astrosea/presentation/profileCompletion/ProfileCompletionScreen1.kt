@@ -142,7 +142,7 @@ fun ProfileCompletionScreen1(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // İleri butonu - Siyah arka plan
+            // İleri butonu
             Button(
                 onClick = {
                     if (firstName.isNotBlank() && lastName.isNotBlank()) {
@@ -159,9 +159,10 @@ fun ProfileCompletionScreen1(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black.copy(alpha = 0.7f),
-                    disabledContainerColor = Color.Black.copy(alpha = 0.55f)
+                    containerColor = Color.Black.copy(alpha = 0.75f),
+                    disabledContainerColor = Color.Black.copy(alpha = 0.5f)
                 ),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
                 shape = RoundedCornerShape(28.dp)
             ) {
                 if (isLoading) {
@@ -172,7 +173,7 @@ fun ProfileCompletionScreen1(
                     )
                 } else {
                     Text(
-                        text = "İleri",
+                        text = "İLERİ",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                             fontSize = 20.sp,
