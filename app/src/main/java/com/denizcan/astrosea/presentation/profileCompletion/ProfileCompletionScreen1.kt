@@ -67,7 +67,7 @@ fun ProfileCompletionScreen1(
             OutlinedTextField(
                 value = firstName,
                 onValueChange = { viewModel.updateFirstName(it) },
-                label = { 
+                placeholder = { 
                     Text(
                         "Adınız...",
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -106,7 +106,7 @@ fun ProfileCompletionScreen1(
             OutlinedTextField(
                 value = lastName,
                 onValueChange = { viewModel.updateLastName(it) },
-                label = { 
+                placeholder = { 
                     Text(
                         "Soyadınız...",
                         style = MaterialTheme.typography.bodyMedium.copy(
