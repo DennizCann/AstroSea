@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -26,8 +27,12 @@ fun SignInScreen(
     onSignInSuccess: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("auth_prefs", android.content.Context.MODE_PRIVATE) }
+    
+    var email by remember { mutableStateOf(prefs.getString("saved_email", "") ?: "") }
+    var password by remember { mutableStateOf(prefs.getString("saved_password", "") ?: "") }
+    var rememberMe by remember { mutableStateOf(prefs.getBoolean("remember_me", false)) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -143,6 +148,27 @@ fun SignInScreen(
                                     focusedLabelColor = Color.White
                                 )
                             )
+                            
+                            // Beni Hatırla Checkbox
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = rememberMe,
+                                    onCheckedChange = { rememberMe = it },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = Color.White.copy(alpha = 0.8f),
+                                        uncheckedColor = Color.White.copy(alpha = 0.5f),
+                                        checkmarkColor = Color.Black
+                                    )
+                                )
+                                Text(
+                                    text = "Beni Hatırla",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
                         }
 
                         // Buton
@@ -163,6 +189,19 @@ fun SignInScreen(
                                                         if (task.isSuccessful) {
                                                             val user = auth.currentUser
                                                             if (user != null && user.isEmailVerified) {
+                                                                // Beni Hatırla işaretliyse bilgileri kaydet
+                                                                prefs.edit().apply {
+                                                                    if (rememberMe) {
+                                                                        putString("saved_email", email)
+                                                                        putString("saved_password", password)
+                                                                        putBoolean("remember_me", true)
+                                                                    } else {
+                                                                        remove("saved_email")
+                                                                        remove("saved_password")
+                                                                        putBoolean("remember_me", false)
+                                                                    }
+                                                                    apply()
+                                                                }
                                                                 onSignInSuccess()
                                                             } else {
                                                                 errorMessage = "Lütfen önce email adresinizi doğrulayın"
