@@ -159,7 +159,7 @@ fun ProfileCompletionScreen1(
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black.copy(alpha = 0.7f),
-                    disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                    disabledContainerColor = Color.Black.copy(alpha = 0.55f)
                 ),
                 shape = RoundedCornerShape(28.dp)
             ) {

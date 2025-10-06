@@ -95,95 +95,93 @@ fun ProfileCompletionScreen2(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Doğum Tarihi Input - Kendi kutusunda
-            Box(
+            // Doğum Tarihi Input
+            OutlinedTextField(
+                value = birthDate,
+                onValueChange = { },
+                placeholder = { 
+                    Text(
+                        "Doğum tarihiniz...",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 18.sp
+                        ),
+                        color = Color.White.copy(alpha = 0.7f)
+                    ) 
+                },
+                readOnly = true,
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                    fontSize = 20.sp
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    disabledTextColor = Color.White,
+                    focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    disabledBorderColor = Color.White.copy(alpha = 0.5f),
+                    cursorColor = Color.White,
+                    focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    disabledContainerColor = Color.Black.copy(alpha = 0.6f)
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
                         color = Color.Black.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(12.dp)
                     )
-                    .padding(20.dp)
-                    .clickable { datePickerDialog.show() }
-            ) {
-                OutlinedTextField(
-                        value = birthDate,
-                        onValueChange = { },
-                        label = { 
-                            Text(
-                                "Doğum tarihiniz...",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 18.sp
-                                ),
-                                color = Color.White.copy(alpha = 0.7f)
-                            ) 
-                        },
-                        readOnly = true,
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            fontSize = 20.sp
-                        ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        disabledTextColor = Color.White,
-                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                        cursorColor = Color.White
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = false
-                )
-            }
+                    .clickable { datePickerDialog.show() },
+                shape = RoundedCornerShape(12.dp),
+                enabled = false
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Doğum Saati Input - Kendi kutusunda
-            Box(
+            // Doğum Saati Input
+            OutlinedTextField(
+                value = birthTime,
+                onValueChange = { },
+                placeholder = { 
+                    Text(
+                        "Doğum saatiniz...",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 18.sp
+                        ),
+                        color = Color.White.copy(alpha = 0.7f)
+                    ) 
+                },
+                readOnly = true,
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                    fontSize = 20.sp
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    disabledTextColor = Color.White,
+                    focusedBorderColor = Color.White.copy(alpha = 0.8f),
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    disabledBorderColor = Color.White.copy(alpha = 0.5f),
+                    cursorColor = Color.White,
+                    focusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    unfocusedContainerColor = Color.Black.copy(alpha = 0.6f),
+                    disabledContainerColor = Color.Black.copy(alpha = 0.6f)
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
                         color = Color.Black.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(12.dp)
                     )
-                    .padding(20.dp)
-                    .clickable { timePickerDialog.show() }
-            ) {
-                OutlinedTextField(
-                        value = birthTime,
-                        onValueChange = { },
-                        label = { 
-                            Text(
-                                "Doğum saatiniz...",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 18.sp
-                                ),
-                                color = Color.White.copy(alpha = 0.7f)
-                            ) 
-                        },
-                        readOnly = true,
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            fontSize = 20.sp
-                        ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        disabledTextColor = Color.White,
-                        focusedBorderColor = Color.White.copy(alpha = 0.8f),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                        cursorColor = Color.White
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = false
-                )
-            }
+                    .clickable { timePickerDialog.show() },
+                shape = RoundedCornerShape(12.dp),
+                enabled = false
+            )
 
             Spacer(modifier = Modifier.height(28.dp))
 
@@ -200,8 +198,8 @@ fun ProfileCompletionScreen2(
                         .weight(1f)
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black.copy(alpha = 0.6f),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = Color.Black.copy(alpha = 0.7f),
+                        disabledContainerColor = Color.Black.copy(alpha = 0.55f)
                     ),
                     shape = RoundedCornerShape(28.dp)
                 ) {
@@ -234,7 +232,7 @@ fun ProfileCompletionScreen2(
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black.copy(alpha = 0.7f),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        disabledContainerColor = Color.Black.copy(alpha = 0.55f)
                     ),
                     shape = RoundedCornerShape(28.dp)
                 ) {
