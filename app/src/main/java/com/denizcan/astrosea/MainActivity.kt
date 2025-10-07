@@ -58,6 +58,7 @@ import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScr
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionViewModel
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionStatus
 import com.denizcan.astrosea.presentation.auth.TransitionScreen
+import com.denizcan.astrosea.presentation.introduction.IntroductionPopupScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -200,6 +201,11 @@ class MainActivity : ComponentActivity() {
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 val hasSeenOnboarding = prefs.getBoolean("has_seen_onboarding", false)
                 val user = FirebaseAuth.getInstance().currentUser
+                
+                // Her kullanıcı için ayrı introduction kontrolü
+                val hasSeenIntroduction = user?.uid?.let { userId ->
+                    prefs.getBoolean("has_seen_introduction_$userId", false)
+                } ?: false
 
                 startDestination = when {
                     !hasSeenOnboarding -> Screen.Onboarding.route
@@ -211,7 +217,14 @@ class MainActivity : ComponentActivity() {
                         val completionStatus = profileVM.checkProfileCompletion()
                         
                         when (completionStatus) {
-                            ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                            ProfileCompletionStatus.COMPLETE -> {
+                                // Profil tamamlanmış, introduction popup kontrolü yap (kullanıcı bazlı)
+                                if (!hasSeenIntroduction) {
+                                    Screen.IntroductionPopup.route
+                                } else {
+                                    Screen.Home.route
+                                }
+                            }
                             ProfileCompletionStatus.INCOMPLETE_NAME, 
                             ProfileCompletionStatus.INCOMPLETE_BIRTH, 
                             ProfileCompletionStatus.INCOMPLETE_LOCATION -> {
@@ -385,13 +398,97 @@ class MainActivity : ComponentActivity() {
                         ProfileCompletionScreen3(
                             viewModel = profileVM,
                             onNavigateToHome = {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(0) { inclusive = true }
+                                // Profil tamamlandıktan sonra introduction popup kontrolü yap (kullanıcı bazlı)
+                                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                val hasSeenIntroduction = userId?.let {
+                                    prefs.getBoolean("has_seen_introduction_$it", false)
+                                } ?: false
+                                
+                                if (!hasSeenIntroduction) {
+                                    navController.navigate(Screen.IntroductionPopup.route) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                } else {
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
                                 }
                             },
                             onNavigateBack = {
                                 navController.navigate(Screen.ProfileCompletion2.route) {
                                     popUpTo(Screen.ProfileCompletion3.route) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    
+                    composable(Screen.IntroductionPopup.route) {
+                        IntroductionPopupScreen(
+                            onDismiss = {
+                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                userId?.let {
+                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putBoolean("has_seen_introduction_$it", true)
+                                        .apply()
+                                }
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onNavigateToTarotMeanings = {
+                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                userId?.let {
+                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putBoolean("has_seen_introduction_$it", true)
+                                        .apply()
+                                }
+                                navController.navigate(Screen.TarotMeanings.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onNavigateToHoroscope = {
+                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                userId?.let {
+                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putBoolean("has_seen_introduction_$it", true)
+                                        .apply()
+                                }
+                                navController.navigate(Screen.Horoscope.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onNavigateToBirthChart = {
+                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                userId?.let {
+                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putBoolean("has_seen_introduction_$it", true)
+                                        .apply()
+                                }
+                                navController.navigate(Screen.BirthChart.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onNavigateToPremium = {
+                                // Rün falı için premium sayfasına yönlendir (şu an için MoreScreen)
+                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
+                                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                userId?.let {
+                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                                        .edit()
+                                        .putBoolean("has_seen_introduction_$it", true)
+                                        .apply()
+                                }
+                                navController.navigate("more") {
+                                    popUpTo(0) { inclusive = true }
                                 }
                             }
                         )

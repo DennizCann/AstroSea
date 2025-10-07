@@ -26,4 +26,5 @@ sealed class Screen(val route: String) {
     object GeneralReadingDetail : Screen("general_reading_detail/{readingType}") {
         fun createRoute(readingType: String) = "general_reading_detail/$readingType"
     }
+    object IntroductionPopup : Screen("introduction_popup")
 }
