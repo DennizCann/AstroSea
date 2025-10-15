@@ -1,33 +1,34 @@
 package com.denizcan.astrosea.util
 
 import android.util.Log
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.model.ReadingFormat
+import com.denizcan.astrosea.BuildConfig
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
-class GeminiService {
-    private var generativeModel: GenerativeModel? = null
+class GroqService {
     
     companion object {
-        private const val TAG = "GeminiService"
-        // API key'i güvenli bir şekilde saklamak için BuildConfig kullanılabilir
-        private const val API_KEY = "AIzaSyAaDqQBEZ84Iw3nUKPfqMkybzxnRqYLiOw" // TODO: API key'i ekleyin
+        private const val TAG = "GroqService"
+        // API Key local.properties'ten BuildConfig üzerinden okunur
+        private val API_KEY = BuildConfig.GROQ_API_KEY
+        private const val API_URL = "https://api.groq.com/openai/v1/chat/completions"
+        private const val MODEL = "llama-3.3-70b-versatile" // Groq'un en iyi modeli
     }
     
-    init {
-        try {
-            generativeModel = GenerativeModel(
-                modelName = "gemini-2.5-flash",
-                apiKey = API_KEY
-            )
-            Log.d(TAG, "Gemini model başarıyla başlatıldı")
-        } catch (e: Exception) {
-            Log.e(TAG, "Gemini model başlatılamadı", e)
-        }
-    }
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .build()
     
     suspend fun generateTarotReading(
         readingType: String,
@@ -35,27 +36,70 @@ class GeminiService {
         readingFormat: ReadingFormat
     ): String = withContext(Dispatchers.IO) {
         try {
-            if (generativeModel == null) {
-                Log.e(TAG, "Gemini model null, varsayılan yorum döndürülüyor")
-                return@withContext generateDefaultReading(readingType, drawnCards, readingFormat)
-            }
-            
             val prompt = buildTarotPrompt(readingType, drawnCards, readingFormat)
             
-            val response = generativeModel!!.generateContent(prompt)
-            val generatedText = response.text
+            Log.d(TAG, "Groq API'ye istek gönderiliyor...")
             
-            if (generatedText.isNullOrEmpty()) {
-                Log.w(TAG, "Gemini'den boş yanıt alındı, varsayılan yorum döndürülüyor")
+            val response = callGroqAPI(prompt)
+            
+            if (response.isNotEmpty()) {
+                Log.d(TAG, "Groq'dan başarılı yanıt alındı")
+                return@withContext response
+            } else {
+                Log.w(TAG, "Groq'dan boş yanıt alındı, varsayılan yorum döndürülüyor")
                 return@withContext generateDefaultReading(readingType, drawnCards, readingFormat)
             }
             
-            Log.d(TAG, "Gemini'den başarılı yanıt alındı")
-            return@withContext generatedText
-            
         } catch (e: Exception) {
-            Log.e(TAG, "Gemini API çağrısında hata", e)
+            Log.e(TAG, "Groq API çağrısında hata", e)
             return@withContext generateDefaultReading(readingType, drawnCards, readingFormat)
+        }
+    }
+    
+    private fun callGroqAPI(prompt: String): String {
+        try {
+            val jsonBody = JSONObject().apply {
+                put("model", MODEL)
+                put("messages", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("role", "user")
+                        put("content", prompt)
+                    })
+                })
+                put("temperature", 0.8)
+                put("max_tokens", 2048)
+                put("top_p", 1.0)
+                put("stream", false)
+            }
+            
+            val requestBody = jsonBody.toString()
+                .toRequestBody("application/json".toMediaType())
+            
+            val request = Request.Builder()
+                .url(API_URL)
+                .addHeader("Authorization", "Bearer $API_KEY")
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build()
+            
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e(TAG, "Groq API hatası: ${response.code} - ${response.message}")
+                    return ""
+                }
+                
+                val responseBody = response.body?.string() ?: ""
+                val jsonResponse = JSONObject(responseBody)
+                
+                return jsonResponse
+                    .getJSONArray("choices")
+                    .getJSONObject(0)
+                    .getJSONObject("message")
+                    .getString("content")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Groq API çağrısında detaylı hata", e)
+            return ""
         }
     }
     
@@ -116,11 +160,11 @@ class GeminiService {
         Bu açılım size hayatınızın bu alanında rehberlik etmek için tasarlanmıştır. Çektiğiniz kartların anlamlarını dikkatlice değerlendirin ve iç sesinizi dinleyin. Her kart size özel bir mesaj taşımaktadır.
         
         **Özet:**
-        Hayatınızda yeni fırsatlar ve gelişmeler beklenmektedir. Pozitif düşüncelerle ilerleyin ve sezgilerinize güvenin.
+        Hayatınızda yeni fırsatlar ve potansiyeller bulunmaktadır. Pozitif düşüncelerle ilerleyin ve sezgilerinize güvenin.
         """.trimIndent()
     }
     
     fun isAvailable(): Boolean {
-        return generativeModel != null && API_KEY != "YOUR_GEMINI_API_KEY"
+        return API_KEY.isNotEmpty()
     }
-} 
+}

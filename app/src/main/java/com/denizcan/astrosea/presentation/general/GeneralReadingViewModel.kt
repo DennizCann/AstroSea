@@ -12,7 +12,7 @@ import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.util.JsonLoader
 import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
-import com.denizcan.astrosea.util.GeminiService
+import com.denizcan.astrosea.util.GroqService
 import com.denizcan.astrosea.model.ReadingFormat
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
@@ -46,8 +46,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     // Günlük açılım state'inin yüklenip yüklenmediğini kontrol etmek için
     private var dailyStateLoaded = false
     
-    // Gemini Service
-    private val geminiService = GeminiService()
+    // Groq Service
+    private val groqService = GroqService()
     
     // Reading Formats
     private val readingFormats by lazy {
@@ -556,8 +556,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     return@launch
                 }
                 
-                // Gemini'den yorum oluştur
-                val reading = geminiService.generateTarotReading(
+                // Groq'dan yorum oluştur
+                val reading = groqService.generateTarotReading(
                     readingType = readingType,
                     drawnCards = tarotCards,
                     readingFormat = format
