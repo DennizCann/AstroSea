@@ -27,15 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.rememberDatePickerState
 import java.text.SimpleDateFormat
-import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import java.util.Calendar
+import com.denizcan.astrosea.presentation.components.WheelDatePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,8 +49,43 @@ fun ProfileScreen(
     val initialProfileData = remember { state.profileData.copy() }
     // Değişiklik kontrolü
     val isChanged = state.profileData != initialProfileData
-    // Material3 DatePicker için state
-    val datePickerState = rememberDatePickerState()
+    
+    // Mevcut tarihi parse et
+    val (initialYear, initialMonth, initialDay) = remember(state.profileData.birthDate) {
+        try {
+            if (state.profileData.birthDate.isNotEmpty()) {
+                val format = SimpleDateFormat("dd.MM.yyyy")
+                val date = format.parse(state.profileData.birthDate)
+                if (date != null) {
+                    val cal = Calendar.getInstance()
+                    cal.time = date
+                    Triple(
+                        cal.get(Calendar.YEAR),
+                        cal.get(Calendar.MONTH),
+                        cal.get(Calendar.DAY_OF_MONTH)
+                    )
+                } else {
+                    Triple(
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                    )
+                }
+            } else {
+                Triple(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+            }
+        } catch (e: Exception) {
+            Triple(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+        }
+    }
 
     // Ülke ve şehir için dropdown state
     val countryList = listOf("Türkiye", "Almanya")
@@ -285,29 +317,18 @@ fun ProfileScreen(
                 }
             }
         }
-        // Material3 DatePicker Dialog
+        // Wheel DatePicker Dialog
         if (showDatePicker) {
-            DatePickerDialog(
+            WheelDatePickerDialog(
                 onDismissRequest = { showDatePicker = false },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            val millis = datePickerState.selectedDateMillis
-                            if (millis != null) {
-                                val date = java.util.Date(millis)
-                                val format = SimpleDateFormat("dd.MM.yyyy")
-                                viewModel.onBirthDateChange(format.format(date))
-                            }
-                            showDatePicker = false
-                        }
-                    ) { Text("Tamam") }
+                onDateSelected = { day, month, year ->
+                    val formattedDate = String.format("%02d.%02d.%04d", day, month + 1, year)
+                    viewModel.onBirthDateChange(formattedDate)
                 },
-                dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) { Text("İptal") }
-                }
-            ) {
-                DatePicker(state = datePickerState)
-            }
+                initialYear = initialYear,
+                initialMonth = initialMonth,
+                initialDay = initialDay
+            )
         }
         // TimePicker Dialog (klasik şekilde kalıyor)
         if (showTimePicker) {

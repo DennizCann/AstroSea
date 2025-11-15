@@ -1,7 +1,8 @@
 package com.denizcan.astrosea.presentation.profileCompletion
 
-import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import com.denizcan.astrosea.presentation.components.WheelDatePickerDialog
+import java.text.SimpleDateFormat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,16 +44,44 @@ fun ProfileCompletionScreen2(
 
     // DatePicker için
     val calendar = Calendar.getInstance()
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, year, month, dayOfMonth ->
-            val formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
-            viewModel.updateBirthDate(formattedDate)
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+    var showDatePicker by remember { mutableStateOf(false) }
+    
+    // Mevcut tarihi parse et
+    val (initialYear, initialMonth, initialDay) = remember(birthDate) {
+        try {
+            if (birthDate.isNotEmpty()) {
+                val format = SimpleDateFormat("dd/MM/yyyy")
+                val date = format.parse(birthDate)
+                if (date != null) {
+                    val cal = Calendar.getInstance()
+                    cal.time = date
+                    Triple(
+                        cal.get(Calendar.YEAR),
+                        cal.get(Calendar.MONTH),
+                        cal.get(Calendar.DAY_OF_MONTH)
+                    )
+                } else {
+                    Triple(
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)
+                    )
+                }
+            } else {
+                Triple(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+            }
+        } catch (e: Exception) {
+            Triple(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+        }
+    }
 
     // TimePicker için
     val timePickerDialog = TimePickerDialog(
@@ -134,7 +163,7 @@ fun ProfileCompletionScreen2(
                         color = Color.Black.copy(alpha = 0.6f),
                         shape = RoundedCornerShape(12.dp)
                     )
-                    .clickable { datePickerDialog.show() },
+                    .clickable { showDatePicker = true },
                 shape = RoundedCornerShape(12.dp),
                 enabled = false
             )
@@ -258,6 +287,20 @@ fun ProfileCompletionScreen2(
                     }
                 }
             }
+        }
+        
+        // Wheel DatePicker Dialog
+        if (showDatePicker) {
+            WheelDatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                onDateSelected = { day, month, year ->
+                    val formattedDate = String.format("%02d/%02d/%04d", day, month + 1, year)
+                    viewModel.updateBirthDate(formattedDate)
+                },
+                initialYear = initialYear,
+                initialMonth = initialMonth,
+                initialDay = initialDay
+            )
         }
     }
 }
