@@ -22,6 +22,7 @@ import com.denizcan.astrosea.presentation.onboarding.OnboardingScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
@@ -42,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.util.JsonLoader
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
 import androidx.navigation.navArgument
@@ -202,9 +202,19 @@ class MainActivity : ComponentActivity() {
                 val hasSeenOnboarding = prefs.getBoolean("has_seen_onboarding", false)
                 val user = FirebaseAuth.getInstance().currentUser
                 
-                // Her kullanıcı için ayrı introduction kontrolü
+                // Her kullanıcı için introduction kontrolü - FIRESTORE'DAN (tüm cihazlarda senkron)
                 val hasSeenIntroduction = user?.uid?.let { userId ->
-                    prefs.getBoolean("has_seen_introduction_$userId", false)
+                    try {
+                        val userDoc = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(userId)
+                            .get()
+                            .await()
+                        userDoc.getBoolean("hasSeenIntroduction") ?: false
+                    } catch (e: Exception) {
+                        android.util.Log.e("MainActivity", "Error checking hasSeenIntroduction", e)
+                        false
+                    }
                 } ?: false
 
                 startDestination = when {
@@ -218,7 +228,7 @@ class MainActivity : ComponentActivity() {
                         
                         when (completionStatus) {
                             ProfileCompletionStatus.COMPLETE -> {
-                                // Profil tamamlanmış, introduction popup kontrolü yap (kullanıcı bazlı)
+                                // Profil tamamlanmış, introduction popup kontrolü yap (Firestore'dan)
                                 if (!hasSeenIntroduction) {
                                     Screen.IntroductionPopup.route
                                 } else {
@@ -398,20 +408,31 @@ class MainActivity : ComponentActivity() {
                         ProfileCompletionScreen3(
                             viewModel = profileVM,
                             onNavigateToHome = {
-                                // Profil tamamlandıktan sonra introduction popup kontrolü yap (kullanıcı bazlı)
-                                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                val hasSeenIntroduction = userId?.let {
-                                    prefs.getBoolean("has_seen_introduction_$it", false)
-                                } ?: false
-                                
-                                if (!hasSeenIntroduction) {
-                                    navController.navigate(Screen.IntroductionPopup.route) {
-                                        popUpTo(0) { inclusive = true }
-                                    }
-                                } else {
-                                    navController.navigate(Screen.Home.route) {
-                                        popUpTo(0) { inclusive = true }
+                                // Profil tamamlandıktan sonra introduction popup kontrolü yap (Firestore'dan)
+                                scope.launch {
+                                    val userId = FirebaseAuth.getInstance().currentUser?.uid
+                                    val hasSeenIntroduction = userId?.let { uid ->
+                                        try {
+                                            val userDoc = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                                .collection("users")
+                                                .document(uid)
+                                                .get()
+                                                .await()
+                                            userDoc.getBoolean("hasSeenIntroduction") ?: false
+                                        } catch (e: Exception) {
+                                            android.util.Log.e("MainActivity", "Error checking hasSeenIntroduction", e)
+                                            false
+                                        }
+                                    } ?: false
+                                    
+                                    if (!hasSeenIntroduction) {
+                                        navController.navigate(Screen.IntroductionPopup.route) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    } else {
+                                        navController.navigate(Screen.Home.route) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
                                     }
                                 }
                             },
@@ -424,69 +445,52 @@ class MainActivity : ComponentActivity() {
                     }
                     
                     composable(Screen.IntroductionPopup.route) {
+                        // Introduction popup görüldüğünde Firestore'a kaydet (tüm cihazlarda senkron)
+                        fun markIntroductionAsSeen() {
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid
+                            userId?.let { uid ->
+                                scope.launch {
+                                    try {
+                                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                            .collection("users")
+                                            .document(uid)
+                                            .update("hasSeenIntroduction", true)
+                                            .await()
+                                        android.util.Log.d("MainActivity", "hasSeenIntroduction set to true for user: $uid")
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("MainActivity", "Error setting hasSeenIntroduction", e)
+                                    }
+                                }
+                            }
+                        }
+                        
                         IntroductionPopupScreen(
                             onDismiss = {
-                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                userId?.let {
-                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                        .edit()
-                                        .putBoolean("has_seen_introduction_$it", true)
-                                        .apply()
-                                }
+                                markIntroductionAsSeen()
                                 navController.navigate(Screen.Home.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             },
                             onNavigateToTarotMeanings = {
-                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                userId?.let {
-                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                        .edit()
-                                        .putBoolean("has_seen_introduction_$it", true)
-                                        .apply()
-                                }
+                                markIntroductionAsSeen()
                                 navController.navigate(Screen.TarotMeanings.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             },
                             onNavigateToHoroscope = {
-                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                userId?.let {
-                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                        .edit()
-                                        .putBoolean("has_seen_introduction_$it", true)
-                                        .apply()
-                                }
+                                markIntroductionAsSeen()
                                 navController.navigate(Screen.Horoscope.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             },
                             onNavigateToBirthChart = {
-                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                userId?.let {
-                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                        .edit()
-                                        .putBoolean("has_seen_introduction_$it", true)
-                                        .apply()
-                                }
+                                markIntroductionAsSeen()
                                 navController.navigate(Screen.BirthChart.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             },
                             onNavigateToPremium = {
-                                // Premium sayfasına yönlendir
-                                // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
-                                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                                userId?.let {
-                                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-                                        .edit()
-                                        .putBoolean("has_seen_introduction_$it", true)
-                                        .apply()
-                                }
+                                markIntroductionAsSeen()
                                 navController.navigate(Screen.Premium.route)
                             }
                         )
