@@ -27,10 +27,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
+import com.denizcan.astrosea.presentation.profile.ProfileViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 // Varsayılan yorum oluşturma fonksiyonu
 fun generateDefaultInterpretation(readingType: String, drawnCards: List<ReadingCardState>, readingInfo: ReadingInfo): String {
@@ -66,9 +68,14 @@ fun generateDefaultInterpretation(readingType: String, drawnCards: List<ReadingC
 fun GeneralReadingDetailScreen(
     readingType: String,
     onNavigateBack: () -> Unit,
-    onNavigateToCardDetail: (String) -> Unit
+    onNavigateToCardDetail: (String) -> Unit,
+    onNavigateToPremium: () -> Unit = {}  // Premium ekranına yönlendirme
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    
+    // Premium kontrol için ProfileViewModel
+    val profileViewModel: ProfileViewModel = viewModel()
     val viewModel: GeneralReadingViewModel = viewModel(
         key = "GeneralReadingViewModel_$readingType",
         factory = GeneralReadingViewModel.Factory(context)
@@ -83,15 +90,37 @@ fun GeneralReadingDetailScreen(
     // Ekran durumları
     var currentScreen by remember { mutableStateOf("detail") } // "detail", "loading", "interpretation"
     
-    // Sayfa yüklendiğinde state'i yükle
+    // Premium dialog state
+    var showPremiumDialog by remember { mutableStateOf(false) }
+    
+    // Günlük açılım mı kontrolü
+    val isDailyReading = readingType.trim() == "GÜNLÜK AÇILIM"
+    
+    // Profil durumu (anlık kontrolden sonra güncellenir)
+    val profileState = profileViewModel.profileState
+    
+    // Sayfa yüklendiğinde ANLIK Firestore kontrolü yap
     LaunchedEffect(readingType) {
-        if (readingType.trim() == "GÜNLÜK AÇILIM") {
+        if (isDailyReading) {
             // Günlük açılım için DailyTarotViewModel'i set et
             Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set ediliyor")
             viewModel.setDailyTarotViewModel(dailyTarotViewModel)
             Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set edildi")
         } else {
-            viewModel.loadReadingState(readingType)
+            // Diğer açılımlar için Firestore'dan ANLIK premium kontrolü yap
+            Log.d("GeneralReadingDetailScreen", "Firestore'dan anlık premium kontrolü yapılıyor...")
+            val isPremium = profileViewModel.checkPremiumStatusFromFirestore()
+            Log.d("GeneralReadingDetailScreen", "Anlık premium kontrolü sonucu: $isPremium")
+            
+            if (!isPremium) {
+                // Premium değilse dialog göster
+                showPremiumDialog = true
+                Log.d("GeneralReadingDetailScreen", "Premium değil, dialog gösteriliyor")
+            } else {
+                // Premium ise state'i yükle
+                Log.d("GeneralReadingDetailScreen", "Premium kullanıcı, açılım yükleniyor")
+                viewModel.loadReadingState(readingType)
+            }
         }
     }
     
@@ -255,9 +284,21 @@ fun GeneralReadingDetailScreen(
                                 // Yorumunu Gör Butonu
                                 Button(
                                     onClick = { 
-                                        // Gemini ile yorum oluştur
-                                        viewModel.generateReading(readingType)
-                                        currentScreen = "loading"
+                                        // Premium kontrolü - Firestore'dan ANLIK kontrol
+                                        scope.launch {
+                                            Log.d("GeneralReadingDetailScreen", "Yorumu Gör tıklandı, anlık premium kontrolü...")
+                                            val isPremium = profileViewModel.checkPremiumStatusFromFirestore()
+                                            Log.d("GeneralReadingDetailScreen", "Anlık premium sonucu: $isPremium")
+                                            
+                                            if (isPremium) {
+                                                // Premium kullanıcı - Gemini ile yorum oluştur
+                                                viewModel.generateReading(readingType)
+                                                currentScreen = "loading"
+                                            } else {
+                                                // Premium değil - Premium dialog göster
+                                                showPremiumDialog = true
+                                            }
+                                        }
                                     },
                                     modifier = Modifier.weight(1f),
                                     enabled = viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount,
@@ -282,6 +323,96 @@ fun GeneralReadingDetailScreen(
                 }
             }
         }
+    }
+    
+    // Premium Dialog
+    if (showPremiumDialog) {
+        // Dialog içeriği açılım türüne göre değişir
+        val isAccessBlocked = !isDailyReading && !profileState.profileData.isPremium  // Açılıma erişim engelli mi
+        
+        AlertDialog(
+            onDismissRequest = { 
+                showPremiumDialog = false
+                // Günlük açılım değilse ve erişim engelliyse geri dön
+                if (isAccessBlocked) {
+                    onNavigateBack()
+                }
+            },
+            containerColor = Color(0xFF1A2236),
+            shape = RoundedCornerShape(16.dp),
+            title = {
+                Text(
+                    text = "🌟 Premium Özellik",
+                    color = Color(0xFFD4AF37),
+                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                    fontSize = 22.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (isAccessBlocked) "Premium Açılım" else "AI Destekli Tarot Yorumu",
+                        color = Color.White,
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = if (isAccessBlocked) 
+                            "Bu açılım sadece Premium üyelere özeldir.\n\nPremium üye olarak tüm açılımlara ve yapay zeka destekli kişiselleştirilmiş yorumlara erişebilirsiniz."
+                        else 
+                            "Yapay zeka destekli kişiselleştirilmiş tarot yorumları sadece Premium üyelere özeldir.\n\nPremium üye olarak tüm açılımların detaylı yorumlarına erişebilirsiniz.",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showPremiumDialog = false
+                        onNavigateToPremium()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFD4AF37)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "Premium'a Geç",
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                        fontSize = 14.sp
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        showPremiumDialog = false
+                        // Günlük açılım değilse ve erişim engelliyse geri dön
+                        if (isAccessBlocked) {
+                            onNavigateBack()
+                        }
+                    }
+                ) {
+                    Text(
+                        text = if (isAccessBlocked) "Geri Dön" else "Daha Sonra",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        )
     }
 }
 

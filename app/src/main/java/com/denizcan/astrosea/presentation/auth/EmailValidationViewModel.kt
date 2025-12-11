@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.delay
@@ -77,24 +78,45 @@ class EmailValidationViewModel : ViewModel() {
                 val user = FirebaseAuth.getInstance().currentUser
                 
                 if (user?.isEmailVerified == true) {
-                    // Email doğrulandı, Firestore'da kullanıcı belgesi oluştur
+                    // Email doğrulandı, Firestore'da kullanıcı belgesi oluştur veya güncelle
                     val userId = user.uid
-                    FirebaseFirestore.getInstance().collection("users")
-                        .document(userId)
-                        .set(
+                    val userDoc = FirebaseFirestore.getInstance().collection("users").document(userId)
+                    
+                    // Önce mevcut belgeyi kontrol et
+                    val existingDoc = userDoc.get().await()
+                    
+                    if (existingDoc.exists()) {
+                        // Mevcut kullanıcı - sadece email_verified güncelle, isPremium'a DOKUNMA!
+                        userDoc.update(
+                            mapOf(
+                                "email_verified" to true
+                            )
+                        ).await()
+                        Log.d("EmailValidation", "Existing user - only updated email_verified for: $tempEmail")
+                    } else {
+                        // Yeni kullanıcı - tüm alanları oluştur
+                        userDoc.set(
                             mapOf(
                                 "email" to tempEmail,
                                 "created_at" to FieldValue.serverTimestamp(),
                                 "auth_type" to "email",
-                                "email_verified" to true
+                                "email_verified" to true,
+                                "isPremium" to false,  // Yeni kullanıcı standart üye olarak başlar
+                                "name" to "",
+                                "surname" to "",
+                                "birthDate" to "",
+                                "birthTime" to "",
+                                "country" to "",
+                                "city" to ""
                             )
-                        )
-                        .await()
+                        ).await()
+                        Log.d("EmailValidation", "New user created for: $tempEmail")
+                    }
                     
                     isEmailVerified = true
                     onVerified()
                     
-                    Log.d("EmailValidation", "Email verified and account created for: $tempEmail")
+                    Log.d("EmailValidation", "Email verified for: $tempEmail")
                 } else {
                     Log.d("EmailValidation", "Email not verified yet")
                 }

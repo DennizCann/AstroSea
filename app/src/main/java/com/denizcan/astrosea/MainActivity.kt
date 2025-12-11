@@ -478,7 +478,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             },
                             onNavigateToPremium = {
-                                // Rün falı için premium sayfasına yönlendir (şu an için MoreScreen)
+                                // Premium sayfasına yönlendir
                                 // Introduction popup görüldü olarak işaretle (kullanıcı bazlı)
                                 val userId = FirebaseAuth.getInstance().currentUser?.uid
                                 userId?.let {
@@ -487,9 +487,7 @@ class MainActivity : ComponentActivity() {
                                         .putBoolean("has_seen_introduction_$it", true)
                                         .apply()
                                 }
-                                navController.navigate("more") {
-                                    popUpTo(0) { inclusive = true }
-                                }
+                                navController.navigate(Screen.Premium.route)
                             }
                         )
                     }
@@ -667,12 +665,24 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavigateToCardDetail = { cardId ->
                                 navController.navigate("tarot_detail/$cardId")
+                            },
+                            onNavigateToPremium = {
+                                navController.navigate(Screen.Premium.route)
                             }
                         )
                     }
                     composable(Screen.Notifications.route) {
                         NotificationsScreen(
                             onNavigateBack = { navController.popBackStack() }
+                        )
+                    }
+                    
+                    composable(Screen.Premium.route) {
+                        com.denizcan.astrosea.presentation.premium.PremiumScreen(
+                            onNavigateBack = { navController.popBackStack() },
+                            onPurchase = { planName ->
+                                // Ödeme işlemi burada yapılacak (şimdilik boş)
+                            }
                         )
                     }
                 }

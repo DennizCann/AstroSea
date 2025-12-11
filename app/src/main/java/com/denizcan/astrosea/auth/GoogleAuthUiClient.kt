@@ -115,7 +115,8 @@ class GoogleAuthUiClient(
                 
                 // Mevcut kullanıcı bilgilerini kontrol et
                 val userDoc = userRef.get().await()
-                val isFirstTime = !userDoc.exists() || userDoc.getLong("login_count") == null
+                // Belge yoksa ilk kez, varsa mevcut kullanıcı (login_count'a bakma, premium kullanıcıları ezer!)
+                val isFirstTime = !userDoc.exists()
                 
                 android.util.Log.d("GoogleAuth", "User exists: ${userDoc.exists()}, isFirstTime: $isFirstTime")
                 
@@ -129,14 +130,23 @@ class GoogleAuthUiClient(
                 )
                 
                 if (isFirstTime) {
-                    // İlk kez giriş yapıyorsa login_count'u 1 yap
+                    // İlk kez giriş yapıyorsa login_count'u 1 yap ve standart üye olarak başlat
                     updateData["login_count"] = 1L
-                    android.util.Log.d("GoogleAuth", "First time user, setting login_count to 1")
+                    updateData["isPremium"] = false  // SADECE YENİ kullanıcı standart üye olarak başlar
+                    updateData["name"] = ""
+                    updateData["surname"] = ""
+                    updateData["birthDate"] = ""
+                    updateData["birthTime"] = ""
+                    updateData["country"] = ""
+                    updateData["city"] = ""
+                    android.util.Log.d("GoogleAuth", "First time user, setting login_count to 1, isPremium to false")
                 } else {
-                    // Daha önce giriş yapmışsa login_count'u artır
+                    // Daha önce giriş yapmışsa login_count'u artır, isPREMIUM'A DOKUNMA!
                     val currentCount = userDoc.getLong("login_count") ?: 0L
                     updateData["login_count"] = currentCount + 1L
-                    android.util.Log.d("GoogleAuth", "Returning user, login_count: $currentCount -> ${currentCount + 1}")
+                    // Mevcut isPremium değerini koru - updateData'ya ekleme!
+                    val currentPremium = userDoc.getBoolean("isPremium") ?: false
+                    android.util.Log.d("GoogleAuth", "Returning user, login_count: $currentCount -> ${currentCount + 1}, isPremium preserved: $currentPremium")
                 }
                 
                 userRef.set(updateData, SetOptions.merge()).await()

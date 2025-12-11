@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.denizcan.astrosea.presentation.profile.ProfileData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -123,9 +124,18 @@ class ProfileCompletionViewModel : ViewModel() {
             val doc = firestore.collection("users").document(userId).get().await()
             
             if (!doc.exists()) {
-                // Kullanıcı belgesi yoksa oluştur
-                val newProfile = ProfileData()
-                firestore.collection("users").document(userId).set(newProfile).await()
+                // Kullanıcı belgesi yoksa, SADECE profil alanlarını oluştur
+                // isPremium gibi kritik alanları EKLEME - auth sırasında zaten ayarlanmış olmalı
+                val initialProfileData = mapOf(
+                    "name" to "",
+                    "surname" to "",
+                    "birthDate" to "",
+                    "birthTime" to "",
+                    "country" to "",
+                    "city" to ""
+                    // isPremium EKLEME! - eğer belge yoksa ve premium gerekiyorsa, bu ayrı yönetilmeli
+                )
+                firestore.collection("users").document(userId).set(initialProfileData, SetOptions.merge()).await()
                 return ProfileCompletionStatus.INCOMPLETE_NAME
             }
             
