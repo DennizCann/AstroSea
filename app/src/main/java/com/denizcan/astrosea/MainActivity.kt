@@ -684,8 +684,11 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Premium.route) {
                         com.denizcan.astrosea.presentation.premium.PremiumScreen(
                             onNavigateBack = { navController.popBackStack() },
-                            onPurchase = { planName ->
-                                // Ödeme işlemi burada yapılacak (şimdilik boş)
+                            onPurchaseComplete = {
+                                // Premium satın alma başarılı - ana sayfaya dön
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) { inclusive = true }
+                                }
                             }
                         )
                     }

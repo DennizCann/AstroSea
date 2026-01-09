@@ -128,4 +128,7 @@ dependencies {
     
     // JSON parsing
     implementation 'org.json:json:20231013'
+    
+    // Google Play Billing (In-App Purchases)
+    implementation 'com.android.billingclient:billing-ktx:6.1.0'
 }

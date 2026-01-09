@@ -58,17 +58,31 @@ class GroqService {
     
     private fun callGroqAPI(prompt: String): String {
         try {
+            // System message - Türkçe dil tutarlılığı için kritik
+            val systemMessage = """
+                Sen profesyonel bir Türk tarot yorumcususun. 
+                MUTLAKA ve SADECE Türkçe yanıt ver. 
+                Hiçbir koşulda İngilizce veya başka bir dilde kelime kullanma.
+                Tüm kart isimlerini Türkçe karşılıklarıyla yaz.
+                Akıcı, anlaşılır ve etkileyici bir Türkçe kullan.
+            """.trimIndent()
+            
             val jsonBody = JSONObject().apply {
                 put("model", MODEL)
                 put("messages", JSONArray().apply {
+                    // System message eklendi
+                    put(JSONObject().apply {
+                        put("role", "system")
+                        put("content", systemMessage)
+                    })
                     put(JSONObject().apply {
                         put("role", "user")
                         put("content", prompt)
                     })
                 })
-                put("temperature", 0.8)
+                put("temperature", 0.65) // Daha tutarlı yanıtlar için düşürüldü
                 put("max_tokens", 2048)
-                put("top_p", 1.0)
+                put("top_p", 0.9) // Biraz düşürüldü
                 put("stream", false)
             }
             
@@ -108,14 +122,14 @@ class GroqService {
         drawnCards: List<TarotCard>,
         readingFormat: ReadingFormat
     ): String {
-        // Kartları pozisyonlarla eşleştir
+        // Kartları pozisyonlarla eşleştir - sadece Türkçe isimler
         val cardDetails = drawnCards.mapIndexed { index, card ->
             val position = if (index < readingFormat.positions.size) readingFormat.positions[index] else null
             val positionName = position?.name ?: "Kart ${index + 1}"
             val cardDisplayName = card.turkishName ?: card.name
             
             """
-            ${positionName}: ${cardDisplayName} (${card.name})
+            ${positionName}: ${cardDisplayName}
             Anlam: ${card.meaningUpright}
             Anahtar Kelimeler: ${card.keywords.joinToString(", ")}
             """.trimIndent()
@@ -135,6 +149,10 @@ class GroqService {
                 prompt = prompt.replace(fallbackPlaceholder, cardDisplayName)
             }
         }
+        
+        // Kart detaylarını ve dil talimatını ekle
+        prompt += "\n\n--- Kart Detayları ---\n$cardDetails"
+        prompt += "\n\n[ÖNEMLİ: Yanıtını SADECE Türkçe yaz. Hiçbir İngilizce kelime kullanma.]"
         
         return prompt
     }

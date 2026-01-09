@@ -42,31 +42,38 @@ fun AnimatedReadingCard(
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     
-    // Animasyon durumları
-    var isRevealing by remember { mutableStateOf(false) }
-    // Kart animasyonu için state
-    var isFlipped by remember { mutableStateOf(cardState.isRevealed) }
+    // Kart kimliği için benzersiz key - kart değiştiğinde state sıfırlanır
+    val cardKey = cardState.card?.id ?: "empty_${cardState.index}"
+    
+    // Animasyon durumları - cardKey ile key'lendi
+    var isRevealing by remember(cardKey) { mutableStateOf(false) }
+    // Kart animasyonu için state - cardKey ve isRevealed ile key'lendi
+    var isFlipped by remember(cardKey, cardState.isRevealed) { mutableStateOf(cardState.isRevealed) }
     
     // Animasyon değerleri
     val rotation by animateFloatAsState(
         targetValue = if (isFlipped) 180f else 0f,
-        animationSpec = tween(0, easing = FastOutSlowInEasing), // Animasyon yok
+        animationSpec = tween(600, easing = FastOutSlowInEasing), // Animasyon eklendi
         label = "rotation"
     )
     
-    // Basit state senkronizasyonu
-    LaunchedEffect(cardState.isRevealed) {
+    // State senkronizasyonu
+    LaunchedEffect(cardState.isRevealed, cardKey) {
         isFlipped = cardState.isRevealed
+        // Kart sıfırlandığında isRevealing'i de sıfırla
+        if (!cardState.isRevealed) {
+            isRevealing = false
+        }
     }
     
-    // Kart tıklama işleyicisi - onCardClick parametresini kullan
+    // Kart tıklama işleyicisi
     val handleCardClick: () -> Unit = {
         // Sadece kapalı kartlara tıklanabilir ve animasyon çalışmıyorsa
         if (!cardState.isRevealed && !isRevealing) {
-            Log.d("AnimatedReadingCard", "🎴 Starting card reveal animation for card ${cardState.index}")
-            isRevealing = true
-            onCardClick() // onCardClick parametresini kullan
-            isRevealing = false
+            Log.d("AnimatedReadingCard", "🎴 Card click for card ${cardState.index}, cardKey: $cardKey")
+            // isRevealing sadece kart açılmaya başladığında true olmalı
+            // onCardClick async olduğu için hemen false yapmıyoruz
+            onCardClick()
         } else if (cardState.isRevealed && !isRevealing) {
             // Kart ön yüzü dönükken direkt detay sayfasına git
             cardState.card?.let { card ->

@@ -32,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.rememberCoroutineScope
 
 // Varsayılan yorum oluşturma fonksiyonu
@@ -286,16 +287,38 @@ fun GeneralReadingDetailScreen(
                                     onClick = { 
                                         // Premium kontrolü - Firestore'dan ANLIK kontrol
                                         scope.launch {
-                                            Log.d("GeneralReadingDetailScreen", "Yorumu Gör tıklandı, anlık premium kontrolü...")
-                                            val isPremium = profileViewModel.checkPremiumStatusFromFirestore()
-                                            Log.d("GeneralReadingDetailScreen", "Anlık premium sonucu: $isPremium")
-                                            
-                                            if (isPremium) {
-                                                // Premium kullanıcı - Gemini ile yorum oluştur
-                                                viewModel.generateReading(readingType)
-                                                currentScreen = "loading"
-                                            } else {
-                                                // Premium değil - Premium dialog göster
+                                            try {
+                                                val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                                                Log.d("GeneralReadingDetailScreen", "Yorumu Gör tıklandı - userId: $userId")
+                                                
+                                                if (userId == null) {
+                                                    Log.e("GeneralReadingDetailScreen", "userId null! Premium dialog gösteriliyor")
+                                                    showPremiumDialog = true
+                                                    return@launch
+                                                }
+                                                
+                                                // Firestore'dan direkt oku
+                                                val document = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                                    .collection("users")
+                                                    .document(userId)
+                                                    .get()
+                                                    .await()
+                                                
+                                                val isPremium = document.getBoolean("isPremium") ?: false
+                                                Log.d("GeneralReadingDetailScreen", "Firestore'dan okunan isPremium: $isPremium")
+                                                
+                                                if (isPremium) {
+                                                    // Premium kullanıcı - AI ile yorum oluştur
+                                                    Log.d("GeneralReadingDetailScreen", "Premium kullanıcı - yorum oluşturuluyor")
+                                                    viewModel.generateReading(readingType)
+                                                    currentScreen = "loading"
+                                                } else {
+                                                    // Premium değil - Premium dialog göster
+                                                    Log.d("GeneralReadingDetailScreen", "Premium DEĞİL - dialog gösteriliyor")
+                                                    showPremiumDialog = true
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e("GeneralReadingDetailScreen", "Premium kontrol hatası", e)
                                                 showPremiumDialog = true
                                             }
                                         }

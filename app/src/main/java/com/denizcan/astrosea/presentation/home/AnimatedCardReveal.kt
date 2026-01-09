@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.positionInParent
 import com.denizcan.astrosea.R
-import com.denizcan.astrosea.util.TarotCard
+import com.denizcan.astrosea.model.TarotCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -43,9 +43,12 @@ fun AnimatedCardReveal(
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     
-    // Animasyon durumları
-    var isRevealing by remember { mutableStateOf(false) }
-    var isFlipped by remember { mutableStateOf(cardState.isRevealed) }
+    // Kart kimliği için benzersiz key - kart değiştiğinde state sıfırlanır
+    val cardKey = cardState.card?.id ?: "empty_${cardState.index}"
+    
+    // Animasyon durumları - cardKey ile key'lendi
+    var isRevealing by remember(cardKey) { mutableStateOf(false) }
+    var isFlipped by remember(cardKey, cardState.isRevealed) { mutableStateOf(cardState.isRevealed) }
     
     // Animasyon değerleri
     val rotation by animateFloatAsState(
@@ -54,15 +57,12 @@ fun AnimatedCardReveal(
         label = "rotation"
     )
     
-    // Kart durumu değiştiğinde isFlipped'i güncelle
-    LaunchedEffect(cardState.isRevealed) {
+    // State senkronizasyonu
+    LaunchedEffect(cardState.isRevealed, cardKey) {
         isFlipped = cardState.isRevealed
-    }
-    
-    // Kart state'i değiştiğinde isFlipped'i güncelle (animasyon dışında)
-    LaunchedEffect(cardState) {
-        if (!isRevealing) {
-            isFlipped = cardState.isRevealed
+        // Kart sıfırlandığında isRevealing'i de sıfırla
+        if (!cardState.isRevealed) {
+            isRevealing = false
         }
     }
     
@@ -70,7 +70,7 @@ fun AnimatedCardReveal(
     val handleCardClick: () -> Unit = {
         // Sadece kapalı kartlara tıklanabilir ve animasyon çalışmıyorsa
         if (!cardState.isRevealed && !isRevealing) {
-            Log.d("AnimatedCardReveal", "🎴 Starting card reveal animation for card ${cardState.index}")
+            Log.d("AnimatedCardReveal", "🎴 Card click for card ${cardState.index}, cardKey: $cardKey")
             scope.launch {
                 isRevealing = true
                 

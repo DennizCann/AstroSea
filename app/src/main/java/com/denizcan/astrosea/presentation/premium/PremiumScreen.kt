@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.premium
 
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -29,46 +30,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
-
-data class PremiumPlan(
-    val name: String,
-    val price: String,
-    val duration: String,
-    val pricePerMonth: String? = null,
-    val isPopular: Boolean = false
-)
+import com.denizcan.astrosea.billing.BillingConfig
+import com.denizcan.astrosea.billing.SubscriptionProduct
 
 @Composable
 fun PremiumScreen(
     onNavigateBack: () -> Unit,
-    onPurchase: (String) -> Unit = {}
+    onPurchaseComplete: () -> Unit = {}
 ) {
-    var selectedPlan by remember { mutableStateOf(1) } // Varsayılan olarak aylık seçili
-    
-    val plans = listOf(
-        PremiumPlan(
-            name = "Haftalık",
-            price = "25 ₺",
-            duration = "/hafta",
-            pricePerMonth = null,
-            isPopular = false
-        ),
-        PremiumPlan(
-            name = "Aylık",
-            price = "40 ₺",
-            duration = "/ay",
-            pricePerMonth = null,
-            isPopular = true
-        ),
-        PremiumPlan(
-            name = "Yıllık",
-            price = "400 ₺",
-            duration = "/yıl",
-            pricePerMonth = "33 ₺/ay",
-            isPopular = false
-        )
+    val context = LocalContext.current
+    val viewModel: PremiumViewModel = viewModel(
+        factory = PremiumViewModel.Factory(context)
     )
+    val uiState by viewModel.uiState.collectAsState()
+    
+    // Satın alma başarılı olduğunda
+    LaunchedEffect(uiState.purchaseSuccess) {
+        if (uiState.purchaseSuccess) {
+            onPurchaseComplete()
+            viewModel.resetPurchaseSuccess()
+        }
+    }
     
     Box(
         modifier = Modifier.fillMaxSize()
@@ -99,12 +83,35 @@ fun PremiumScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                // Close button
+                // Close button ve Test Mode Badge
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
+                    // Test Mode Badge (sol üst)
+                    if (uiState.isTestMode) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .background(
+                                    color = Color(0xFFFF6B6B),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = "🔧 TEST MODU",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.sp
+                                ),
+                                color = Color.White
+                            )
+                        }
+                    }
+                    
+                    // Close button (sağ üst)
                     IconButton(
                         onClick = onNavigateBack,
                         modifier = Modifier
@@ -140,7 +147,7 @@ fun PremiumScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Logo veya Icon
+                // Logo
                 Icon(
                     painter = painterResource(id = R.drawable.astrosea_logo),
                     contentDescription = "AstroSea Logo",
@@ -184,7 +191,7 @@ fun PremiumScreen(
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
-                // Fiyatlandırma Kartları
+                // Fiyatlandırma Başlığı
                 Text(
                     text = "Planınızı Seçin",
                     style = MaterialTheme.typography.titleLarge.copy(
@@ -198,29 +205,36 @@ fun PremiumScreen(
                 
                 Spacer(modifier = Modifier.height(20.dp))
                 
-                // Pricing Cards
-                plans.forEachIndexed { index, plan ->
-                    PricingCard(
-                        plan = plan,
-                        isSelected = selectedPlan == index,
-                        onSelect = { selectedPlan = index }
+                // Loading durumu
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        color = Color(0xFFD4AF37),
+                        modifier = Modifier.padding(32.dp)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                } else {
+                    // Pricing Cards
+                    uiState.products.forEachIndexed { index, product ->
+                        PricingCard(
+                            product = product,
+                            isSelected = uiState.selectedProductIndex == index,
+                            onSelect = { viewModel.selectProduct(index) }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 // Ödemeye Geç Butonu
                 Button(
-                    onClick = { 
-                        // Şimdilik çalışmaz
-                        // onPurchase(plans[selectedPlan].name)
-                    },
+                    onClick = { viewModel.showPurchaseConfirmation() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
+                    enabled = !uiState.isLoading && !uiState.isPurchasing,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
+                        containerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
                     ),
                     contentPadding = PaddingValues(0.dp),
                     shape = RoundedCornerShape(30.dp)
@@ -230,31 +244,62 @@ fun PremiumScreen(
                             .fillMaxSize()
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color(0xFF4A148C),
-                                        Color(0xFF6A1B9A),
-                                        Color(0xFF8E24AA)
-                                    )
+                                    colors = if (uiState.isPurchasing) {
+                                        listOf(
+                                            Color(0xFF4A148C).copy(alpha = 0.5f),
+                                            Color(0xFF6A1B9A).copy(alpha = 0.5f),
+                                            Color(0xFF8E24AA).copy(alpha = 0.5f)
+                                        )
+                                    } else {
+                                        listOf(
+                                            Color(0xFF4A148C),
+                                            Color(0xFF6A1B9A),
+                                            Color(0xFF8E24AA)
+                                        )
+                                    }
                                 ),
                                 shape = RoundedCornerShape(30.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "Ödemeye Geç",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontFamily = FontFamily(Font(R.font.cinzel_bold)),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = Color.White
-                        )
+                        if (uiState.isPurchasing) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "İşleniyor...",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = Color.White
+                                )
+                            }
+                        } else {
+                            Text(
+                                text = "Ödemeye Geç",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color.White
+                            )
+                        }
                     }
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Küçük bilgi yazısı
+                // Bilgi yazısı
                 Text(
                     text = "İstediğiniz zaman iptal edebilirsiniz",
                     style = MaterialTheme.typography.bodySmall.copy(
@@ -268,7 +313,164 @@ fun PremiumScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
+        
+        // Onay Dialogu
+        if (uiState.showConfirmDialog) {
+            PurchaseConfirmDialog(
+                product = uiState.products.getOrNull(uiState.selectedProductIndex),
+                isTestMode = uiState.isTestMode,
+                onConfirm = {
+                    val activity = context as? Activity
+                    if (activity != null) {
+                        viewModel.startPurchase(activity)
+                    }
+                },
+                onDismiss = { viewModel.dismissConfirmDialog() }
+            )
+        }
+        
+        // Hata Snackbar
+        uiState.errorMessage?.let { error ->
+            LaunchedEffect(error) {
+                // Snackbar göster
+                kotlinx.coroutines.delay(3000)
+                viewModel.clearError()
+            }
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFB71C1C)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.White,
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
     }
+}
+
+@Composable
+private fun PurchaseConfirmDialog(
+    product: SubscriptionProduct?,
+    isTestMode: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1A1F3A),
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isTestMode) {
+                    Text(
+                        text = "🔧 TEST MODU",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color(0xFFFF6B6B),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                Text(
+                    text = "Satın Almayı Onayla",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = Color(0xFFD4AF37)
+                )
+            }
+        },
+        text = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = product?.name ?: "Premium",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = Color.White
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "${product?.price ?: ""}${product?.duration ?: ""}",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                    ),
+                    color = Color(0xFFD4AF37)
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                if (isTestMode) {
+                    Text(
+                        text = "⚠️ Bu bir test satın almasıdır.\nGerçek ödeme alınmayacaktır.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFFFF6B6B),
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    Text(
+                        text = "Aboneliğiniz otomatik olarak yenilenecektir.\nİstediğiniz zaman iptal edebilirsiniz.",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        ),
+                        color = Color.White.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4A148C)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = if (isTestMode) "Test Et" else "Satın Al",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                    ),
+                    color = Color.White
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "İptal",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                    ),
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            }
+        }
+    )
 }
 
 @Composable
@@ -326,7 +528,7 @@ private fun PremiumFeaturesList() {
 
 @Composable
 private fun PricingCard(
-    plan: PremiumPlan,
+    product: SubscriptionProduct,
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
@@ -374,7 +576,7 @@ private fun PricingCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = plan.name,
+                            text = product.name,
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                 fontSize = 20.sp,
@@ -383,7 +585,7 @@ private fun PricingCard(
                             color = Color.White
                         )
                         
-                        if (plan.isPopular) {
+                        if (product.isPopular) {
                             Spacer(modifier = Modifier.width(8.dp))
                             Box(
                                 modifier = Modifier
@@ -412,7 +614,7 @@ private fun PricingCard(
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = plan.price,
+                            text = product.price,
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                 fontSize = 28.sp,
@@ -421,7 +623,7 @@ private fun PricingCard(
                             color = Color(0xFFD4AF37)
                         )
                         Text(
-                            text = plan.duration,
+                            text = product.duration,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                 fontSize = 14.sp
@@ -432,7 +634,7 @@ private fun PricingCard(
                     }
                     
                     // Aylık fiyat varsa göster
-                    plan.pricePerMonth?.let {
+                    product.pricePerMonth?.let {
                         Text(
                             text = it,
                             style = MaterialTheme.typography.bodySmall.copy(
@@ -472,4 +674,3 @@ private fun PricingCard(
         }
     }
 }
-

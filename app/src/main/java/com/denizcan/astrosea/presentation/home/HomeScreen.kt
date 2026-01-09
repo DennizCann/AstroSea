@@ -81,7 +81,11 @@ fun HomeScreen(
 ) {
     val profileState = viewModel.profileState
     val context = LocalContext.current
-    val dailyTarotViewModel: DailyTarotViewModel = viewModel(factory = DailyTarotViewModel.Factory(context))
+    // Key eklendi - tüm ekranlarda aynı ViewModel instance'ı kullanılması için
+    val dailyTarotViewModel: DailyTarotViewModel = viewModel(
+        key = "DailyTarotViewModel",
+        factory = DailyTarotViewModel.Factory(context)
+    )
     
     // Bildirim yöneticisi ve sayacı
     val notificationManager = remember { NotificationManager(context) }
@@ -111,6 +115,15 @@ fun HomeScreen(
         ),
         label = "pulse"
     )
+    
+    // Günlük kartları yenile - ekrana her gelişte Firestore'dan güncel veriyi al
+    LaunchedEffect(Unit) {
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            android.util.Log.d("HomeScreen", "Refreshing daily cards for user: $userId")
+            dailyTarotViewModel.refreshCards()
+        }
+    }
     
     // Okunmamış bildirim sayısını yükle ve periyodik olarak güncelle
     LaunchedEffect(Unit) {
@@ -532,13 +545,13 @@ fun HomeScreen(
                                     onNavigateToCardDetail(cardId)
                                 },
                                 onDrawCard = {
+                                    // Yükleme devam ediyorsa işlem yapma
+                                    if (dailyTarotViewModel.isLoading) return@AnimatedCardReveal
+                                    
                                     if (!cardState.isRevealed) {
-                                        // Önce kartları çek (eğer henüz çekilmemişse)
-                                        if (!dailyTarotViewModel.hasDrawnToday) {
-                                            dailyTarotViewModel.drawDailyCards()
-                                        }
-                                        // Sonra kartı aç
-                                        dailyTarotViewModel.revealCard(cardState.index)
+                                        // Tek fonksiyonla hem çek hem aç - Firestore'a kaydeder
+                                        dailyTarotViewModel.drawAndRevealCard(cardState.index)
+                                        
                                         // Bildirim sayısını güncelle (arka planda)
                                         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
                                         if (userId != null) {

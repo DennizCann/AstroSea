@@ -190,16 +190,24 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         Log.d("GeneralReadingVM", "=== Drawing daily card for position $position ===")
         Log.d("GeneralReadingVM", "dailyTarotViewModel: $dailyTarotViewModel")
         dailyTarotViewModel?.let { dailyVM ->
-            Log.d("GeneralReadingVM", "DailyTarotViewModel mevcut. hasDrawnToday: ${dailyVM.hasDrawnToday}")
-            if (!dailyVM.hasDrawnToday) {
-                Log.d("GeneralReadingVM", "Kartlar henüz çekilmemiş, çekiliyor...")
-                dailyVM.drawDailyCards()
+            Log.d("GeneralReadingVM", "DailyTarotViewModel mevcut. isLoading: ${dailyVM.isLoading}")
+            
+            // Yükleme devam ediyorsa bekle
+            if (dailyVM.isLoading) {
+                Log.d("GeneralReadingVM", "DailyTarotViewModel yükleniyor, işlem yapılmıyor")
+                return
             }
-            // Basit kart açma - diğer açılımlar gibi
-            Log.d("GeneralReadingVM", "Kart açılıyor: position $position")
-            dailyVM.revealCard(position)
-            updateDrawnCardsFromDailyViewModel()
-            Log.d("GeneralReadingVM", "Kart açma tamamlandı")
+            
+            // Tek fonksiyonla hem çek hem aç - Firestore'a kaydeder
+            Log.d("GeneralReadingVM", "drawAndRevealCard çağrılıyor: position $position")
+            dailyVM.drawAndRevealCard(position)
+            
+            // State güncellemesini biraz geciktir (async işlem tamamlansın)
+            viewModelScope.launch {
+                delay(500) // Firestore işleminin tamamlanmasını bekle
+                updateDrawnCardsFromDailyViewModel()
+                Log.d("GeneralReadingVM", "Kart açma tamamlandı")
+            }
         } ?: run {
             Log.e("GeneralReadingVM", "DailyTarotViewModel null! Kart açılamıyor.")
         }

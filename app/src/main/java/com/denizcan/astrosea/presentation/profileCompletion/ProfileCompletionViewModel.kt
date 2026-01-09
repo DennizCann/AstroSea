@@ -3,6 +3,7 @@ package com.denizcan.astrosea.presentation.profileCompletion
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.denizcan.astrosea.presentation.profile.ProfileData
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -10,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ProfileCompletionViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
@@ -139,7 +142,8 @@ class ProfileCompletionViewModel : ViewModel() {
                 return ProfileCompletionStatus.INCOMPLETE_NAME
             }
             
-            val profile = doc.toObject(ProfileData::class.java) ?: return ProfileCompletionStatus.INCOMPLETE_NAME
+            // Manuel parse - Timestamp ve String formatlarını destekle
+            val profile = parseProfileData(doc.data) ?: return ProfileCompletionStatus.INCOMPLETE_NAME
             
             // Adım adım kontrol et
             if (profile.name.isEmpty() || profile.surname.isEmpty()) {
@@ -158,6 +162,43 @@ class ProfileCompletionViewModel : ViewModel() {
         } catch (e: Exception) {
             ProfileCompletionStatus.ERROR
         }
+    }
+    
+    /**
+     * Firestore verisini manuel olarak parse eder
+     * Timestamp ve String formatlarını destekler
+     */
+    private fun parseProfileData(data: Map<String, Any>?): ProfileData? {
+        if (data == null) return null
+        
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+        
+        fun parseDate(value: Any?): String? {
+            return when (value) {
+                is Timestamp -> dateFormat.format(value.toDate())
+                is String -> value
+                else -> null
+            }
+        }
+        
+        return ProfileData(
+            name = data["name"] as? String ?: "",
+            surname = data["surname"] as? String ?: "",
+            birthDate = data["birthDate"] as? String ?: "",
+            birthTime = data["birthTime"] as? String ?: "",
+            country = data["country"] as? String ?: "",
+            city = data["city"] as? String ?: "",
+            isPremium = data["isPremium"] as? Boolean ?: false,
+            premiumStartDate = parseDate(data["premiumStartDate"]),
+            premiumEndDate = parseDate(data["premiumEndDate"]),
+            card_0_id = data["card_0_id"] as? String,
+            card_0_revealed = data["card_0_revealed"] as? Boolean,
+            card_1_id = data["card_1_id"] as? String,
+            card_1_revealed = data["card_1_revealed"] as? Boolean,
+            card_2_id = data["card_2_id"] as? String,
+            card_2_revealed = data["card_2_revealed"] as? Boolean,
+            last_draw_date = data["last_draw_date"] as? String
+        )
     }
 }
 
