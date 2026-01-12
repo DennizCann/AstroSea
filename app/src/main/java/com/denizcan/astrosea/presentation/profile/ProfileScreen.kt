@@ -303,6 +303,24 @@ fun ProfileScreen(
                         }
                     }
                 }
+                // Premium Üyelik Bilgileri
+                Spacer(modifier = Modifier.height(16.dp))
+                PremiumStatusCard(
+                    isPremium = state.profileData.isPremium,
+                    premiumProductId = state.profileData.premiumProductId,
+                    premiumEndDate = state.profileData.premiumEndDate,
+                    onCancelPremium = {
+                        viewModel.cancelPremium(
+                            onSuccess = {
+                                // Başarılı iptal
+                            },
+                            onError = { error ->
+                                // Hata
+                            }
+                        )
+                    }
+                )
+
                 if (state.isLoading) {
                     Spacer(modifier = Modifier.height(16.dp))
                     CircularProgressIndicator(color = Color.White)
@@ -419,4 +437,230 @@ fun ProfileDateField(
             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
         )
     )
+}
+
+@Composable
+fun PremiumStatusCard(
+    isPremium: Boolean,
+    premiumProductId: String?,
+    premiumEndDate: String?,
+    onCancelPremium: () -> Unit
+) {
+    var showCancelDialog by remember { mutableStateOf(false) }
+    
+    // Plan adını Türkçe'ye çevir
+    val planName = when (premiumProductId) {
+        "astrosea_weekly" -> "Haftalık Plan"
+        "astrosea_monthly" -> "Aylık Plan"
+        "astrosea_yearly" -> "Yıllık Plan"
+        else -> "Bilinmiyor"
+    }
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)),
+        border = BorderStroke(1.dp, if (isPremium) Color(0xFFFFD700).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Başlık
+            Text(
+                text = "Üyelik Durumu",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                    color = Color.White
+                )
+            )
+            
+            HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
+            
+            // Üyelik Durumu Satırı
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.Star,
+                        contentDescription = null,
+                        tint = if (isPremium) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Durum",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            color = Color.White
+                        )
+                    )
+                }
+                Text(
+                    text = if (isPremium) "Premium Üye ✨" else "Standart Üye",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        color = if (isPremium) Color(0xFFFFD700) else Color.White.copy(alpha = 0.7f)
+                    )
+                )
+            }
+            
+            // Premium kullanıcılar için ek bilgiler
+            if (isPremium) {
+                // Seçilen Plan Satırı
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Plan",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                color = Color.White
+                            )
+                        )
+                    }
+                    Text(
+                        text = planName,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    )
+                }
+                
+                // Bitiş Tarihi Satırı (varsa)
+                premiumEndDate?.let { endDate ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Bitiş Tarihi",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    color = Color.White
+                                )
+                            )
+                        }
+                        Text(
+                            text = endDate.take(10), // Sadece tarih kısmını göster
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Üyeliği İptal Et Butonu
+                OutlinedButton(
+                    onClick = { showCancelDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFFFF6B6B)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFFFF6B6B).copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Üyeliği İptal Et (Demo)",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        )
+                    )
+                }
+            }
+        }
+    }
+    
+    // İptal Onay Dialogu
+    if (showCancelDialog) {
+        AlertDialog(
+            onDismissRequest = { showCancelDialog = false },
+            containerColor = Color(0xFF1A1A2E),
+            title = {
+                Text(
+                    text = "Üyeliği İptal Et",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        color = Color.White
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = "Premium üyeliğinizi iptal etmek istediğinizden emin misiniz?\n\nBu işlem sonrasında premium özelliklere erişiminiz sona erecektir.",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onCancelPremium()
+                        showCancelDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFF6B6B)
+                    )
+                ) {
+                    Text(
+                        text = "İptal Et",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        )
+                    )
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showCancelDialog = false },
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                ) {
+                    Text(
+                        text = "Vazgeç",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            color = Color.White
+                        )
+                    )
+                }
+            }
+        )
+    }
 } 

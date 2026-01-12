@@ -225,6 +225,7 @@ class ProfileViewModel : ViewModel() {
             isPremium = data["isPremium"] as? Boolean ?: false,
             premiumStartDate = parseDate(data["premiumStartDate"]),
             premiumEndDate = parseDate(data["premiumEndDate"]),
+            premiumProductId = data["premiumProductId"] as? String,
             card_0_id = data["card_0_id"] as? String,
             card_0_revealed = data["card_0_revealed"] as? Boolean,
             card_1_id = data["card_1_id"] as? String,
