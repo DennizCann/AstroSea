@@ -21,6 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -602,5 +606,230 @@ fun getCardMeaningDescription(readingType: String, meaning: String): String {
             else -> "Bu kartın anlamını temsil eder."
         }
         else -> "Bu kartın anlamını temsil eder."
+    }
+}
+
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun GeneralReadingInfoScreenPreview() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Preview için gradient arka plan
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A0A2E),
+                            Color(0xFF2D1B4E),
+                            Color(0xFF1A1A3E)
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Top Bar
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "←",
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "GÜNLÜK AÇILIM",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // Kart yerleşimi
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                // 3 kartlık günlük açılım örneği
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(3) { index ->
+                        Card(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .aspectRatio(0.7f),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(2.dp, Color.White)
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = (index + 1).toString(),
+                                    color = Color.White,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Bilgi kartı
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Black.copy(alpha = 0.6f)
+                ),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Güne başlarken niyetinizi belirlemek ve günün enerjilerine uyumlanmak için bu açılımdan faydalanabilirsiniz...",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Kart Anlamları:",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    listOf("1. Düşünce", "2. His", "3. Aksiyon").forEach { meaning ->
+                        Text(
+                            text = meaning,
+                            color = Color.White.copy(alpha = 0.9f),
+                            fontSize = 13.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+            }
+
+            // Başla butonu
+            Button(
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black.copy(alpha = 0.6f)
+                ),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+            ) {
+                Text("Açılıma Başla", color = Color.White)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun CardLayoutPreview() {
+    // Farklı kart yerleşimlerini gösteren preview
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFF1A0A2E))
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Piramit Yerleşimi (6 Kart)",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Piramit - 1 kart
+            Card(
+                modifier = Modifier
+                    .width(50.dp)
+                    .aspectRatio(0.7f),
+                colors = CardDefaults.cardColors(containerColor = Color.Black),
+                border = BorderStroke(1.dp, Color.White)
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("1", color = Color.White)
+                }
+            }
+
+            // 2 kart
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(2) { i ->
+                    Card(
+                        modifier = Modifier
+                            .width(50.dp)
+                            .aspectRatio(0.7f),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black),
+                        border = BorderStroke(1.dp, Color.White)
+                    ) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("${i + 2}", color = Color.White)
+                        }
+                    }
+                }
+            }
+
+            // 3 kart
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(3) { i ->
+                    Card(
+                        modifier = Modifier
+                            .width(50.dp)
+                            .aspectRatio(0.7f),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black),
+                        border = BorderStroke(1.dp, Color.White)
+                    ) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("${i + 4}", color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
     }
 } 

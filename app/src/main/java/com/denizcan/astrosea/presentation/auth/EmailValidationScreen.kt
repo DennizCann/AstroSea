@@ -21,6 +21,11 @@ import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -259,6 +264,197 @@ fun EmailValidationScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun EmailValidationScreenPreview() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Preview için gradient arka plan
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A0A2E),
+                            Color(0xFF2D1B4E),
+                            Color(0xFF1A1A3E)
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Top Bar
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "←",
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "Email Doğrulama",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // Content
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Email ikonu
+                        Icon(
+                            imageVector = Icons.Default.Email,
+                            contentDescription = "Email",
+                            modifier = Modifier.size(80.dp),
+                            tint = Color.White
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Başlık
+                        Text(
+                            text = "Email Adresinizi Doğrulayın",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Açıklama
+                        Text(
+                            text = "Hesabınızı aktifleştirmek için ornek@email.com adresine gönderdiğimiz doğrulama linkine tıklayın.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White.copy(alpha = 0.9f),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Yeniden gönder butonu
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White.copy(alpha = 0.15f)
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Yeniden Gönder",
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Email'i Yeniden Gönder",
+                                color = Color.White
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Durumu yenile butonu
+                        OutlinedButton(
+                            onClick = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                        ) {
+                            Text(
+                                "Durumu Yenile",
+                                color = Color.White
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Text(
+                            text = "Email doğrulandıktan sonra otomatik olarak ana sayfaya yönlendirileceksiniz.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun EmailSentSuccessPreview() {
+    // Email gönderildi başarı mesajı
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Green.copy(alpha = 0.3f)
+        ),
+        border = BorderStroke(1.dp, Color.Green.copy(alpha = 0.5f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "✅ Email Gönderildi",
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Doğrulama emaili ornek@email.com adresine gönderildi.\n\nLütfen email kutunuzu kontrol edin.",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

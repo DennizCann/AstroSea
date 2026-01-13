@@ -19,7 +19,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AuthOptionsScreen(
@@ -162,6 +164,154 @@ fun AuthOptionsScreen(
                                 .padding(4.dp)
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun AuthOptionsScreenPreview() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Preview için gradient arka plan
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A0A2E),
+                            Color(0xFF2D1B4E),
+                            Color(0xFF1A1A3E)
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Logo placeholder
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                // Logo yerine altın renkli placeholder
+                Box(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .background(
+                            color = Color(0xFFD4AF37).copy(alpha = 0.3f),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "☽ ✧ ☾",
+                        fontSize = 48.sp,
+                        color = Color(0xFFD4AF37)
+                    )
+                }
+            }
+
+            // Alt kısım - butonlar
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(320.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Giriş Yap Butonu
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF1A1A1A)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        "Giriş Yap",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    )
+                }
+
+                // Kayıt Ol Butonu
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4A4A8F),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        "Kayıt Ol",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    )
+                }
+
+                // "veya" kısmı
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.White.copy(alpha = 0.5f),
+                        thickness = 1.dp
+                    )
+                    Text(
+                        "veya",
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        color = Color.White.copy(alpha = 0.5f),
+                        thickness = 1.dp
+                    )
+                }
+
+                // Google butonu placeholder
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(
+                            color = Color.White,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "G",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4285F4)
+                    )
                 }
             }
         }

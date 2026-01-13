@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
@@ -671,6 +672,246 @@ private fun PricingCard(
                     }
                 }
             }
+        }
+    }
+}
+
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, backgroundColor = 0xFF0A0E27)
+@Composable
+private fun PremiumFeaturesListPreview() {
+    PremiumFeaturesList()
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0A0E27)
+@Composable
+private fun PricingCardPreview() {
+    Column(
+        modifier = Modifier
+            .background(Color(0xFF0A0E27))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Seçili kart
+        PricingCard(
+            product = SubscriptionProduct(
+                productId = "monthly",
+                name = "Aylık",
+                price = "₺79.99",
+                duration = "/ay",
+                durationDays = 30,
+                pricePerMonth = null,
+                isPopular = true
+            ),
+            isSelected = true,
+            onSelect = {}
+        )
+        
+        // Seçili olmayan kart
+        PricingCard(
+            product = SubscriptionProduct(
+                productId = "yearly",
+                name = "Yıllık",
+                price = "₺499.99",
+                duration = "/yıl",
+                durationDays = 365,
+                pricePerMonth = "Aylık ₺41.67",
+                isPopular = false
+            ),
+            isSelected = false,
+            onSelect = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1A1F3A)
+@Composable
+private fun PurchaseConfirmDialogPreview() {
+    PurchaseConfirmDialog(
+        product = SubscriptionProduct(
+            productId = "monthly",
+            name = "Aylık Premium",
+            price = "₺79.99",
+            duration = "/ay",
+            durationDays = 30,
+            isPopular = true
+        ),
+        isTestMode = true,
+        onConfirm = {},
+        onDismiss = {}
+    )
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun PremiumScreenContentPreview() {
+    val mockProducts = listOf(
+        SubscriptionProduct(
+            productId = "weekly",
+            name = "Haftalık",
+            price = "₺29.99",
+            duration = "/hafta",
+            durationDays = 7
+        ),
+        SubscriptionProduct(
+            productId = "monthly",
+            name = "Aylık",
+            price = "₺79.99",
+            duration = "/ay",
+            durationDays = 30,
+            isPopular = true
+        ),
+        SubscriptionProduct(
+            productId = "yearly",
+            name = "Yıllık",
+            price = "₺499.99",
+            duration = "/yıl",
+            durationDays = 365,
+            pricePerMonth = "Aylık ₺41.67"
+        )
+    )
+    
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Gradient overlay (Preview için basitleştirilmiş)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF0A0E27),
+                            Color(0xFF1A1F3A),
+                            Color(0xFF2D1B4E)
+                        )
+                    )
+                )
+        )
+        
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Test Mode Badge
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .background(
+                        color = Color(0xFFFF6B6B),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = "🔧 TEST MODU",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp
+                    ),
+                    color = Color.White
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Başlık
+            Text(
+                text = "Premium'a Yükseltin",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                color = Color(0xFFD4AF37),
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Sınırsız Tarot Açılımları ve Özel İçeriklere Erişin",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.9f),
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            // Özellikler
+            PremiumFeaturesList()
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "Planınızı Seçin",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                color = Color.White
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Fiyat kartları
+            mockProducts.forEachIndexed { index, product ->
+                PricingCard(
+                    product = product,
+                    isSelected = index == 1, // Aylık seçili
+                    onSelect = {}
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            // Ödemeye Geç butonu
+            Button(
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                contentPadding = PaddingValues(0.dp),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color(0xFF4A148C),
+                                    Color(0xFF6A1B9A),
+                                    Color(0xFF8E24AA)
+                                )
+                            ),
+                            shape = RoundedCornerShape(28.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Ödemeye Geç",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color.White
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Text(
+                text = "İstediğiniz zaman iptal edebilirsiniz",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.6f)
+            )
         }
     }
 }

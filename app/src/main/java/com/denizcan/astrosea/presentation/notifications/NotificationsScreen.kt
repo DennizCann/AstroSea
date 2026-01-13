@@ -30,6 +30,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 
 // outlinedCardBorder fonksiyonunu tanımlıyoruz
 private fun outlinedCardBorder(brush: androidx.compose.ui.graphics.Brush? = null): androidx.compose.foundation.BorderStroke {
@@ -404,6 +408,252 @@ private fun formatTimestamp(timestamp: Long): String {
             val date = Date(timestamp)
             val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             format.format(date)
+        }
+    }
+}
+
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun NotificationsScreenPreview() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Preview için gradient arka plan
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A0A2E),
+                            Color(0xFF2D1B4E),
+                            Color(0xFF1A1A3E)
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Top Bar
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "←",
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "Bildirimler",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // İstatistik kartı
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = "Toplam Bildirim",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "5",
+                                color = Color.White,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                text = "Okunmamış",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "2",
+                                color = Color(0xFFFFD700),
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                // Örnek bildirimler
+                NotificationCardPreview(
+                    title = "Günlük Tarot Kartlarınız Hazır!",
+                    message = "Bugünün enerjisini keşfetmek için kartlarınızı çekin.",
+                    time = "Az önce",
+                    isRead = false
+                )
+
+                NotificationCardPreview(
+                    title = "Yeni Ay Dönemi",
+                    message = "Yeni ay enerjisiyle niyetlerinizi belirleyin.",
+                    time = "2 saat önce",
+                    isRead = false
+                )
+
+                NotificationCardPreview(
+                    title = "Haftalık Burç Yorumu",
+                    message = "Bu haftanın burç yorumları yayınlandı.",
+                    time = "1 gün önce",
+                    isRead = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotificationCardPreview(
+    title: String,
+    message: String,
+    time: String,
+    isRead: Boolean
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isRead) Color.Black.copy(alpha = 0.4f) else Color.Black.copy(alpha = 0.7f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            if (!isRead) Color(0xFFFFD700).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.2f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Bildirim ikonu
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF9C27B0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier.size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    color = if (isRead) Color.White.copy(alpha = 0.8f) else Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = message,
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = time,
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontSize = 12.sp
+                )
+            }
+
+            if (!isRead) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(Color(0xFFFFD700), RoundedCornerShape(4.dp))
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 400)
+@Composable
+private fun EmptyNotificationsPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1A0A2E),
+                        Color(0xFF2D1B4E)
+                    )
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "Bildirim Yok",
+                modifier = Modifier.size(64.dp),
+                tint = Color.White.copy(alpha = 0.5f)
+            )
+            Text(
+                text = "Henüz bildiriminiz yok",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Günlük açılım kartlarınız yenilendiğinde\nburada bildirim göreceksiniz",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

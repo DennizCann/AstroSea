@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TransitionScreen(
@@ -91,3 +92,97 @@ fun TransitionScreen(
     }
 }
 
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun TransitionScreenPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1a0033),
+                        Color(0xFF2d1b69),
+                        Color(0xFF4a2f8f),
+                        Color(0xFF5d3fa8),
+                        Color(0xFF2a4f7f),
+                        Color(0xFF1a365d)
+                    )
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Loading indicator
+            CircularProgressIndicator(
+                modifier = Modifier.size(64.dp),
+                color = Color.White,
+                strokeWidth = 4.dp
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Mesaj
+            Text(
+                text = "Yönlendiriliyorsunuz...",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                ),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 400)
+@Composable
+private fun TransitionScreenEmailVerifiedPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1a0033),
+                        Color(0xFF2d1b69),
+                        Color(0xFF4a2f8f)
+                    )
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(64.dp),
+                color = Color.White,
+                strokeWidth = 4.dp
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Email doğrulandı! Ana sayfaya yönlendiriliyorsunuz...",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                ),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}

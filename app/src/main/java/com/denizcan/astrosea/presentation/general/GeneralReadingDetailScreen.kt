@@ -34,6 +34,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 
 // Varsayılan yorum oluşturma fonksiyonu
 fun generateDefaultInterpretation(readingType: String, drawnCards: List<ReadingCardState>, readingInfo: ReadingInfo): String {
@@ -1250,5 +1254,257 @@ fun getReadingInfo(readingType: String): ReadingInfo {
             "Olası Sonuç"
         ), CardLayout.FINANCIAL_6)
         else -> ReadingInfo(1, listOf("Kart"), CardLayout.SINGLE)
+    }
+}
+
+// ==================== PREVIEW ====================
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+private fun GeneralReadingInterpretationScreenPreview() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Preview için gradient arka plan
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A0A2E),
+                            Color(0xFF2D1B4E),
+                            Color(0xFF1A1A3E)
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Top Bar
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "←",
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "GÜNLÜK AÇILIM",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            // Kartlar alanı
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 3 açık kart örneği
+                    repeat(3) { index ->
+                        Card(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .aspectRatio(0.7f),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF2D1B4E)
+                            ),
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(2.dp, Color(0xFFFFD700))
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = listOf("☀️", "🌙", "⭐")[index],
+                                        fontSize = 24.sp
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = listOf("Güneş", "Ay", "Yıldız")[index],
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Yorum kutusu
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Black.copy(alpha = 0.6f)
+                ),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "GÜNLÜK AÇILIM Yorumu",
+                        color = Color(0xFFFFD700),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Düşünce: Güneş Kartı\n" +
+                                "Bugün zihinsel olarak enerjik ve pozitif bir gün. Yeni başlangıçlar için ideal bir zaman.\n\n" +
+                                "His: Ay Kartı\n" +
+                                "Duygusal olarak içsel bir yolculuk. Sezgilerinizi dinleyin.\n\n" +
+                                "Aksiyon: Yıldız Kartı\n" +
+                                "Umut dolu adımlar atın. Hayallerinize doğru ilerleyin.",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        lineHeight = 22.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 400)
+@Composable
+private fun LoadingScreenPreview() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Preview için gradient arka plan
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A0A2E),
+                            Color(0xFF2D1B4E),
+                            Color(0xFF1A1A3E)
+                        )
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(
+                color = Color.White,
+                modifier = Modifier.size(60.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Yorumunuz hazırlanıyor...",
+                color = Color.White,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Lütfen bekleyin",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun MeaningCardPreview() {
+    Column(
+        modifier = Modifier
+            .background(Color(0xFF1A0A2E))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Seçili kart
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black.copy(alpha = 0.6f)
+            ),
+            border = BorderStroke(1.dp, Color(0xFFFFD700))
+        ) {
+            Text(
+                text = "1. Düşünce (Seçili)",
+                color = Color.White,
+                modifier = Modifier.padding(16.dp),
+                fontSize = 18.sp
+            )
+        }
+
+        // Normal kart
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black.copy(alpha = 0.6f)
+            ),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+        ) {
+            Text(
+                text = "2. His",
+                color = Color.White,
+                modifier = Modifier.padding(16.dp),
+                fontSize = 18.sp
+            )
+        }
+
+        // Devre dışı kart
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black.copy(alpha = 0.6f)
+            ),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+        ) {
+            Text(
+                text = "3. Aksiyon (Devre Dışı)",
+                color = Color.Gray,
+                modifier = Modifier.padding(16.dp),
+                fontSize = 18.sp
+            )
+        }
     }
 } 
