@@ -1,138 +1,57 @@
 package com.denizcan.astrosea.presentation.notifications
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
-import androidx.core.app.NotificationCompat
-import com.denizcan.astrosea.MainActivity
-import com.denizcan.astrosea.R
-import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.*
 
+/**
+ * Firestore'daki bildirimleri yöneten sınıf.
+ * Push notification gönderimi artık DailyNotificationReceiver tarafından yapılıyor.
+ */
 class NotificationManager(private val context: Context) {
+    
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     
     companion object {
-        private const val CHANNEL_ID = "daily_tarot_channel"
-        private const val CHANNEL_NAME = "Günlük Tarot Açılımları"
-        private const val CHANNEL_DESCRIPTION = "Günlük tarot kartı açılımları ve hatırlatmalar"
-        private const val NOTIFICATION_ID = 1001
+        private const val TAG = "NotificationManager"
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 100
     }
     
-    init {
-        createNotificationChannel()
-    }
-    
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = CHANNEL_DESCRIPTION
-                enableVibration(true)
-                enableLights(true)
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
+    // ==================== FIRESTORE İŞLEMLERİ ====================
     
     /**
-     * Gerçek push notification gönderir
+     * Firestore'a bildirim kaydeder (uygulama içi bildirim geçmişi için)
      */
-    private fun sendPushNotification(title: String, message: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("navigate_to", "notifications")
-        }
-        
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.astrosea_icon)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .setVibrate(longArrayOf(0, 500, 200, 500))
-            .build()
-        
-        notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-    
-    /**
-     * Yeni kullanıcı için ilk günlük açılım bildirimi gönderir
-     */
-    suspend fun sendFirstDailyReadingNotification(userId: String) {
+    suspend fun saveNotificationToFirestore(
+        userId: String,
+        title: String,
+        message: String,
+        type: NotificationType = NotificationType.DAILY_TAROT
+    ): String? {
         val notification = Notification(
             id = "",
-            title = "İlk Günlük Açılımınızı Yapın",
-            message = "Hoş geldiniz! İlk günlük tarot açılımınızı yaparak gününüzün enerjilerini keşfedin.",
+            title = title,
+            message = message,
             timestamp = System.currentTimeMillis(),
             isRead = false,
-            type = NotificationType.DAILY_TAROT
+            type = type
         )
         
-        try {
+        return try {
             val docRef = firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
                 .add(notification)
                 .await()
             
-            // Gerçek push notification gönder
-            sendPushNotification(notification.title, notification.message)
-            
-            android.util.Log.d("NotificationManager", "First daily reading notification sent successfully: ${docRef.id}")
+            Log.d(TAG, "Bildirim Firestore'a kaydedildi: ${docRef.id}")
+            docRef.id
         } catch (e: Exception) {
-            android.util.Log.e("NotificationManager", "Error sending first daily reading notification", e)
-            e.printStackTrace()
-        }
-    }
-    
-    /**
-     * Günlük kartlar yenilendiğinde bildirim gönderir
-     */
-    suspend fun sendDailyCardsRenewedNotification(userId: String, cardNames: List<String>) {
-        val notification = Notification(
-            id = "",
-            title = "Günlük Açılım Kartlarınız Yenilendi",
-            message = "Bugün için ${cardNames.joinToString(", ")} kartları çekildi. Kartlarınızı açarak günlük yorumunuzu okuyabilirsiniz.",
-            timestamp = System.currentTimeMillis(),
-            isRead = false,
-            type = NotificationType.DAILY_TAROT
-        )
-        
-        try {
-            val docRef = firestore.collection("users")
-                .document(userId)
-                .collection("notifications")
-                .add(notification)
-                .await()
-            
-            // Gerçek push notification gönder
-            sendPushNotification(notification.title, notification.message)
-            
-            android.util.Log.d("NotificationManager", "Daily cards renewed notification sent successfully: ${docRef.id}")
-        } catch (e: Exception) {
-            android.util.Log.e("NotificationManager", "Error sending daily cards renewed notification", e)
-            e.printStackTrace()
+            Log.e(TAG, "Bildirim kaydetme hatası", e)
+            null
         }
     }
     
@@ -150,13 +69,13 @@ class NotificationManager(private val context: Context) {
             
             snapshot.size()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Okunmamış bildirim sayısı alınamadı", e)
             0
         }
     }
     
     /**
-     * Tüm bildirimleri getirir
+     * Tüm bildirimleri getirir (en yeniden en eskiye)
      */
     suspend fun getAllNotifications(userId: String): List<Notification> {
         return try {
@@ -171,7 +90,7 @@ class NotificationManager(private val context: Context) {
                 doc.toObject(Notification::class.java)?.copy(id = doc.id)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Bildirimler alınamadı", e)
             emptyList()
         }
     }
@@ -187,129 +106,72 @@ class NotificationManager(private val context: Context) {
                 .document(notificationId)
                 .update("isRead", true)
                 .await()
+            
+            Log.d(TAG, "Bildirim okundu işaretlendi: $notificationId")
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Bildirim okundu işaretlenemedi", e)
         }
     }
     
     /**
-     * Kullanıcının ilk giriş yapıp yapmadığını kontrol eder
+     * Tüm bildirimleri okundu olarak işaretler
      */
-    suspend fun isFirstTimeUser(userId: String): Boolean {
-        return try {
-            val userDoc = firestore.collection("users")
-                .document(userId)
-                .get()
-                .await()
-            
-            // Kullanıcı dokümanı var mı ve daha önce giriş yapmış mı kontrol et
-            val hasLoggedInBefore = userDoc.exists() && userDoc.getLong("login_count") != null
-            !hasLoggedInBefore
-        } catch (e: Exception) {
-            e.printStackTrace()
-            true // Hata durumunda ilk kez kullanıcı olarak kabul et
-        }
-    }
-    
-    /**
-     * Günlük kartların yenilenip yenilenmediğini kontrol eder
-     */
-    suspend fun shouldRenewDailyCards(userId: String): Boolean {
-        return try {
-            val userDoc = firestore.collection("users")
-                .document(userId)
-                .get()
-                .await()
-            
-            val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
-            val currentDate = getCurrentDateString()
-            
-            lastDrawDate != currentDate
-        } catch (e: Exception) {
-            e.printStackTrace()
-            true
-        }
-    }
-    
-    /**
-     * Açılmamış günlük kartlar için hatırlatma bildirimi gönderir
-     */
-    suspend fun sendUnopenedCardsReminder(userId: String) {
+    suspend fun markAllNotificationsAsRead(userId: String) {
         try {
-            val userDoc = firestore.collection("users")
+            val snapshot = firestore.collection("users")
                 .document(userId)
+                .collection("notifications")
+                .whereEqualTo("isRead", false)
                 .get()
                 .await()
             
-            val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
-            val currentDate = getCurrentDateString()
-            
-            // Bugün kartlar çekilmiş mi kontrol et
-            if (lastDrawDate == currentDate) {
-                // Açılmamış kart sayısını kontrol et
-                val unopenedCount = (0..2).count { index ->
-                    !(userDoc.getBoolean("card_${index}_revealed") ?: false)
-                }
-                
-                if (unopenedCount > 0) {
-                    val notification = Notification(
-                        id = "",
-                        title = "Günlük Açılımınızı Tamamlayın",
-                        message = "Bugün çektiğiniz ${unopenedCount} kart henüz açılmadı. Günlük yorumunuzu okumak için kartlarınızı açın.",
-                        timestamp = System.currentTimeMillis(),
-                        isRead = false,
-                        type = NotificationType.DAILY_TAROT
-                    )
-                    
-                    val docRef = firestore.collection("users")
-                        .document(userId)
-                        .collection("notifications")
-                        .add(notification)
-                        .await()
-                    
-                    android.util.Log.d("NotificationManager", "Unopened cards reminder sent: $unopenedCount cards, notification ID: ${docRef.id}")
-                }
+            val batch = firestore.batch()
+            snapshot.documents.forEach { doc ->
+                batch.update(doc.reference, "isRead", true)
             }
+            batch.commit().await()
+            
+            Log.d(TAG, "Tüm bildirimler okundu işaretlendi: ${snapshot.size()} bildirim")
         } catch (e: Exception) {
-            android.util.Log.e("NotificationManager", "Error sending unopened cards reminder", e)
-            e.printStackTrace()
+            Log.e(TAG, "Bildirimler okundu işaretlenemedi", e)
         }
     }
     
     /**
-     * Kullanıcının açılmamış kartları olup olmadığını kontrol eder
+     * Eski bildirimleri siler (30 günden eski)
      */
-    suspend fun hasUnopenedCards(userId: String): Boolean {
-        return try {
-            val userDoc = firestore.collection("users")
+    suspend fun deleteOldNotifications(userId: String) {
+        try {
+            val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
+            
+            val snapshot = firestore.collection("users")
                 .document(userId)
+                .collection("notifications")
+                .whereLessThan("timestamp", thirtyDaysAgo)
                 .get()
                 .await()
             
-            val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
-            val currentDate = getCurrentDateString()
-            
-            // Bugün kartlar çekilmiş mi ve açılmamış kart var mı kontrol et
-            if (lastDrawDate == currentDate) {
-                val unopenedCount = (0..2).count { index ->
-                    !(userDoc.getBoolean("card_${index}_revealed") ?: false)
-                }
-                unopenedCount > 0
-            } else {
-                false
+            val batch = firestore.batch()
+            snapshot.documents.forEach { doc ->
+                batch.delete(doc.reference)
             }
+            batch.commit().await()
+            
+            Log.d(TAG, "Eski bildirimler silindi: ${snapshot.size()} bildirim")
         } catch (e: Exception) {
-            e.printStackTrace()
-            false
+            Log.e(TAG, "Eski bildirimler silinemedi", e)
         }
     }
+    
+    // ==================== İZİN KONTROLLERİ ====================
     
     /**
      * Bildirim izinlerini kontrol eder
      */
     fun checkNotificationPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == 
+                android.content.pm.PackageManager.PERMISSION_GRANTED
         } else {
             true // Android 13'ten önceki sürümlerde otomatik olarak izin verilir
         }
@@ -320,17 +182,13 @@ class NotificationManager(private val context: Context) {
      */
     fun requestNotificationPermission(activity: android.app.Activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != 
+                android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 activity.requestPermissions(
                     arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    100
+                    NOTIFICATION_PERMISSION_REQUEST_CODE
                 )
             }
         }
     }
-
-    private fun getCurrentDateString(): String {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return dateFormat.format(Date())
-    }
-} 
+}

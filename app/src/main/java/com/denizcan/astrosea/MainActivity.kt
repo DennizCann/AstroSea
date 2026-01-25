@@ -50,8 +50,9 @@ import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
 import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
 import com.denizcan.astrosea.navigation.SmartNavigationHelper
 import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
-import com.denizcan.astrosea.workers.DailyNotificationWorker
-import com.denizcan.astrosea.workers.UnopenedCardsReminderWorker
+import com.denizcan.astrosea.notifications.DailyNotificationScheduler
+import com.denizcan.astrosea.notifications.PremiumReminderScheduler
+import com.google.firebase.firestore.FirebaseFirestore
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen1
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen2
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen3
@@ -101,19 +102,19 @@ class MainActivity : ComponentActivity() {
                 // Log işlemi ekleyelim - hata ayıklama için
                 Log.d("Auth", "User logged in: ${user.uid}, email: ${user.email}")
                 
-                // Kullanıcı giriş yaptığında worker'ları başlat
-                DailyNotificationWorker.scheduleDailyNotification(this)
-                UnopenedCardsReminderWorker.scheduleUnopenedCardsReminder(this)
-                Log.d("Auth", "Daily notification worker scheduled")
-                Log.d("Auth", "Unopened cards reminder worker scheduled")
+                // Kullanıcı giriş yaptığında günlük bildirim alarmını kur (saat 10:00)
+                DailyNotificationScheduler.scheduleDailyNotification(this)
+                Log.d("Auth", "Günlük bildirim alarmı kuruldu (10:00)")
+                
+                // Premium durumunu kontrol et ve hatırlatmaları yönet
+                checkPremiumAndScheduleReminders(user.uid)
             } else {
                 Log.d("Auth", "User logged out")
                 
-                // Kullanıcı çıkış yaptığında worker'ları durdur
-                DailyNotificationWorker.cancelDailyNotification(this)
-                UnopenedCardsReminderWorker.cancelUnopenedCardsReminder(this)
-                Log.d("Auth", "Daily notification worker cancelled")
-                Log.d("Auth", "Unopened cards reminder worker cancelled")
+                // Kullanıcı çıkış yaptığında tüm alarmları iptal et
+                DailyNotificationScheduler.cancelDailyNotification(this)
+                PremiumReminderScheduler.cancelAllReminders(this)
+                Log.d("Auth", "Tüm bildirim alarmları iptal edildi")
             }
         }
 
@@ -705,6 +706,59 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+        
+        // Uygulama kapandığında premium hatırlatmasını zamanla
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null && PremiumReminderScheduler.isFirstTimeUser(this)) {
+            // İlk kez kullanıcı ise 30 dakika sonra premium hatırlatma
+            scheduleInstantPremiumReminder(userId)
+        }
+    }
+    
+    /**
+     * Premium durumunu kontrol eder ve hatırlatmaları zamanlar
+     */
+    private fun checkPremiumAndScheduleReminders(userId: String) {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val isPremium = document.getBoolean("isPremium") ?: false
+                
+                if (isPremium) {
+                    // Premium kullanıcı - tüm hatırlatmaları iptal et
+                    PremiumReminderScheduler.cancelAllReminders(this)
+                    Log.d("MainActivity", "Kullanıcı premium, hatırlatmalar iptal edildi")
+                } else {
+                    Log.d("MainActivity", "Kullanıcı premium değil, hatırlatmalar aktif")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("MainActivity", "Premium kontrol hatası", e)
+            }
+    }
+    
+    /**
+     * İlk kez kullanıcı için anında premium hatırlatma zamanlar (30 dakika sonra)
+     */
+    private fun scheduleInstantPremiumReminder(userId: String) {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val isPremium = document.getBoolean("isPremium") ?: false
+                
+                if (!isPremium) {
+                    // Premium değilse 30 dakika sonra hatırlatma
+                    PremiumReminderScheduler.scheduleInstantReminder(this)
+                    Log.d("MainActivity", "30 dakika sonra premium hatırlatma zamanlandı")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("MainActivity", "Premium kontrol hatası", e)
+            }
     }
 }
 

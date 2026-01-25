@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <application
         android:allowBackup="true"
@@ -35,6 +38,39 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Günlük bildirim receiver'ı -->
+        <receiver
+            android:name=".notifications.DailyNotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.denizcan.astrosea.DAILY_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- Boot receiver - telefon açılınca alarmı tekrar kur -->
+        <receiver
+            android:name=".notifications.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- Premium hatırlatma receiver'ı -->
+        <receiver
+            android:name=".notifications.PremiumReminderReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.denizcan.astrosea.PREMIUM_INSTANT_REMINDER" />
+                <action android:name="com.denizcan.astrosea.PREMIUM_24H_REMINDER" />
+                <action android:name="com.denizcan.astrosea.PREMIUM_5DAY_REMINDER" />
+                <action android:name="com.denizcan.astrosea.PREMIUM_WEEKLY_REMINDER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

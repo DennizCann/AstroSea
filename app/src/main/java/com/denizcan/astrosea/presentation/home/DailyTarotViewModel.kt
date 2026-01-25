@@ -85,14 +85,17 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     }
                     hasDrawnToday = false
                     
-                    // Günlük kartlar çekildi bildirimi gönder
+                    // Günlük kartlar yenilendi - Firestore'a bildirim kaydet
                     if (userId != null) {
                         try {
-                            // İlk günlük açılım bildirimi gönder
-                            notificationManager.sendFirstDailyReadingNotification(userId!!)
-                            Log.d("DailyTarotViewModel", "First daily reading notification sent")
+                            notificationManager.saveNotificationToFirestore(
+                                userId = userId!!,
+                                title = "Günlük Kartlarınız Hazır! 🔮",
+                                message = "Bugün için yeni kartlarınız çekildi. Kartlarınızı açarak günlük yorumunuzu keşfedin."
+                            )
+                            Log.d("DailyTarotViewModel", "Daily cards notification saved to Firestore")
                         } catch (e: Exception) {
-                            Log.e("DailyTarotViewModel", "Error sending daily notification", e)
+                            Log.e("DailyTarotViewModel", "Error saving daily notification", e)
                         }
                     }
                 } else {

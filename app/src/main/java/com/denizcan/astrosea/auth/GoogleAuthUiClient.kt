@@ -152,19 +152,22 @@ class GoogleAuthUiClient(
                 userRef.set(updateData, SetOptions.merge()).await()
                 android.util.Log.d("GoogleAuth", "User data saved to Firestore")
                 
-                // İlk kez kullanıcı ise bildirim gönder
+                // İlk kez kullanıcı ise Firestore'a hoşgeldin bildirimi kaydet
                 if (isFirstTime) {
-                    android.util.Log.d("GoogleAuth", "Sending first daily reading notification")
+                    android.util.Log.d("GoogleAuth", "Saving welcome notification for first time user")
                     try {
                         val notificationManager = NotificationManager(context)
-                        notificationManager.sendFirstDailyReadingNotification(firebaseUser.uid)
-                        android.util.Log.d("GoogleAuth", "First daily reading notification sent successfully")
+                        notificationManager.saveNotificationToFirestore(
+                            userId = firebaseUser.uid,
+                            title = "Hoş Geldiniz! ✨",
+                            message = "AstroSea'ye hoş geldiniz! İlk günlük tarot açılımınızı yaparak gününüzün enerjilerini keşfedin."
+                        )
+                        android.util.Log.d("GoogleAuth", "Welcome notification saved successfully")
                     } catch (e: Exception) {
-                        android.util.Log.e("GoogleAuth", "Error sending first daily reading notification", e)
-                        e.printStackTrace()
+                        android.util.Log.e("GoogleAuth", "Error saving welcome notification", e)
                     }
                 } else {
-                    android.util.Log.d("GoogleAuth", "Not a first time user, skipping notification")
+                    android.util.Log.d("GoogleAuth", "Not a first time user, skipping welcome notification")
                 }
             }
             
