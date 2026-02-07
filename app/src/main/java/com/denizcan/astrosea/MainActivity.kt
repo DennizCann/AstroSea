@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -60,6 +61,7 @@ import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionVie
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionStatus
 import com.denizcan.astrosea.presentation.auth.TransitionScreen
 import com.denizcan.astrosea.presentation.introduction.IntroductionPopupScreen
+import com.denizcan.astrosea.presentation.components.KvkkDialog
 
 
 class MainActivity : ComponentActivity() {
@@ -73,7 +75,11 @@ class MainActivity : ComponentActivity() {
     private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Splash Screen'i kur (super.onCreate'den ÖNCE olmalı)
+        installSplashScreen()
+        
         super.onCreate(savedInstanceState)
+        
         enableEdgeToEdge()
 
         // Sistem çubuklarını şeffaf yap
@@ -124,6 +130,11 @@ class MainActivity : ComponentActivity() {
             var startDestination by remember { mutableStateOf<String?>(null) }
             val scope = rememberCoroutineScope()
             var fallbackTried by remember { mutableStateOf(false) }
+            
+            // KVKK Dialog state
+            var showKvkkDialog by remember { mutableStateOf(false) }
+            var pendingNavDestination by remember { mutableStateOf<String?>(null) }
+            var pendingUserId by remember { mutableStateOf<String?>(null) }
 
             val googleLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult(),
@@ -144,8 +155,17 @@ class MainActivity : ComponentActivity() {
                                     else -> Screen.Home.route
                                 }
                                 
-                                navController.navigate(destination) {
-                                    popUpTo(0) { inclusive = true }
+                                // KVKK kontrolü
+                                if (!signInResult.kvkkAccepted) {
+                                    // KVKK kabul edilmemiş, dialog göster
+                                    pendingNavDestination = destination
+                                    pendingUserId = signInResult.data.userId
+                                    showKvkkDialog = true
+                                } else {
+                                    // KVKK zaten kabul edilmiş, devam et
+                                    navController.navigate(destination) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
                                 }
                             } else {
                                 Log.e("GoogleSignIn", "Giriş başarısız (fallback): ${signInResult.errorMessage}")
@@ -174,8 +194,17 @@ class MainActivity : ComponentActivity() {
                                     else -> Screen.Home.route
                                 }
                                 
-                                navController.navigate(destination) {
-                                    popUpTo(0) { inclusive = true }
+                                // KVKK kontrolü
+                                if (!signInResult.kvkkAccepted) {
+                                    // KVKK kabul edilmemiş, dialog göster
+                                    pendingNavDestination = destination
+                                    pendingUserId = signInResult.data.userId
+                                    showKvkkDialog = true
+                                } else {
+                                    // KVKK zaten kabul edilmiş, devam et
+                                    navController.navigate(destination) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
                                 }
                             } else {
                                 Log.e("GoogleSignIn", "Giriş başarısız (one tap): ${signInResult.errorMessage}")
@@ -693,6 +722,38 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+                }
+                
+                // KVKK Dialog (Google Sign-In için)
+                if (showKvkkDialog) {
+                    KvkkDialog(
+                        onDismiss = {
+                            // Kullanıcı KVKK'yı kabul etmeden kapatırsa, çıkış yap
+                            scope.launch {
+                                googleAuthUiClient.signOut()
+                                showKvkkDialog = false
+                                pendingNavDestination = null
+                                pendingUserId = null
+                            }
+                        },
+                        onAccept = {
+                            // KVKK kabul edildi, Firestore'a kaydet ve devam et
+                            scope.launch {
+                                pendingUserId?.let { userId ->
+                                    googleAuthUiClient.saveKvkkConsent(userId)
+                                }
+                                showKvkkDialog = false
+                                pendingNavDestination?.let { destination ->
+                                    navController.navigate(destination) {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }
+                                pendingNavDestination = null
+                                pendingUserId = null
+                            }
+                        },
+                        showAcceptButton = true
+                    )
                 }
             }
         }

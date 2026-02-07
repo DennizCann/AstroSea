@@ -265,10 +265,24 @@ object PremiumReminderScheduler {
             .apply()
     }
     
+    /**
+     * Sadece alarm state'ini temizler, gönderim geçmişini KORUR.
+     * Bu sayede çıkış/giriş yapınca 30 dk timer sıfırlanmaz.
+     */
     private fun clearReminderState(context: Context) {
-        context.getSharedPreferences("premium_reminder_prefs", Context.MODE_PRIVATE)
-            .edit()
+        val prefs = context.getSharedPreferences("premium_reminder_prefs", Context.MODE_PRIVATE)
+        
+        // Önemli: instant_reminder_sent ve reminder_count'u KORU!
+        // Sadece alarm zamanlamasıyla ilgili state'leri temizle
+        val instantReminderSent = prefs.getBoolean("instant_reminder_sent", false)
+        val reminderCount = prefs.getInt("reminder_count", 0)
+        
+        prefs.edit()
             .clear()
+            .putBoolean("instant_reminder_sent", instantReminderSent)  // Koru
+            .putInt("reminder_count", reminderCount)  // Koru
             .apply()
+        
+        Log.d(TAG, "Alarm state temizlendi (instant_reminder_sent: $instantReminderSent, count: $reminderCount korundu)")
     }
 }

@@ -108,6 +108,9 @@ class GoogleAuthUiClient(
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
             
+            var isFirstTimeUser = false
+            var kvkkAlreadyAccepted = false
+            
             // Kullanıcı giriş yaptığında Firestore'a bilgileri kaydet
             user?.let { firebaseUser ->
                 val firestore = FirebaseFirestore.getInstance()
@@ -116,9 +119,10 @@ class GoogleAuthUiClient(
                 // Mevcut kullanıcı bilgilerini kontrol et
                 val userDoc = userRef.get().await()
                 // Belge yoksa ilk kez, varsa mevcut kullanıcı (login_count'a bakma, premium kullanıcıları ezer!)
-                val isFirstTime = !userDoc.exists()
+                isFirstTimeUser = !userDoc.exists()
+                kvkkAlreadyAccepted = userDoc.getBoolean("kvkk_accepted") ?: false
                 
-                android.util.Log.d("GoogleAuth", "User exists: ${userDoc.exists()}, isFirstTime: $isFirstTime")
+                android.util.Log.d("GoogleAuth", "User exists: ${userDoc.exists()}, isFirstTime: $isFirstTimeUser, kvkkAccepted: $kvkkAlreadyAccepted")
                 
                 // Kullanıcı bilgilerini güncelle
                 val updateData = mutableMapOf<String, Any>(
@@ -129,7 +133,7 @@ class GoogleAuthUiClient(
                     "last_login" to FieldValue.serverTimestamp()
                 )
                 
-                if (isFirstTime) {
+                if (isFirstTimeUser) {
                     // İlk kez giriş yapıyorsa login_count'u 1 yap ve standart üye olarak başlat
                     updateData["login_count"] = 1L
                     updateData["isPremium"] = false  // SADECE YENİ kullanıcı standart üye olarak başlar
@@ -139,6 +143,7 @@ class GoogleAuthUiClient(
                     updateData["birthTime"] = ""
                     updateData["country"] = ""
                     updateData["city"] = ""
+                    updateData["kvkk_accepted"] = false  // KVKK henüz kabul edilmedi
                     android.util.Log.d("GoogleAuth", "First time user, setting login_count to 1, isPremium to false")
                 } else {
                     // Daha önce giriş yapmışsa login_count'u artır, isPREMIUM'A DOKUNMA!
@@ -153,7 +158,7 @@ class GoogleAuthUiClient(
                 android.util.Log.d("GoogleAuth", "User data saved to Firestore")
                 
                 // İlk kez kullanıcı ise Firestore'a hoşgeldin bildirimi kaydet
-                if (isFirstTime) {
+                if (isFirstTimeUser) {
                     android.util.Log.d("GoogleAuth", "Saving welcome notification for first time user")
                     try {
                         val notificationManager = NotificationManager(context)
@@ -179,7 +184,9 @@ class GoogleAuthUiClient(
                         email = this.email
                     )
                 },
-                errorMessage = null
+                errorMessage = null,
+                isFirstTime = isFirstTimeUser,
+                kvkkAccepted = kvkkAlreadyAccepted
             )
         } catch(e: Exception) {
             e.printStackTrace()
@@ -188,6 +195,25 @@ class GoogleAuthUiClient(
                 data = null,
                 errorMessage = e.message
             )
+        }
+    }
+    
+    /**
+     * KVKK onayını Firestore'a kaydet
+     */
+    suspend fun saveKvkkConsent(userId: String) {
+        try {
+            val firestore = FirebaseFirestore.getInstance()
+            val userRef = firestore.collection("users").document(userId)
+            userRef.update(
+                mapOf(
+                    "kvkk_accepted" to true,
+                    "kvkk_accepted_at" to FieldValue.serverTimestamp()
+                )
+            ).await()
+            android.util.Log.d("GoogleAuth", "KVKK consent saved for user: $userId")
+        } catch (e: Exception) {
+            android.util.Log.e("GoogleAuth", "Error saving KVKK consent", e)
         }
     }
 
@@ -225,7 +251,9 @@ class GoogleAuthUiClient(
 
 data class SignInResult(
     val data: UserData?,
-    val errorMessage: String?
+    val errorMessage: String?,
+    val isFirstTime: Boolean = false,
+    val kvkkAccepted: Boolean = false
 )
 
 data class UserData(

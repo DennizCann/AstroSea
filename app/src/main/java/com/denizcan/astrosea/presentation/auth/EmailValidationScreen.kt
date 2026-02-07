@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun EmailValidationScreen(
     email: String,
     password: String,
+    kvkkAccepted: Boolean = false,
     onEmailVerified: () -> Unit,
     onBackClick: () -> Unit,
     onNavigateToTransition: () -> Unit
@@ -41,7 +42,7 @@ fun EmailValidationScreen(
     
     // Email doğrulama durumunu periyodik olarak kontrol et
     LaunchedEffect(Unit) {
-        viewModel.setTempUserData(email, password)
+        viewModel.setTempUserData(email, password, kvkkAccepted)
         viewModel.sendVerificationEmail()
         viewModel.startPeriodicVerificationCheck(onEmailVerified)
     }

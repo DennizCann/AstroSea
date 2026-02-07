@@ -5,8 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -33,6 +35,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import java.util.Calendar
 import com.denizcan.astrosea.presentation.components.WheelDatePickerDialog
+import com.denizcan.astrosea.util.responsiveSize
+import com.denizcan.astrosea.util.responsivePadding
+import com.denizcan.astrosea.presentation.components.KvkkDialog
+import com.denizcan.astrosea.util.KvkkTexts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +51,7 @@ fun ProfileScreen(
     val calendar = remember { Calendar.getInstance() }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showKvkkDialog by remember { mutableStateOf(false) }
     // İlk yüklenen profil verisini sakla
     val initialProfileData = remember { state.profileData.copy() }
     // Değişiklik kontrolü
@@ -154,11 +161,15 @@ fun ProfileScreen(
                 }
             }
         ) { paddingValues ->
+            val scrollState = rememberScrollState()
+            val horizontalPad = responsivePadding(compact = 6.dp, medium = 8.dp, expanded = 12.dp)
+            
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = horizontalPad)
+                    .verticalScroll(scrollState),  // Scroll eklendi
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -320,6 +331,35 @@ fun ProfileScreen(
                         )
                     }
                 )
+                
+                // KVKK / Gizlilik Politikası Linki
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.4f)),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    TextButton(
+                        onClick = { showKvkkDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = KvkkTexts.getShortTitle(),
+                            color = Color.White.copy(alpha = 0.8f),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
                 if (state.isLoading) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -333,6 +373,9 @@ fun ProfileScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
+                
+                // Alt boşluk - scroll için
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
         // Wheel DatePicker Dialog
@@ -364,6 +407,15 @@ fun ProfileScreen(
             ).apply {
                 setOnCancelListener { showTimePicker = false }
             }.show()
+        }
+        
+        // KVKK Dialog
+        if (showKvkkDialog) {
+            KvkkDialog(
+                onDismiss = { showKvkkDialog = false },
+                onAccept = null, // Profil ekranında sadece okuma modu
+                showAcceptButton = false
+            )
         }
     }
 }

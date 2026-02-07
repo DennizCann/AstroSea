@@ -26,12 +26,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.denizcan.astrosea.presentation.components.KvkkCheckbox
+import com.denizcan.astrosea.presentation.components.KvkkDialog
+import com.denizcan.astrosea.util.KvkkTexts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     onNavigateToSignIn: () -> Unit,
-    onSignUpSuccess: (String, String) -> Unit,
+    onSignUpSuccess: (String, String, Boolean) -> Unit, // kvkkAccepted parametresi eklendi
     onBackClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -39,6 +42,13 @@ fun SignUpScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    // KVKK state
+    var kvkkAccepted by remember { mutableStateOf(false) }
+    var showKvkkDialog by remember { mutableStateOf(false) }
+    
+    // Dil kontrolü
+    val isTurkish = KvkkTexts.isDeviceTurkishLocale()
 
     val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
@@ -172,6 +182,14 @@ fun SignUpScreen(
                                 )
                             )
 
+                            // KVKK Checkbox
+                            KvkkCheckbox(
+                                checked = kvkkAccepted,
+                                onCheckedChange = { kvkkAccepted = it },
+                                onTextClick = { showKvkkDialog = true },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            
                             Spacer(modifier = Modifier.weight(1f))  // Esnek boşluk ekledik
                         }
 
@@ -179,15 +197,16 @@ fun SignUpScreen(
                         Button(
                             onClick = {
                                 when {
-                                    email.isEmpty() -> errorMessage = "E-posta alanı boş bırakılamaz"
-                                    password.isEmpty() -> errorMessage = "Şifre alanı boş bırakılamaz"
-                                    confirmPassword.isEmpty() -> errorMessage = "Şifre tekrar alanı boş bırakılamaz"
-                                    !email.contains("@") -> errorMessage = "Geçerli bir e-posta adresi giriniz"
-                                    password.length < 6 -> errorMessage = "Şifre en az 6 karakter olmalıdır"
-                                    password != confirmPassword -> errorMessage = "Şifreler eşleşmiyor"
+                                    email.isEmpty() -> errorMessage = if (isTurkish) "E-posta alanı boş bırakılamaz" else "Email field cannot be empty"
+                                    password.isEmpty() -> errorMessage = if (isTurkish) "Şifre alanı boş bırakılamaz" else "Password field cannot be empty"
+                                    confirmPassword.isEmpty() -> errorMessage = if (isTurkish) "Şifre tekrar alanı boş bırakılamaz" else "Confirm password field cannot be empty"
+                                    !email.contains("@") -> errorMessage = if (isTurkish) "Geçerli bir e-posta adresi giriniz" else "Please enter a valid email address"
+                                    password.length < 6 -> errorMessage = if (isTurkish) "Şifre en az 6 karakter olmalıdır" else "Password must be at least 6 characters"
+                                    password != confirmPassword -> errorMessage = if (isTurkish) "Şifreler eşleşmiyor" else "Passwords do not match"
+                                    !kvkkAccepted -> errorMessage = if (isTurkish) "KVKK Aydınlatma Metni'ni kabul etmelisiniz" else "You must accept the Privacy Policy"
                                     else -> {
                                         // Email doğrulama ekranına yönlendir
-                                        onSignUpSuccess(email, password)
+                                        onSignUpSuccess(email, password, kvkkAccepted)
                                     }
                                 }
                             },
@@ -212,6 +231,18 @@ fun SignUpScreen(
                     }
                 }
             }
+        }
+        
+        // KVKK Dialog
+        if (showKvkkDialog) {
+            KvkkDialog(
+                onDismiss = { showKvkkDialog = false },
+                onAccept = {
+                    kvkkAccepted = true
+                    showKvkkDialog = false
+                },
+                showAcceptButton = true
+            )
         }
     }
 }

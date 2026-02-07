@@ -50,6 +50,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.zIndex
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
+import com.denizcan.astrosea.util.responsiveSize
+import com.denizcan.astrosea.util.screenWidth
+import com.denizcan.astrosea.util.isCompactScreen
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
@@ -566,23 +569,26 @@ fun HomeScreen(
                                     }
                                 },
                                 modifier = Modifier
-                                    .height(160.dp)
-                                    .width(95.dp),
+                                    .height(responsiveSize(compact = 130.dp, medium = 150.dp, expanded = 160.dp))
+                                    .width(responsiveSize(compact = 78.dp, medium = 88.dp, expanded = 95.dp)),
                                 parentSize = parentContainerSize
                             )
                         }
                     }
                 }
 
-                // Alt kartlar için grid
+                // Alt kartlar için grid - responsive yükseklik
+                val serviceCardHeight = responsiveSize(compact = 130.dp, medium = 145.dp, expanded = 160.dp)
+                val cardSpacing = responsiveSize(compact = 6.dp, medium = 8.dp, expanded = 8.dp)
+                
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(cardSpacing)
                 ) {
                     // İlk sıra
                     Row(
-                        modifier = Modifier.height(160.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.height(serviceCardHeight),
+                        horizontalArrangement = Arrangement.spacedBy(cardSpacing)
                     ) {
                         ServiceCard(
                             title = menuItems[0].title,
@@ -600,8 +606,8 @@ fun HomeScreen(
 
                     // İkinci sıra
                     Row(
-                        modifier = Modifier.height(160.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.height(serviceCardHeight),
+                        horizontalArrangement = Arrangement.spacedBy(cardSpacing)
                     ) {
                         ServiceCard(
                             title = menuItems[2].title,
@@ -619,8 +625,8 @@ fun HomeScreen(
 
                     // Üçüncü sıra
                     Row(
-                        modifier = Modifier.height(160.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.height(serviceCardHeight),
+                        horizontalArrangement = Arrangement.spacedBy(cardSpacing)
                     ) {
                         ServiceCard(
                             title = menuItems[4].title,

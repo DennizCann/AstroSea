@@ -131,4 +131,7 @@ dependencies {
     
     // Google Play Billing (In-App Purchases)
     implementation 'com.android.billingclient:billing-ktx:6.1.0'
+    
+    // Splash Screen API (Android 12+ uyumluluğu)
+    implementation 'androidx.core:core-splashscreen:1.0.1'
 }

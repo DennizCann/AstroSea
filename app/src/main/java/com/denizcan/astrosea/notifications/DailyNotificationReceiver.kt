@@ -12,6 +12,12 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.denizcan.astrosea.MainActivity
 import com.denizcan.astrosea.R
+import com.denizcan.astrosea.presentation.notifications.NotificationManager as AppNotificationManager
+import com.denizcan.astrosea.presentation.notifications.NotificationType
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * AlarmManager tarafından tetiklenen BroadcastReceiver.
@@ -104,5 +110,34 @@ class DailyNotificationReceiver : BroadcastReceiver() {
         notificationManager.notify(NOTIFICATION_ID, notification)
         
         Log.d(TAG, "Bildirim gönderildi: $title")
+        
+        // Firestore'a da kaydet (uygulama içi bildirim listesi için)
+        saveNotificationToFirestore(context, title, message)
+    }
+    
+    /**
+     * Bildirimi Firestore'a kaydeder
+     */
+    private fun saveNotificationToFirestore(context: Context, title: String, message: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Log.d(TAG, "Kullanıcı giriş yapmamış, Firestore'a kaydedilmedi")
+            return
+        }
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val appNotificationManager = AppNotificationManager(context)
+                appNotificationManager.saveNotificationToFirestore(
+                    userId = userId,
+                    title = title,
+                    message = message,
+                    type = NotificationType.DAILY_TAROT
+                )
+                Log.d(TAG, "Bildirim Firestore'a kaydedildi")
+            } catch (e: Exception) {
+                Log.e(TAG, "Firestore kaydetme hatası", e)
+            }
+        }
     }
 }

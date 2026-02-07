@@ -7,7 +7,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,8 +57,10 @@ data class Notification(
 )
 
 enum class NotificationType {
-    DAILY_TAROT,
-    GENERAL
+    DAILY_TAROT,      // Günlük tarot bildirimi
+    PREMIUM_REMINDER, // Premium hatırlatma
+    WELCOME,          // Hoş geldin bildirimi
+    GENERAL           // Genel bildirim
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -382,7 +386,9 @@ fun NotificationCard(
 @Composable
 private fun getNotificationTypeIcon(type: NotificationType): androidx.compose.ui.graphics.vector.ImageVector {
     return when (type) {
-        NotificationType.DAILY_TAROT -> Icons.Default.Notifications // Tarot ikonu için
+        NotificationType.DAILY_TAROT -> Icons.Default.Notifications
+        NotificationType.PREMIUM_REMINDER -> Icons.Default.Star
+        NotificationType.WELCOME -> Icons.Default.Favorite
         NotificationType.GENERAL -> Icons.Default.Notifications
     }
 }
@@ -390,8 +396,10 @@ private fun getNotificationTypeIcon(type: NotificationType): androidx.compose.ui
 @Composable
 private fun getNotificationTypeColor(type: NotificationType): Color {
     return when (type) {
-        NotificationType.DAILY_TAROT -> Color(0xFF9C27B0) // Mor
-        NotificationType.GENERAL -> Color(0xFF607D8B) // Gri-mavi
+        NotificationType.DAILY_TAROT -> Color(0xFF9C27B0)    // Mor
+        NotificationType.PREMIUM_REMINDER -> Color(0xFFFFD700) // Altın
+        NotificationType.WELCOME -> Color(0xFF4CAF50)        // Yeşil
+        NotificationType.GENERAL -> Color(0xFF607D8B)        // Gri-mavi
     }
 }
 

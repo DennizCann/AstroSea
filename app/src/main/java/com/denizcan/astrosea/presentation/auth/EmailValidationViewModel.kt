@@ -14,6 +14,7 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 class EmailValidationViewModel : ViewModel() {
     
@@ -35,10 +36,12 @@ class EmailValidationViewModel : ViewModel() {
     // Geçici kullanıcı bilgileri
     private var tempEmail: String = ""
     private var tempPassword: String = ""
+    private var tempKvkkAccepted: Boolean = false
     
-    fun setTempUserData(email: String, password: String) {
+    fun setTempUserData(email: String, password: String, kvkkAccepted: Boolean = false) {
         tempEmail = email
         tempPassword = password
+        tempKvkkAccepted = kvkkAccepted
     }
     
     fun sendVerificationEmail() {
@@ -49,6 +52,10 @@ class EmailValidationViewModel : ViewModel() {
             try {
                 // Firebase'de geçici kullanıcı oluştur
                 val auth = FirebaseAuth.getInstance()
+                
+                // Cihaz diline göre e-posta dilini ayarla
+                setFirebaseLanguage(auth)
+                
                 val result = auth.createUserWithEmailAndPassword(tempEmail, tempPassword).await()
                 currentUser = result.user
                 
@@ -56,7 +63,7 @@ class EmailValidationViewModel : ViewModel() {
                 currentUser?.sendEmailVerification()?.await()
                 isEmailSent = true
                 
-                Log.d("EmailValidation", "Firebase verification email sent to: $tempEmail")
+                Log.d("EmailValidation", "Firebase verification email sent to: $tempEmail (Language: ${auth.languageCode})")
                 
             } catch (e: Exception) {
                 errorMessage = when {
@@ -87,12 +94,16 @@ class EmailValidationViewModel : ViewModel() {
                     
                     if (existingDoc.exists()) {
                         // Mevcut kullanıcı - sadece email_verified güncelle, isPremium'a DOKUNMA!
-                        userDoc.update(
-                            mapOf(
-                                "email_verified" to true
-                            )
-                        ).await()
-                        Log.d("EmailValidation", "Existing user - only updated email_verified for: $tempEmail")
+                        val updateData = mutableMapOf<String, Any>(
+                            "email_verified" to true
+                        )
+                        // KVKK onayı varsa ekle
+                        if (tempKvkkAccepted) {
+                            updateData["kvkk_accepted"] = true
+                            updateData["kvkk_accepted_at"] = FieldValue.serverTimestamp()
+                        }
+                        userDoc.update(updateData).await()
+                        Log.d("EmailValidation", "Existing user - updated email_verified and kvkk for: $tempEmail")
                     } else {
                         // Yeni kullanıcı - tüm alanları oluştur
                         userDoc.set(
@@ -107,10 +118,12 @@ class EmailValidationViewModel : ViewModel() {
                                 "birthDate" to "",
                                 "birthTime" to "",
                                 "country" to "",
-                                "city" to ""
+                                "city" to "",
+                                "kvkk_accepted" to tempKvkkAccepted,
+                                "kvkk_accepted_at" to if (tempKvkkAccepted) FieldValue.serverTimestamp() else null
                             )
                         ).await()
-                        Log.d("EmailValidation", "New user created for: $tempEmail")
+                        Log.d("EmailValidation", "New user created for: $tempEmail (KVKK: $tempKvkkAccepted)")
                     }
                     
                     isEmailVerified = true
@@ -133,6 +146,9 @@ class EmailValidationViewModel : ViewModel() {
             errorMessage = null
             
             try {
+                // Dil ayarını yeniden kontrol et
+                setFirebaseLanguage(FirebaseAuth.getInstance())
+                
                 currentUser?.sendEmailVerification()?.await()
                 isEmailSent = true
                 
@@ -176,5 +192,23 @@ class EmailValidationViewModel : ViewModel() {
                 Log.e("EmailValidation", "Error manually verifying email", e)
             }
         }
+    }
+    
+    /**
+     * Cihaz diline göre Firebase e-posta dilini ayarlar.
+     * Desteklenen diller: Türkçe (tr), İngilizce (en)
+     * Diğer diller için varsayılan olarak İngilizce kullanılır.
+     */
+    private fun setFirebaseLanguage(auth: FirebaseAuth) {
+        val deviceLanguage = Locale.getDefault().language
+        
+        // Sadece Türkçe ve İngilizce destekleniyor
+        val languageCode = when (deviceLanguage) {
+            "tr" -> "tr"  // Türkçe
+            else -> "en"  // Diğer tüm diller için İngilizce
+        }
+        
+        auth.setLanguageCode(languageCode)
+        Log.d("EmailValidation", "Firebase language set to: $languageCode (device: $deviceLanguage)")
     }
 }

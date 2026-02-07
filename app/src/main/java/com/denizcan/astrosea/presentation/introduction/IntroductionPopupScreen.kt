@@ -37,6 +37,9 @@ import androidx.compose.ui.window.DialogProperties
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.util.JsonLoader
+import com.denizcan.astrosea.util.responsiveSize
+import com.denizcan.astrosea.util.heightPercent
+import com.denizcan.astrosea.util.isShortScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -289,19 +292,24 @@ private fun IntroPageContent(
     pageIndex: Int,
     onPrimaryClick: () -> Unit
 ) {
+    // Responsive değerler
+    val cardHeight = heightPercent(fraction = 0.5f, maxSize = 400.dp)
+    val isShort = isShortScreen()
+    val horizontalPad = responsiveSize(compact = 8.dp, medium = 12.dp, expanded = 16.dp)
+    
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = horizontalPad),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(if (isShort) 4.dp else 8.dp))
         
         // Altın çerçeve ile görsel kartı
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(380.dp),
+                .height(cardHeight),  // Responsive yükseklik
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = Color(0xFF1A0F2E) // Koyu mor arka plan
@@ -343,15 +351,16 @@ private fun IntroPageContent(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(20.dp)
+                            .padding(responsiveSize(compact = 12.dp, medium = 16.dp, expanded = 20.dp))
                     ) {
-                        // Görsel
+                        // Görsel - responsive boyut
+                        val imageSize = responsiveSize(compact = 130.dp, medium = 160.dp, expanded = 180.dp)
                         Image(
                             painter = painterResource(id = introPage.imageRes),
                             contentDescription = introPage.title,
                             modifier = Modifier
-                                .size(180.dp)
-                                .padding(vertical = 12.dp),
+                                .size(imageSize)
+                                .padding(vertical = if (isShort) 6.dp else 12.dp),
                             contentScale = ContentScale.Fit
                         )
 
@@ -389,14 +398,15 @@ private fun IntroPageContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(if (isShort) 12.dp else 24.dp))
 
         // Primary Action Button (Ücretsiz Denemeyi Başlat)
+        val buttonHeight = responsiveSize(compact = 46.dp, medium = 52.dp, expanded = 56.dp)
         Button(
             onClick = onPrimaryClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(buttonHeight),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent
             ),

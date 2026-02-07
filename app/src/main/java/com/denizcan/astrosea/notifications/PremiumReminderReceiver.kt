@@ -209,7 +209,7 @@ class PremiumReminderReceiver : BroadcastReceiver() {
                 userId = userId,
                 title = title,
                 message = message,
-                type = com.denizcan.astrosea.presentation.notifications.NotificationType.GENERAL
+                type = com.denizcan.astrosea.presentation.notifications.NotificationType.PREMIUM_REMINDER
             )
             
             Log.d(TAG, "Premium bildirim Firestore'a kaydedildi")

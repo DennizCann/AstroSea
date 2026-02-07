@@ -63,24 +63,26 @@ fun AuthScreen(
                             popUpTo("auth_options")
                         }
                     },
-                    onSignUpSuccess = { email, password ->
-                        navController.navigate("email_validation/$email/$password")
+                    onSignUpSuccess = { email, password, kvkkAccepted ->
+                        navController.navigate("email_validation/$email/$password/$kvkkAccepted")
                     },
                     onBackClick = { navController.popBackStack() }
                 )
             }
             
-            composable("email_validation/{email}/{password}") { backStackEntry ->
+            composable("email_validation/{email}/{password}/{kvkkAccepted}") { backStackEntry ->
                 val email = backStackEntry.arguments?.getString("email") ?: ""
                 val password = backStackEntry.arguments?.getString("password") ?: ""
+                val kvkkAccepted = backStackEntry.arguments?.getString("kvkkAccepted")?.toBoolean() ?: false
                 EmailValidationScreen(
                     email = email,
                     password = password,
+                    kvkkAccepted = kvkkAccepted,
                     onEmailVerified = onNavigateToHome,
                     onBackClick = { navController.popBackStack() },
                     onNavigateToTransition = {
                         navController.navigate("transition_to_auth") {
-                            popUpTo("email_validation/{email}/{password}") { inclusive = true }
+                            popUpTo("email_validation/{email}/{password}/{kvkkAccepted}") { inclusive = true }
                         }
                     }
                 )

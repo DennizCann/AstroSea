@@ -3,7 +3,9 @@ package com.denizcan.astrosea.presentation.auth
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +24,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
+import com.denizcan.astrosea.util.responsiveSize
+import com.denizcan.astrosea.util.heightPercent
+import com.denizcan.astrosea.util.widthPercent
+import com.denizcan.astrosea.util.isShortScreen
+import androidx.compose.foundation.layout.heightIn
 
 @Composable
 fun AuthOptionsScreen(
@@ -29,6 +36,13 @@ fun AuthOptionsScreen(
     onNavigateToSignUp: () -> Unit,
     onGoogleSignIn: () -> Unit
 ) {
+    // Responsive değerler
+    val logoSize = responsiveSize(compact = 220.dp, medium = 280.dp, expanded = 340.dp)
+    val buttonSectionHeight = heightPercent(fraction = 0.42f, maxSize = 320.dp)
+    val horizontalPadding = responsiveSize(compact = 20.dp, medium = 28.dp, expanded = 32.dp)
+    val buttonSpacing = responsiveSize(compact = 12.dp, medium = 16.dp, expanded = 16.dp)
+    val isShort = isShortScreen()
+    
     Box(modifier = Modifier.fillMaxSize()) {
         // Arka plan görseli
         Image(
@@ -41,7 +55,9 @@ fun AuthOptionsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(horizontal = horizontalPadding)
+                .padding(vertical = if (isShort) 16.dp else 32.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Logo kısmı - yukarıda ve büyük
@@ -55,25 +71,29 @@ fun AuthOptionsScreen(
                     painter = painterResource(id = R.drawable.astrosea_logo),
                     contentDescription = "AstroSea Logo",
                     modifier = Modifier
-                        .size(340.dp),  // Logoyu büyüttük
+                        .size(logoSize),  // Responsive logo boyutu
                     contentScale = ContentScale.Fit
                 )
             }
 
-            // Alt kısım - sabit yükseklikte ve yerinde
+            // Alt kısım - responsive yükseklik
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(320.dp),  // Sabit yükseklik
+                    .heightIn(min = 280.dp, max = buttonSectionHeight),  // Responsive yükseklik
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(buttonSpacing)
             ) {
+                // Responsive buton yüksekliği
+                val buttonHeight = responsiveSize(compact = 48.dp, medium = 52.dp, expanded = 56.dp)
+                val buttonFontSize = if (isShort) 17.sp else 20.sp
+                
                 // Giriş Yap Butonu
                 Button(
                     onClick = onNavigateToSignIn,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(buttonHeight),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color(0xFF1A1A1A)
@@ -87,7 +107,7 @@ fun AuthOptionsScreen(
                         "Giriş Yap",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontSize = buttonFontSize
                         )
                     )
                 }
@@ -97,7 +117,7 @@ fun AuthOptionsScreen(
                     onClick = onNavigateToSignUp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(buttonHeight),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4A4A8F),
                         contentColor = Color.White
@@ -111,7 +131,7 @@ fun AuthOptionsScreen(
                         "Kayıt Ol",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontSize = buttonFontSize
                         )
                     )
                 }
