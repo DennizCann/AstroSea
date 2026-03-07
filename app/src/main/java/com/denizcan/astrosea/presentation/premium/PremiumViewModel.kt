@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.adapty.Adapty
 import com.denizcan.astrosea.billing.BillingConfig
 import com.denizcan.astrosea.billing.BillingManager
 import com.denizcan.astrosea.billing.BillingState
@@ -48,8 +49,20 @@ class PremiumViewModel(
     val uiState: StateFlow<PremiumUiState> = _uiState.asStateFlow()
     
     init {
+        identifyUser()
         observeBillingState()
         loadProducts()
+    }
+    
+    private fun identifyUser() {
+        val userId = auth.currentUser?.uid ?: return
+        Adapty.identify(userId) { error ->
+            if (error != null) {
+                Log.e(TAG, "Adapty kullanıcı tanımlama hatası: ${error.message}")
+            } else {
+                Log.d(TAG, "Adapty kullanıcı tanımlandı: $userId")
+            }
+        }
     }
     
     private fun observeBillingState() {
@@ -191,6 +204,46 @@ class PremiumViewModel(
         }
     }
     
+    /**
+     * Satın almaları geri yükle (Restore Purchases)
+     */
+    fun restorePurchases() {
+        _uiState.value = _uiState.value.copy(isLoading = true)
+        billingManager.restorePurchases { hasAccess ->
+            if (hasAccess) {
+                viewModelScope.launch {
+                    try {
+                        val userId = auth.currentUser?.uid ?: return@launch
+                        val premiumData = mapOf(
+                            "isPremium" to true,
+                            "premiumRestoredAt" to SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
+                        )
+                        firestore.collection("users")
+                            .document(userId)
+                            .set(premiumData, SetOptions.merge())
+                            .await()
+                        
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            purchaseSuccess = true
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Restore kaydetme hatası", e)
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = "Geri yükleme kaydedilemedi"
+                        )
+                    }
+                }
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "Geri yüklenecek satın alma bulunamadı"
+                )
+            }
+        }
+    }
+
     /**
      * Hata mesajını temizle
      */

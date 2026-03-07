@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
+import com.denizcan.astrosea.presentation.notifications.NotificationType
 
 class GoogleAuthUiClient(
     private val context: Context,
@@ -165,7 +166,8 @@ class GoogleAuthUiClient(
                         notificationManager.saveNotificationToFirestore(
                             userId = firebaseUser.uid,
                             title = "Hoş Geldiniz! ✨",
-                            message = "AstroSea'ye hoş geldiniz! İlk günlük tarot açılımınızı yaparak gününüzün enerjilerini keşfedin."
+                            message = "AstroSea'ye hoş geldiniz! İlk günlük tarot açılımınızı yaparak gününüzün enerjilerini keşfedin.",
+                            type = NotificationType.WELCOME
                         )
                         android.util.Log.d("GoogleAuth", "Welcome notification saved successfully")
                     } catch (e: Exception) {

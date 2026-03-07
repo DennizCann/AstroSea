@@ -311,7 +311,24 @@ fun PremiumScreen(
                     textAlign = TextAlign.Center
                 )
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Satın Almaları Geri Yükle
+                TextButton(
+                    onClick = { viewModel.restorePurchases() },
+                    enabled = !uiState.isLoading && !uiState.isPurchasing
+                ) {
+                    Text(
+                        text = "Satın Almaları Geri Yükle",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 14.sp
+                        ),
+                        color = Color(0xFFD4AF37).copy(alpha = 0.8f)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
         
@@ -693,12 +710,11 @@ private fun PricingCardPreview() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Seçili kart
         PricingCard(
             product = SubscriptionProduct(
                 productId = "monthly",
                 name = "Aylık",
-                price = "₺79.99",
+                price = "₺99.99",
                 duration = "/ay",
                 durationDays = 30,
                 pricePerMonth = null,
@@ -708,15 +724,14 @@ private fun PricingCardPreview() {
             onSelect = {}
         )
         
-        // Seçili olmayan kart
         PricingCard(
             product = SubscriptionProduct(
                 productId = "yearly",
                 name = "Yıllık",
-                price = "₺499.99",
+                price = "₺599.99",
                 duration = "/yıl",
                 durationDays = 365,
-                pricePerMonth = "Aylık ₺41.67",
+                pricePerMonth = "Aylık ₺50",
                 isPopular = false
             ),
             isSelected = false,
@@ -732,7 +747,7 @@ private fun PurchaseConfirmDialogPreview() {
         product = SubscriptionProduct(
             productId = "monthly",
             name = "Aylık Premium",
-            price = "₺79.99",
+            price = "₺99.99",
             duration = "/ay",
             durationDays = 30,
             isPopular = true
@@ -750,14 +765,14 @@ private fun PremiumScreenContentPreview() {
         SubscriptionProduct(
             productId = "weekly",
             name = "Haftalık",
-            price = "₺29.99",
+            price = "₺49.99",
             duration = "/hafta",
             durationDays = 7
         ),
         SubscriptionProduct(
             productId = "monthly",
             name = "Aylık",
-            price = "₺79.99",
+            price = "₺99.99",
             duration = "/ay",
             durationDays = 30,
             isPopular = true
@@ -765,10 +780,10 @@ private fun PremiumScreenContentPreview() {
         SubscriptionProduct(
             productId = "yearly",
             name = "Yıllık",
-            price = "₺499.99",
+            price = "₺599.99",
             duration = "/yıl",
             durationDays = 365,
-            pricePerMonth = "Aylık ₺41.67"
+            pricePerMonth = "Aylık ₺50"
         )
     )
     

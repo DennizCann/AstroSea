@@ -129,9 +129,12 @@ dependencies {
     // JSON parsing
     implementation 'org.json:json:20231013'
     
-    // Google Play Billing (In-App Purchases)
-    implementation 'com.android.billingclient:billing-ktx:6.1.0'
-    
     // Splash Screen API (Android 12+ uyumluluğu)
     implementation 'androidx.core:core-splashscreen:1.0.1'
+
+    // Adapty SDK (In-App Subscriptions)
+    implementation platform('io.adapty:adapty-bom:3.15.2')
+    implementation 'io.adapty:android-sdk'
+    implementation 'io.adapty:android-ui'
+    
 }

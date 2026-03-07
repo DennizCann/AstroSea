@@ -47,14 +47,27 @@ private fun outlinedCardBorder(brush: androidx.compose.ui.graphics.Brush? = null
     )
 }
 
+/**
+ * Firestore ile uyumlu bildirim veri sınıfı.
+ * Tüm alanların varsayılan değerleri olmalı (Firestore deserialization için).
+ */
 data class Notification(
-    val id: String,
-    val title: String,
-    val message: String,
-    val timestamp: Long,
+    val id: String = "",
+    val title: String = "",
+    val message: String = "",
+    val timestamp: Long = 0L,
     val isRead: Boolean = false,
-    val type: NotificationType = NotificationType.GENERAL
-)
+    val type: String = NotificationType.GENERAL.name  // Enum yerine String kullan
+) {
+    // Enum tipini almak için helper
+    fun getNotificationType(): NotificationType {
+        return try {
+            NotificationType.valueOf(type)
+        } catch (e: Exception) {
+            NotificationType.GENERAL
+        }
+    }
+}
 
 enum class NotificationType {
     DAILY_TAROT,      // Günlük tarot bildirimi
@@ -231,26 +244,40 @@ fun NotificationsScreen(
                             modifier = Modifier.weight(1f),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            items(notifications) { notification ->
+                            items(
+                                items = notifications,
+                                key = { it.id }  // Benzersiz key kullan
+                            ) { notification ->
                                 NotificationCard(
                                     notification = notification,
                                     onNotificationClick = {
-                                        scope.launch {
-                                            // Bildirimi okundu olarak işaretle
-                                            if (!notification.isRead && userId != null) {
+                                        android.util.Log.d("NotificationsScreen", "Bildirime tıklandı: id=${notification.id}, isRead=${notification.isRead}")
+                                        
+                                        // Bildirimi okundu olarak işaretle
+                                        if (!notification.isRead && userId != null) {
+                                            android.util.Log.d("NotificationsScreen", "Okundu olarak işaretleniyor... userId=$userId, notificationId=${notification.id}")
+                                            
+                                            scope.launch {
                                                 try {
+                                                    // Önce Firestore'u güncelle
                                                     notificationManager.markNotificationAsRead(userId, notification.id)
+                                                    android.util.Log.d("NotificationsScreen", "Firestore güncellendi, yerel liste güncelleniyor...")
                                                     
-                                                    // Yerel listeyi güncelle
+                                                    // Sonra yerel listeyi güncelle
                                                     val index = notifications.indexOfFirst { it.id == notification.id }
                                                     if (index != -1) {
-                                                        notifications[index] = notification.copy(isRead = true)
+                                                        // Listeyi doğrudan güncelle
+                                                        notifications.removeAt(index)
+                                                        notifications.add(index, notification.copy(isRead = true))
                                                         unreadCount = notifications.count { !it.isRead }
+                                                        android.util.Log.d("NotificationsScreen", "Yerel liste güncellendi, yeni unreadCount=$unreadCount")
                                                     }
                                                 } catch (e: Exception) {
-                                                    // Hata durumunda sessizce devam et
+                                                    android.util.Log.e("NotificationsScreen", "Bildirim okundu işaretlenemedi", e)
                                                 }
                                             }
+                                        } else {
+                                            android.util.Log.d("NotificationsScreen", "Bildirim zaten okunmuş veya userId null")
                                         }
                                     }
                                 )
@@ -306,7 +333,7 @@ fun NotificationCard(
             ) {
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = getNotificationTypeColor(notification.type)
+                        containerColor = getNotificationTypeColor(notification.getNotificationType())
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
@@ -316,7 +343,7 @@ fun NotificationCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = getNotificationTypeIcon(notification.type),
+                            imageVector = getNotificationTypeIcon(notification.getNotificationType()),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)

@@ -3,25 +3,31 @@ package com.denizcan.astrosea.billing
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import com.android.billingclient.api.*
+import com.adapty.Adapty
+import com.adapty.models.AdaptyPaywall
+import com.adapty.models.AdaptyPaywallProduct
+import com.adapty.models.AdaptyPeriodUnit
+import com.adapty.models.AdaptyPurchaseResult
+import com.adapty.utils.AdaptyResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * Google Play Billing yönetim sınıfı
- * TEST_MODE = true iken gerçek ödeme almaz, simülasyon yapar
- */
 object BillingConfig {
     // 🔧 TEST MODU - Geliştirme için true, yayınlamadan önce false yap
     const val TEST_MODE = true
-    
-    // Ürün ID'leri (Google Play Console'da oluşturunca güncelle)
+
+    // Adapty Placement ID - Dashboard'da oluşturacaksın
+    const val PLACEMENT_ID = "premium"
+
+    // Access Level ID - Dashboard'da tanımlı
+    const val ACCESS_LEVEL = "premium"
+
+    // Ürün ID'leri (Google Play Console'da oluşturunca Adapty'de eşle)
     const val PRODUCT_WEEKLY = "astrosea_weekly"
     const val PRODUCT_MONTHLY = "astrosea_monthly"
     const val PRODUCT_YEARLY = "astrosea_yearly"
-    
-    // Abonelik süreleri (gün cinsinden)
+
     const val DURATION_WEEKLY = 7
     const val DURATION_MONTHLY = 30
     const val DURATION_YEARLY = 365
@@ -34,7 +40,8 @@ data class SubscriptionProduct(
     val duration: String,
     val durationDays: Int,
     val pricePerMonth: String? = null,
-    val isPopular: Boolean = false
+    val isPopular: Boolean = false,
+    val adaptyProduct: AdaptyPaywallProduct? = null
 )
 
 sealed class BillingState {
@@ -49,305 +56,217 @@ sealed class BillingState {
 }
 
 class BillingManager(private val context: Context) {
-    
+
     companion object {
         private const val TAG = "BillingManager"
-        
+
         @Volatile
         private var INSTANCE: BillingManager? = null
-        
+
         fun getInstance(context: Context): BillingManager {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: BillingManager(context.applicationContext).also { INSTANCE = it }
             }
         }
     }
-    
+
     private val _billingState = MutableStateFlow<BillingState>(BillingState.Idle)
     val billingState: StateFlow<BillingState> = _billingState.asStateFlow()
-    
-    private var billingClient: BillingClient? = null
-    private var productDetailsList: List<ProductDetails> = emptyList()
-    
-    // Test modu için sabit ürünler
+
+    private var adaptyProducts: List<AdaptyPaywallProduct> = emptyList()
+
     private val testProducts = listOf(
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_WEEKLY,
             name = "Haftalık",
-            price = "25 ₺",
+            price = "₺49.99",
             duration = "/hafta",
             durationDays = BillingConfig.DURATION_WEEKLY,
-            pricePerMonth = null,
             isPopular = false
         ),
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_MONTHLY,
             name = "Aylık",
-            price = "40 ₺",
+            price = "₺99.99",
             duration = "/ay",
             durationDays = BillingConfig.DURATION_MONTHLY,
-            pricePerMonth = null,
             isPopular = true
         ),
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_YEARLY,
             name = "Yıllık",
-            price = "400 ₺",
+            price = "₺599.99",
             duration = "/yıl",
             durationDays = BillingConfig.DURATION_YEARLY,
-            pricePerMonth = "33 ₺/ay",
+            pricePerMonth = "Aylık ₺50",
             isPopular = false
         )
     )
-    
-    private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, purchases ->
-        when (billingResult.responseCode) {
-            BillingClient.BillingResponseCode.OK -> {
-                purchases?.forEach { purchase ->
-                    handlePurchase(purchase)
-                }
-            }
-            BillingClient.BillingResponseCode.USER_CANCELED -> {
-                Log.d(TAG, "Kullanıcı satın almayı iptal etti")
-                _billingState.value = BillingState.PurchaseCancelled("Satın alma iptal edildi")
-            }
-            else -> {
-                Log.e(TAG, "Satın alma hatası: ${billingResult.debugMessage}")
-                _billingState.value = BillingState.Error("Satın alma hatası: ${billingResult.debugMessage}")
-            }
-        }
-    }
-    
-    /**
-     * BillingClient'ı başlat ve Google Play'e bağlan
-     */
+
     fun startConnection() {
         if (BillingConfig.TEST_MODE) {
-            Log.d(TAG, "TEST MODU: Gerçek bağlantı yapılmıyor")
+            Log.d(TAG, "TEST MODU: Adapty bağlantısı simüle ediliyor")
             _billingState.value = BillingState.Connected
             _billingState.value = BillingState.ProductsLoaded(testProducts)
             return
         }
-        
+
         _billingState.value = BillingState.Loading
-        
-        billingClient = BillingClient.newBuilder(context)
-            .setListener(purchasesUpdatedListener)
-            .enablePendingPurchases()
-            .build()
-        
-        billingClient?.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(billingResult: BillingResult) {
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    Log.d(TAG, "Google Play Billing bağlantısı başarılı")
-                    _billingState.value = BillingState.Connected
-                    queryProducts()
-                } else {
-                    Log.e(TAG, "Bağlantı hatası: ${billingResult.debugMessage}")
-                    _billingState.value = BillingState.Error("Bağlantı hatası: ${billingResult.debugMessage}")
+
+        // Adapty üzerinden paywall ve ürünleri çek
+        Adapty.getPaywall(BillingConfig.PLACEMENT_ID) { result ->
+            when (result) {
+                is AdaptyResult.Success -> {
+                    val paywall = result.value
+                    Log.d(TAG, "Adapty paywall yüklendi: ${paywall.placement.id}")
+                    loadProducts(paywall)
                 }
-            }
-            
-            override fun onBillingServiceDisconnected() {
-                Log.w(TAG, "Google Play Billing bağlantısı kesildi")
-                _billingState.value = BillingState.Disconnected
-                // Yeniden bağlanmayı dene
-                startConnection()
-            }
-        })
-    }
-    
-    /**
-     * Mevcut abonelikleri sorgula
-     */
-    private fun queryProducts() {
-        val productList = listOf(
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(BillingConfig.PRODUCT_WEEKLY)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(BillingConfig.PRODUCT_MONTHLY)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build(),
-            QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(BillingConfig.PRODUCT_YEARLY)
-                .setProductType(BillingClient.ProductType.SUBS)
-                .build()
-        )
-        
-        val params = QueryProductDetailsParams.newBuilder()
-            .setProductList(productList)
-            .build()
-        
-        billingClient?.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                this.productDetailsList = productDetailsList
-                
-                val products = productDetailsList.mapNotNull { details ->
-                    val offerDetails = details.subscriptionOfferDetails?.firstOrNull()
-                    val pricingPhase = offerDetails?.pricingPhases?.pricingPhaseList?.firstOrNull()
-                    
-                    if (pricingPhase != null) {
-                        SubscriptionProduct(
-                            productId = details.productId,
-                            name = details.name,
-                            price = pricingPhase.formattedPrice,
-                            duration = getDurationString(pricingPhase.billingPeriod),
-                            durationDays = getDurationDays(pricingPhase.billingPeriod),
-                            pricePerMonth = calculateMonthlyPrice(details),
-                            isPopular = details.productId == BillingConfig.PRODUCT_MONTHLY
-                        )
-                    } else null
+                is AdaptyResult.Error -> {
+                    Log.e(TAG, "Adapty paywall hatası: ${result.error.message}")
+                    _billingState.value = BillingState.Error("Ürünler yüklenemedi: ${result.error.message}")
                 }
-                
-                Log.d(TAG, "Ürünler yüklendi: ${products.size} adet")
-                _billingState.value = BillingState.ProductsLoaded(products)
-            } else {
-                Log.e(TAG, "Ürün sorgulama hatası: ${billingResult.debugMessage}")
-                _billingState.value = BillingState.Error("Ürünler yüklenemedi")
             }
         }
     }
-    
-    /**
-     * Satın alma akışını başlat
-     */
+
+    private fun loadProducts(paywall: AdaptyPaywall) {
+        Adapty.getPaywallProducts(paywall) { result ->
+            when (result) {
+                is AdaptyResult.Success -> {
+                    adaptyProducts = result.value
+                    
+                    val products = adaptyProducts.map { adaptyProduct ->
+                        val subscriptionDetails = adaptyProduct.subscriptionDetails
+                        val periodUnit = subscriptionDetails?.subscriptionPeriod?.unit
+                        
+                        val (duration, durationDays, isPopular) = when (periodUnit) {
+                            AdaptyPeriodUnit.WEEK -> Triple("/hafta", 7, false)
+                            AdaptyPeriodUnit.MONTH -> Triple("/ay", 30, true)
+                            AdaptyPeriodUnit.YEAR -> Triple("/yıl", 365, false)
+                            else -> Triple("", 30, false)
+                        }
+                        
+                        SubscriptionProduct(
+                            productId = adaptyProduct.vendorProductId,
+                            name = adaptyProduct.localizedTitle,
+                            price = adaptyProduct.price.localizedString,
+                            duration = duration,
+                            durationDays = durationDays,
+                            pricePerMonth = if (durationDays == 365) calculateMonthlyPrice(adaptyProduct) else null,
+                            isPopular = isPopular,
+                            adaptyProduct = adaptyProduct
+                        )
+                    }
+
+                    Log.d(TAG, "Adapty ürünleri yüklendi: ${products.size} adet")
+                    _billingState.value = BillingState.ProductsLoaded(products)
+                }
+                is AdaptyResult.Error -> {
+                    Log.e(TAG, "Adapty ürün yükleme hatası: ${result.error.message}")
+                    _billingState.value = BillingState.Error("Ürünler yüklenemedi")
+                }
+            }
+        }
+    }
+
     fun launchPurchaseFlow(activity: Activity, productId: String) {
         if (BillingConfig.TEST_MODE) {
             Log.d(TAG, "TEST MODU: Simüle edilmiş satın alma - $productId")
-            // Test modunda direkt başarılı döndür
             _billingState.value = BillingState.PurchaseSuccess(productId)
             return
         }
-        
-        val productDetails = productDetailsList.find { it.productId == productId }
-        if (productDetails == null) {
+
+        val product = adaptyProducts.find { it.vendorProductId == productId }
+        if (product == null) {
             _billingState.value = BillingState.Error("Ürün bulunamadı: $productId")
             return
         }
-        
-        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
-        if (offerToken == null) {
-            _billingState.value = BillingState.Error("Teklif bulunamadı")
-            return
-        }
-        
-        val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
-            .setProductDetails(productDetails)
-            .setOfferToken(offerToken)
-            .build()
-        
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(listOf(productDetailsParams))
-            .build()
-        
-        billingClient?.launchBillingFlow(activity, billingFlowParams)
-    }
-    
-    /**
-     * Satın almayı işle ve onayla
-     */
-    private fun handlePurchase(purchase: Purchase) {
-        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-            // Satın alma başarılı
-            if (!purchase.isAcknowledged) {
-                // Satın almayı onayla
-                val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                    .setPurchaseToken(purchase.purchaseToken)
-                    .build()
-                
-                billingClient?.acknowledgePurchase(acknowledgePurchaseParams) { billingResult ->
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                        Log.d(TAG, "Satın alma onaylandı")
-                        val productId = purchase.products.firstOrNull() ?: ""
-                        _billingState.value = BillingState.PurchaseSuccess(productId)
-                    } else {
-                        Log.e(TAG, "Onaylama hatası: ${billingResult.debugMessage}")
-                        _billingState.value = BillingState.Error("Satın alma onaylanamadı")
+
+        Adapty.makePurchase(activity, product, null) { result ->
+            when (result) {
+                is AdaptyResult.Success -> {
+                    when (val purchaseResult = result.value) {
+                        is AdaptyPurchaseResult.Success -> {
+                            val profile = purchaseResult.profile
+                            val hasAccess = profile.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
+                            Log.d(TAG, "Satın alma başarılı! Premium erişim: $hasAccess")
+                            _billingState.value = BillingState.PurchaseSuccess(productId)
+                        }
+                        is AdaptyPurchaseResult.UserCanceled -> {
+                            Log.d(TAG, "Kullanıcı satın almayı iptal etti")
+                            _billingState.value = BillingState.PurchaseCancelled("Satın alma iptal edildi")
+                        }
+                        is AdaptyPurchaseResult.Pending -> {
+                            Log.d(TAG, "Satın alma beklemede")
+                            _billingState.value = BillingState.PurchaseCancelled("Satın alma işlemi beklemede")
+                        }
                     }
                 }
-            } else {
-                val productId = purchase.products.firstOrNull() ?: ""
-                _billingState.value = BillingState.PurchaseSuccess(productId)
+                is AdaptyResult.Error -> {
+                    Log.e(TAG, "Adapty satın alma hatası: ${result.error.message}")
+                    _billingState.value = BillingState.Error("Satın alma hatası: ${result.error.message}")
+                }
             }
         }
     }
-    
+
     /**
-     * Mevcut abonelikleri kontrol et
+     * Kullanıcının premium erişimi olup olmadığını Adapty'den kontrol et
      */
-    fun queryExistingPurchases(onResult: (List<Purchase>) -> Unit) {
+    fun checkPremiumAccess(onResult: (Boolean) -> Unit) {
         if (BillingConfig.TEST_MODE) {
-            Log.d(TAG, "TEST MODU: Mevcut abonelik yok")
-            onResult(emptyList())
+            Log.d(TAG, "TEST MODU: Premium erişim kontrolü atlandı")
+            onResult(false)
             return
         }
-        
-        val params = QueryPurchasesParams.newBuilder()
-            .setProductType(BillingClient.ProductType.SUBS)
-            .build()
-        
-        billingClient?.queryPurchasesAsync(params) { billingResult, purchases ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                onResult(purchases)
-            } else {
-                Log.e(TAG, "Abonelik sorgulama hatası: ${billingResult.debugMessage}")
-                onResult(emptyList())
+
+        Adapty.getProfile { result ->
+            when (result) {
+                is AdaptyResult.Success -> {
+                    val hasAccess = result.value.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
+                    Log.d(TAG, "Premium erişim durumu: $hasAccess")
+                    onResult(hasAccess)
+                }
+                is AdaptyResult.Error -> {
+                    Log.e(TAG, "Profil kontrol hatası: ${result.error.message}")
+                    onResult(false)
+                }
             }
         }
     }
-    
+
     /**
-     * Test ürünlerini al
+     * Satın almaları geri yükle
      */
-    fun getTestProducts(): List<SubscriptionProduct> = testProducts
-    
-    /**
-     * State'i sıfırla
-     */
+    fun restorePurchases(onResult: (Boolean) -> Unit) {
+        if (BillingConfig.TEST_MODE) {
+            Log.d(TAG, "TEST MODU: Restore atlandı")
+            onResult(false)
+            return
+        }
+
+        Adapty.restorePurchases { result ->
+            when (result) {
+                is AdaptyResult.Success -> {
+                    val hasAccess = result.value.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
+                    Log.d(TAG, "Restore sonucu: premium=$hasAccess")
+                    onResult(hasAccess)
+                }
+                is AdaptyResult.Error -> {
+                    Log.e(TAG, "Restore hatası: ${result.error.message}")
+                    onResult(false)
+                }
+            }
+        }
+    }
+
     fun resetState() {
         _billingState.value = BillingState.Idle
     }
-    
-    /**
-     * Bağlantıyı kapat
-     */
-    fun endConnection() {
-        billingClient?.endConnection()
-        billingClient = null
-    }
-    
-    // Yardımcı fonksiyonlar
-    private fun getDurationString(billingPeriod: String): String {
-        return when {
-            billingPeriod.contains("W") -> "/hafta"
-            billingPeriod.contains("M") -> "/ay"
-            billingPeriod.contains("Y") -> "/yıl"
-            else -> ""
-        }
-    }
-    
-    private fun getDurationDays(billingPeriod: String): Int {
-        return when {
-            billingPeriod.contains("W") -> 7
-            billingPeriod.contains("M") -> 30
-            billingPeriod.contains("Y") -> 365
-            else -> 30
-        }
-    }
-    
-    private fun calculateMonthlyPrice(productDetails: ProductDetails): String? {
-        val offerDetails = productDetails.subscriptionOfferDetails?.firstOrNull()
-        val pricingPhase = offerDetails?.pricingPhases?.pricingPhaseList?.firstOrNull()
-        
-        if (pricingPhase?.billingPeriod?.contains("Y") == true) {
-            val yearlyMicros = pricingPhase.priceAmountMicros
-            val monthlyMicros = yearlyMicros / 12
-            val monthlyPrice = monthlyMicros / 1_000_000.0
-            return String.format("%.0f ₺/ay", monthlyPrice)
-        }
-        return null
+
+    private fun calculateMonthlyPrice(product: AdaptyPaywallProduct): String? {
+        val priceAmount = product.price.amount
+        val monthly = priceAmount.toDouble() / 12
+        return "Aylık ₺${String.format("%.0f", monthly)}"
     }
 }
-

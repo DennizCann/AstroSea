@@ -31,23 +31,23 @@ class NotificationManager(private val context: Context) {
         message: String,
         type: NotificationType = NotificationType.DAILY_TAROT
     ): String? {
-        val notification = Notification(
-            id = "",
-            title = title,
-            message = message,
-            timestamp = System.currentTimeMillis(),
-            isRead = false,
-            type = type
+        // Firestore'a kaydedilecek veri - HashMap olarak
+        val notificationData = hashMapOf(
+            "title" to title,
+            "message" to message,
+            "timestamp" to System.currentTimeMillis(),
+            "isRead" to false,
+            "type" to type.name  // Enum'u String olarak kaydet
         )
         
         return try {
             val docRef = firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
-                .add(notification)
+                .add(notificationData)
                 .await()
             
-            Log.d(TAG, "Bildirim Firestore'a kaydedildi: ${docRef.id}")
+            Log.d(TAG, "Bildirim Firestore'a kaydedildi: ${docRef.id}, type: ${type.name}")
             docRef.id
         } catch (e: Exception) {
             Log.e(TAG, "Bildirim kaydetme hatası", e)
@@ -79,6 +79,8 @@ class NotificationManager(private val context: Context) {
      */
     suspend fun getAllNotifications(userId: String): List<Notification> {
         return try {
+            Log.d(TAG, "Bildirimler yükleniyor... userId: $userId")
+            
             val snapshot = firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
@@ -86,9 +88,32 @@ class NotificationManager(private val context: Context) {
                 .get()
                 .await()
             
-            snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Notification::class.java)?.copy(id = doc.id)
+            Log.d(TAG, "Firestore'dan ${snapshot.documents.size} bildirim dökümanı alındı")
+            
+            val notifications = snapshot.documents.mapNotNull { doc ->
+                try {
+                    // Manuel olarak Notification oluştur (daha güvenilir)
+                    val data = doc.data ?: return@mapNotNull null
+                    
+                    val notification = Notification(
+                        id = doc.id,  // Firestore document ID
+                        title = data["title"] as? String ?: "",
+                        message = data["message"] as? String ?: "",
+                        timestamp = (data["timestamp"] as? Long) ?: 0L,
+                        isRead = data["isRead"] as? Boolean ?: false,
+                        type = data["type"] as? String ?: NotificationType.GENERAL.name
+                    )
+                    
+                    Log.d(TAG, "Bildirim parse edildi: id=${notification.id}, title=${notification.title}, isRead=${notification.isRead}")
+                    notification
+                } catch (e: Exception) {
+                    Log.e(TAG, "Bildirim parse hatası: ${doc.id}", e)
+                    null
+                }
             }
+            
+            Log.d(TAG, "Toplam ${notifications.size} bildirim yüklendi")
+            notifications
         } catch (e: Exception) {
             Log.e(TAG, "Bildirimler alınamadı", e)
             emptyList()
@@ -99,7 +124,14 @@ class NotificationManager(private val context: Context) {
      * Bildirimi okundu olarak işaretler
      */
     suspend fun markNotificationAsRead(userId: String, notificationId: String) {
+        if (notificationId.isEmpty()) {
+            Log.e(TAG, "Bildirim ID boş, güncelleme yapılamadı!")
+            return
+        }
+        
         try {
+            Log.d(TAG, "Bildirim okundu işaretleniyor... userId: $userId, notificationId: $notificationId")
+            
             firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
@@ -107,9 +139,10 @@ class NotificationManager(private val context: Context) {
                 .update("isRead", true)
                 .await()
             
-            Log.d(TAG, "Bildirim okundu işaretlendi: $notificationId")
+            Log.d(TAG, "Bildirim başarıyla okundu işaretlendi: $notificationId")
         } catch (e: Exception) {
-            Log.e(TAG, "Bildirim okundu işaretlenemedi", e)
+            Log.e(TAG, "Bildirim okundu işaretlenemedi: $notificationId", e)
+            throw e  // Hatayı yukarı fırlat ki UI'da yakalansın
         }
     }
     
