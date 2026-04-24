@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "14279256363-hm2ngo0rufj554udj9u7ieultsfrpru5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.denizcan.astrosea",
+            "certificate_hash": "066403336dc6b1d51fab1c82ab980650220b545f"
+          }
+        },
+        {
+          "client_id": "14279256363-mh3osp2vcnm78bemkmv56fne77k96g72.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.denizcan.astrosea",
+            "certificate_hash": "14dfd04284f5032463c2e0cdebaba6ee5400c1d7"
+          }
+        },
+        {
           "client_id": "14279256363-vi3ujouvls6afiemcdkgmbplcrneth0r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

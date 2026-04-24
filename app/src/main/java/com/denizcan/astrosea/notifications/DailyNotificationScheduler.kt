@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import java.util.Calendar
 
@@ -51,33 +50,13 @@ object DailyNotificationScheduler {
             }
         }
         
-        // Android 12+ için exact alarm izni gerekli
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
-                Log.d(TAG, "Günlük bildirim zamanlandı: ${calendar.time}")
-            } else {
-                // Exact alarm izni yoksa inexact alarm kullan
-                alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
-                Log.d(TAG, "Günlük bildirim zamanlandı (inexact): ${calendar.time}")
-            }
-        } else {
-            // Android 11 ve altı
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                pendingIntent
-            )
-            Log.d(TAG, "Günlük bildirim zamanlandı: ${calendar.time}")
-        }
+        // Exact alarm izinleri olmadan da calisacak inexact zamanlama kullan.
+        alarmManager.setAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+        Log.d(TAG, "Günlük bildirim zamanlandı (inexact): ${calendar.time}")
         
         // SharedPreferences'a kaydet (boot receiver için)
         saveAlarmState(context, true)

@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object BillingConfig {
-    // 🔧 TEST MODU - Geliştirme için true, yayınlamadan önce false yap
-    const val TEST_MODE = true
+    // Canli ortama gecis: gercek Play Billing akisini kullan
+    const val TEST_MODE = false
 
     // Adapty Placement ID - Dashboard'da oluşturacaksın
     const val PLACEMENT_ID = "premium"
