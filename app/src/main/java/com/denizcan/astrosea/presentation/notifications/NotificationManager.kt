@@ -18,6 +18,9 @@ class NotificationManager(private val context: Context) {
     companion object {
         private const val TAG = "NotificationManager"
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 100
+        private const val DISPLAY_WINDOW_DAYS = 7L
+        private const val RETENTION_DAYS = 30L
+        private const val MAX_NOTIFICATIONS = 50L
     }
     
     // ==================== FIRESTORE İŞLEMLERİ ====================
@@ -31,11 +34,13 @@ class NotificationManager(private val context: Context) {
         message: String,
         type: NotificationType = NotificationType.DAILY_TAROT
     ): String? {
+        val now = System.currentTimeMillis()
         // Firestore'a kaydedilecek veri - HashMap olarak
         val notificationData = hashMapOf(
             "title" to title,
             "message" to message,
-            "timestamp" to System.currentTimeMillis(),
+            "timestamp" to now,
+            "expiresAt" to now + daysToMillis(RETENTION_DAYS),
             "isRead" to false,
             "type" to type.name  // Enum'u String olarak kaydet
         )
@@ -46,6 +51,9 @@ class NotificationManager(private val context: Context) {
                 .collection("notifications")
                 .add(notificationData)
                 .await()
+
+            // Veri tabanini sisme riskine karsi, kayit sirasinda eski bildirimleri temizle.
+            deleteOldNotifications(userId)
             
             Log.d(TAG, "Bildirim Firestore'a kaydedildi: ${docRef.id}, type: ${type.name}")
             docRef.id
@@ -60,9 +68,11 @@ class NotificationManager(private val context: Context) {
      */
     suspend fun getUnreadNotificationCount(userId: String): Int {
         return try {
+            val visibleWindowStart = System.currentTimeMillis() - daysToMillis(DISPLAY_WINDOW_DAYS)
             val snapshot = firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
+                .whereGreaterThanOrEqualTo("timestamp", visibleWindowStart)
                 .whereEqualTo("isRead", false)
                 .get()
                 .await()
@@ -80,11 +90,14 @@ class NotificationManager(private val context: Context) {
     suspend fun getAllNotifications(userId: String): List<Notification> {
         return try {
             Log.d(TAG, "Bildirimler yükleniyor... userId: $userId")
+            val visibleWindowStart = System.currentTimeMillis() - daysToMillis(DISPLAY_WINDOW_DAYS)
             
             val snapshot = firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
+                .whereGreaterThanOrEqualTo("timestamp", visibleWindowStart)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(MAX_NOTIFICATIONS)
                 .get()
                 .await()
             
@@ -175,12 +188,12 @@ class NotificationManager(private val context: Context) {
      */
     suspend fun deleteOldNotifications(userId: String) {
         try {
-            val thirtyDaysAgo = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
+            val retentionStart = System.currentTimeMillis() - daysToMillis(RETENTION_DAYS)
             
             val snapshot = firestore.collection("users")
                 .document(userId)
                 .collection("notifications")
-                .whereLessThan("timestamp", thirtyDaysAgo)
+                .whereLessThan("timestamp", retentionStart)
                 .get()
                 .await()
             
@@ -194,6 +207,10 @@ class NotificationManager(private val context: Context) {
         } catch (e: Exception) {
             Log.e(TAG, "Eski bildirimler silinemedi", e)
         }
+    }
+
+    private fun daysToMillis(days: Long): Long {
+        return days * 24 * 60 * 60 * 1000
     }
     
     // ==================== İZİN KONTROLLERİ ====================

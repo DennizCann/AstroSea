@@ -1,7 +1,6 @@
 package com.denizcan.astrosea.presentation.home
 
 import android.util.Log
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
@@ -107,18 +106,6 @@ fun HomeScreen(
         }
     }
     
-    // Pulse animasyonu için
-    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "pulse")
-    val pulseScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.3f,
-        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
-            animation = androidx.compose.animation.core.tween(1000),
-            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
-        ),
-        label = "pulse"
-    )
-    
     // Günlük kartları yenile - ekrana her gelişte Firestore'dan güncel veriyi al
     LaunchedEffect(Unit) {
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
@@ -128,6 +115,9 @@ fun HomeScreen(
         }
     }
     
+    // Çan için okunmamis bildirim rozeti (dot) gosterimi.
+    val showNotificationBadge = true
+
     // Okunmamış bildirim sayısını yükle ve periyodik olarak güncelle
     LaunchedEffect(Unit) {
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
@@ -244,50 +234,30 @@ fun HomeScreen(
                                 modifier = Modifier.weight(1f),
                                 contentAlignment = Alignment.Center
                             ) {
-                                IconButton(
-                                    onClick = onNavigateToNotifications
+                                Box(
+                                    modifier = Modifier.size(40.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Notifications,
-                                        contentDescription = "Bildirimler",
-                                        tint = Color.White
-                                    )
-                                }
-                                
-                                // Okunmamış bildirim sayacı
-                                if (unreadNotificationCount > 0) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(20.dp)
-                                            .clip(CircleShape)
-                                            .background(Color(0xFFFFD700))
-                                            .align(Alignment.TopEnd)
-                                            .offset(x = 8.dp, y = (-4).dp),
-                                        contentAlignment = Alignment.Center
+                                    IconButton(
+                                        onClick = onNavigateToNotifications,
+                                        modifier = Modifier.fillMaxSize()
                                     ) {
-                                        Text(
-                                            text = if (unreadNotificationCount > 99) "99+" else unreadNotificationCount.toString(),
-                                            color = Color.Black,
-                                            fontSize = 10.sp,
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                fontFamily = FontFamily(Font(R.font.cinzel_bold))
-                                            )
+                                        Icon(
+                                            imageVector = Icons.Default.Notifications,
+                                            contentDescription = "Bildirimler",
+                                            tint = Color.White
                                         )
                                     }
-                                    
-                                    // Animasyonlu pulse efekti
-                                    if (unreadNotificationCount > 0) {
+
+                                    // Okunmamis bildirimler icin kucuk kirmizi dot.
+                                    if (showNotificationBadge && unreadNotificationCount > 0) {
                                         Box(
                                             modifier = Modifier
-                                                .size(24.dp)
+                                                .size(9.dp)
                                                 .clip(CircleShape)
-                                                .background(Color(0xFFFFD700).copy(alpha = 0.3f))
+                                                .background(Color(0xFFFF3B30))
                                                 .align(Alignment.TopEnd)
-                                                .offset(x = 6.dp, y = (-6).dp)
-                                                .graphicsLayer {
-                                                    scaleX = pulseScale
-                                                    scaleY = pulseScale
-                                                }
+                                                .offset(x = 2.dp, y = (-2).dp)
                                         )
                                     }
                                 }

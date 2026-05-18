@@ -163,7 +163,7 @@ fun NotificationsScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "Toplam Bildirim",
+                                    text = "Son 7 Gün",
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 16.sp
