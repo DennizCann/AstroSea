@@ -152,7 +152,7 @@ Kanun'un 11. maddesi uyarınca, veri sorumlusu olan Geliştirici'ye başvurarak 
 
 KVKK kapsamındaki taleplerinizi, kimliğinizi tespit edici gerekli bilgiler ile birlikte aşağıdaki e-posta adresine iletebilirsiniz:
 
-E-posta: kvkk@astrosea.app
+E-posta: astrosea777@gmail.com
 
 Talebiniz, niteliğine göre en kısa sürede ve en geç 30 (otuz) gün içinde ücretsiz olarak sonuçlandırılacaktır.
 """
@@ -244,7 +244,7 @@ In accordance with Article 11 of the Law, you can exercise the following rights 
 
 You can submit your requests within the scope of KVKK, along with the necessary information to identify your identity, to the following e-mail address:
 
-E-mail: kvkk@astrosea.app
+E-mail: astrosea777@gmail.com
 
 Your request will be concluded free of charge as soon as possible and within 30 (thirty) days at the latest, depending on its nature.
 """
