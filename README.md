@@ -1,102 +1,63 @@
 # AstroSea
 
-AstroSea, tarot ve astroloji odaklı bir Android uygulamasıdır.  
-Uygulama; günlük açılımlar, farklı tarot okuma türleri, profil bazlı kişiselleştirme, bildirim sistemi ve premium üyelik akışını bir araya getirir.
+AstroSea, tarot ve astroloji odaklı, Kotlin + Jetpack Compose ile geliştirilmiş bir Android uygulamasıdır.  
+Proje; kişiselleştirilmiş içerik deneyimi, hesap yönetimi, bildirim merkezi ve premium üyelik akışını üretim seviyesinde bir mobil ürün yaklaşımıyla birleştirir.
 
-## Öne Çıkan Özellikler
+## Product Snapshot
 
-- Google ile giriş ve kullanıcı hesabı yönetimi
-- Günlük tarot kartı akışı ve farklı okuma kategorileri
-- Burç yorumları ve doğum haritası ekranları
-- Uygulama içi bildirim merkezi (okunmamış durum takibi)
-- Premium üyelik/paywall akışı (Play Billing + Adapty)
-- Firebase tabanlı kullanıcı ve içerik verisi yönetimi
+- Platform: Android
+- Durum: Production-ready yayın akışı
+- Mimari yaklaşım: Modüler ekran yapısı + ViewModel tabanlı state yönetimi
+- Gelir modeli: Play Billing abonelik altyapısı
 
-## Teknik Stack
+## Neler Sunuyor?
 
-- **Dil:** Kotlin
-- **UI:** Jetpack Compose (Material 3)
-- **Mimari:** ViewModel + StateFlow tabanlı ekran yönetimi
-- **Navigation:** Navigation Compose
-- **Backend/Servisler:** Firebase Auth, Firestore, Realtime Database, Analytics
-- **Kimlik Doğrulama:** Google Sign-In
-- **Abonelik:** Google Play Billing + Adapty SDK
-- **Arka Plan İşleri:** WorkManager
+- Google ile giriş ve kullanıcı profili yönetimi
+- Günlük tarot akışı ve çoklu açılım senaryoları
+- Burç ve doğum haritası ekranları
+- Uygulama içi bildirim merkezi (okunmamış durum göstergesi ile)
+- Premium paywall ve abonelik yönetimi
+- Firestore tabanlı kullanıcı ve içerik verisi akışı
 
-## Proje Yapısı (Özet)
+## Tech Stack
+
+- Kotlin
+- Jetpack Compose (Material 3)
+- Navigation Compose
+- Firebase (Auth, Firestore, Realtime DB, Analytics)
+- Google Sign-In
+- Google Play Billing + Adapty
+- WorkManager
+
+## Mühendislik Notları
+
+- Mobil üretim süreçlerine uygun versioning (`versionCode` artışı) ve release akışı
+- Store compliance için gizlilik politikası, hesap silme ve veri güvenliği deklarasyonları
+- Bildirim tarafında veri saklama penceresi (son 7 gün görüntüleme, eski kayıt temizliği)
+- UI/UX tarafında sade ve odaklı ana akış tasarımı
+
+## Proje Yapısı (Kısa)
 
 ```text
-app/
-  src/main/java/com/denizcan/astrosea/
-    presentation/      -> Compose ekranları ve UI logic
-    auth/              -> Kimlik doğrulama akışları
-    billing/           -> Premium/abonelik yönetimi
-    notifications/     -> Bildirim zamanlama ve receiver katmanı
-    navigation/        -> Route ve ekran yönlendirmeleri
+app/src/main/java/com/denizcan/astrosea/
+  presentation/   -> Compose ekranları
+  auth/           -> Kimlik doğrulama
+  billing/        -> Premium/abonelik
+  notifications/  -> Bildirim planlama ve yönetim
+  navigation/     -> Uygulama route yapısı
 ```
 
-## Kurulum
+## Privacy & Compliance
 
-### Gereksinimler
+- Privacy Policy: `docs/privacy-policy.html`
+- Account Deletion: `docs/account-deletion.html`
 
-- Android Studio (güncel stable sürüm)
-- JDK 11+
-- Android SDK (minSdk 24, target/compileSdk 35)
-
-### 1) Projeyi Klonla
-
-```bash
-git clone https://github.com/DennizCann/AstroSea.git
-cd AstroSea
-```
-
-### 2) Yerel Ayarlar
-
-`local.properties` içinde gerekli anahtarları tanımla:
-
-```properties
-GROQ_API_KEY=YOUR_KEY
-```
-
-`app/google-services.json` dosyasının mevcut ve doğru Firebase projesine bağlı olduğundan emin ol.
-
-### 3) Çalıştırma
-
-- Android Studio ile projeyi aç
-- Gradle sync tamamlandıktan sonra `app` modülünü çalıştır
-
-## Build
-
-Debug build:
-
-```bash
-./gradlew :app:assembleDebug
-```
-
-Release bundle:
-
-```bash
-./gradlew :app:bundleRelease
-```
-
-> Not: Play Console yüklemelerinde `versionCode` her sürümde artırılmalıdır.
-
-## Gizlilik ve Hesap Silme
-
-- Gizlilik Politikası: `docs/privacy-policy.html`
-- Hesap Silme Talebi: `docs/account-deletion.html`
-
-GitHub Pages aktifse:
+Public Pages:
 
 - `https://dennizcann.github.io/AstroSea/privacy-policy.html`
 - `https://dennizcann.github.io/AstroSea/account-deletion.html`
 
-## Durum
+## Contact
 
-Proje aktif geliştirme altındadır.  
-Kapalı test, Play Console süreçleri ve yayın hazırlıkları düzenli olarak güncellenmektedir.
-
----
-
-İletişim: **astrosea777@gmail.com**
+**astrosea777@gmail.com**
 
