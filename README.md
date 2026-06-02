@@ -1,23 +1,24 @@
 # AstroSea
 
-AstroSea, tarot ve astroloji odaklı, Kotlin + Jetpack Compose ile geliştirilmiş bir Android uygulamasıdır.  
-Proje; kişiselleştirilmiş içerik deneyimi, hesap yönetimi, bildirim merkezi ve premium üyelik akışını üretim seviyesinde bir mobil ürün yaklaşımıyla birleştirir.
+For Turkish documentation, see [README.tr.md](README.tr.md).
+
+AstroSea is an Android application built with Kotlin and Jetpack Compose, featuring authentication, subscription management, notifications, personalized content delivery, and AI-powered user experiences.
 
 ## Product Snapshot
 
 - Platform: Android
-- Durum: Production-ready yayın akışı
-- Mimari yaklaşım: Modüler ekran yapısı + ViewModel tabanlı state yönetimi
-- Gelir modeli: Play Billing abonelik altyapısı
+- Status: Production-ready release flow
+- Architecture approach: Modular screen structure + ViewModel-based state management
+- Monetization model: Play Billing subscription infrastructure
 
-## Neler Sunuyor?
+## What It Offers
 
-- Google ile giriş ve kullanıcı profili yönetimi
-- Günlük tarot akışı ve çoklu açılım senaryoları
-- Burç ve doğum haritası ekranları
-- Uygulama içi bildirim merkezi (okunmamış durum göstergesi ile)
-- Premium paywall ve abonelik yönetimi
-- Firestore tabanlı kullanıcı ve içerik verisi akışı
+- Google Sign-In and user profile management
+- Daily tarot flow and multiple reading scenarios
+- Horoscope and birth chart screens
+- In-app notification center (with unread status indicator)
+- Premium paywall and subscription management
+- Firestore-based user and content data flow
 
 ## Tech Stack
 
@@ -29,22 +30,22 @@ Proje; kişiselleştirilmiş içerik deneyimi, hesap yönetimi, bildirim merkezi
 - Google Play Billing + Adapty
 - WorkManager
 
-## Mühendislik Notları
+## Engineering Notes
 
-- Mobil üretim süreçlerine uygun versioning (`versionCode` artışı) ve release akışı
-- Store compliance için gizlilik politikası, hesap silme ve veri güvenliği deklarasyonları
-- Bildirim tarafında veri saklama penceresi (son 7 gün görüntüleme, eski kayıt temizliği)
-- UI/UX tarafında sade ve odaklı ana akış tasarımı
+- Mobile release versioning with `versionCode` increments
+- Store compliance assets: privacy policy, account deletion, and data safety declarations
+- Notification retention window optimization (last 7 days in UI + cleanup policy)
+- Clean and focused main flow with iterative UX improvements
 
-## Proje Yapısı (Kısa)
+## Project Structure (Short)
 
 ```text
 app/src/main/java/com/denizcan/astrosea/
-  presentation/   -> Compose ekranları
-  auth/           -> Kimlik doğrulama
-  billing/        -> Premium/abonelik
-  notifications/  -> Bildirim planlama ve yönetim
-  navigation/     -> Uygulama route yapısı
+  presentation/   -> Compose screens
+  auth/           -> Authentication flows
+  billing/        -> Premium/subscription logic
+  notifications/  -> Notification scheduling and management
+  navigation/     -> Route structure
 ```
 
 ## Privacy & Compliance
