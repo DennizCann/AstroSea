@@ -11,87 +11,48 @@ class SmartNavigationHelper(
     
     private val infoScreenManager = InfoScreenManager(context)
     
-    /**
-     * Açılım sayfasına akıllı navigation yapar
-     * Info ekranı bugün gösterilmemişse info ekranına, gösterilmişse direkt detay sayfasına gider
-     */
     fun navigateToReading(readingType: String) {
         if (infoScreenManager.shouldShowInfoScreen(readingType)) {
-            // Info ekranı bugün gösterilmemiş, info ekranına git
-            navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType))
+            navController.navigate(Screen.GeneralReadingInfo.createRoute(readingType)) {
+                launchSingleTop = true
+            }
         } else {
-            // Info ekranı bugün gösterilmiş, direkt detay sayfasına git
-            navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+            navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType)) {
+                launchSingleTop = true
+            }
         }
     }
     
-    /**
-     * Info ekranından detay sayfasına geçerken info ekranının gösterildiğini kaydeder
-     */
     fun navigateFromInfoToDetail(readingType: String) {
         infoScreenManager.markInfoScreenAsShown(readingType)
-        navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType))
+        navController.navigate(Screen.GeneralReadingDetail.createRoute(readingType)) {
+            launchSingleTop = true
+        }
     }
     
-    /**
-     * Detay sayfasından geri dönerken uygun sayfaya yönlendirir
-     * Info ekranına değil, ana açılım sayfasına döner
-     */
     fun navigateBackFromDetail(readingType: String) {
-        // Hangi ana sayfadan geldiğini belirle ve o sayfaya dön
-        when (readingType.trim()) {
-            // İlişki açılımları sayfasındaki açılımlar
+        val targetRoute = when (readingType.trim()) {
             "İLİŞKİ AÇILIMI",
-            "UYUMLULUK AÇILIMI", 
+            "UYUMLULUK AÇILIMI",
             "DETAYLI İLİŞKİ AÇILIMI",
             "MÜCADELELER AÇILIMI",
-            "TAMAM MI, DEVAM MI" -> {
-                // İlişki açılımları sayfasına dön
-                navController.navigate("relationship_readings") {
-                    popUpTo("relationship_readings") { inclusive = true }
-                }
-            }
-            // Kariyer açılımı sayfasındaki açılımlar
+            "TAMAM MI, DEVAM MI" -> "relationship_readings"
             "KARİYER AÇILIMI",
             "GELECEĞİNE GİDEN YOL",
             "İŞ YERİNDEKİ PROBLEMLER",
-            "FİNANSAL DURUM" -> {
-                // Kariyer açılımı sayfasına dön
-                navController.navigate("career_reading") {
-                    popUpTo("career_reading") { inclusive = true }
-                }
-            }
-            // Genel açılımlar sayfasındaki açılımlar (günlük ve evet-hayır dahil)
-            "GÜNLÜK AÇILIM",
-            "EVET – HAYIR AÇILIMI",
-            "TEK KART AÇILIMI",
-            "GEÇMİŞ, ŞİMDİ, GELECEK",
-            "DURUM, AKSİYON, SONUÇ" -> {
-                // Genel açılımlar sayfasına dön
-                navController.navigate(Screen.GeneralReadings.route) {
-                    popUpTo(Screen.GeneralReadings.route) { inclusive = true }
-                }
-            }
-            else -> {
-                // Varsayılan olarak genel açılımlar sayfasına dön
-                navController.navigate(Screen.GeneralReadings.route) {
-                    popUpTo(Screen.GeneralReadings.route) { inclusive = true }
-                }
-            }
+            "FİNANSAL DURUM" -> "career_reading"
+            else -> Screen.GeneralReadings.route
+        }
+        if (!navController.popBackStack(targetRoute, inclusive = false)) {
+            navController.popBackStack()
         }
     }
     
-    /**
-     * Test için info ekranı kayıtlarını temizler
-     */
     fun clearInfoScreenRecords() {
         infoScreenManager.clearAllInfoScreenRecords()
     }
     
-    /**
-     * Belirli bir açılım için info ekranı kaydını temizler
-     */
     fun clearInfoScreenRecord(readingType: String) {
         infoScreenManager.clearInfoScreenRecord(readingType)
     }
-} 
+}

@@ -55,6 +55,7 @@ class PremiumViewModel(
     }
     
     private fun identifyUser() {
+        if (BillingConfig.TEST_MODE) return
         val userId = auth.currentUser?.uid ?: return
         Adapty.identify(userId) { error ->
             if (error != null) {

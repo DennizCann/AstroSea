@@ -52,9 +52,10 @@ fun ProfileScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showKvkkDialog by remember { mutableStateOf(false) }
-    // İlk yüklenen profil verisini sakla
-    val initialProfileData = remember { state.profileData.copy() }
-    // Değişiklik kontrolü
+    var initialProfileData by remember { mutableStateOf(state.profileData.copy()) }
+    LaunchedEffect(Unit) {
+        initialProfileData = state.profileData.copy()
+    }
     val isChanged = state.profileData != initialProfileData
     
     // Mevcut tarihi parse et
@@ -161,6 +162,16 @@ fun ProfileScreen(
                 }
             }
         ) { paddingValues ->
+            if (state.isLoading && state.profileData.name.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color.White)
+                }
+            } else {
             val scrollState = rememberScrollState()
             val horizontalPad = responsivePadding(compact = 6.dp, medium = 8.dp, expanded = 12.dp)
             
@@ -376,6 +387,7 @@ fun ProfileScreen(
                 
                 // Alt boşluk - scroll için
                 Spacer(modifier = Modifier.height(24.dp))
+            }
             }
         }
         // Wheel DatePicker Dialog

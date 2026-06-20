@@ -3,6 +3,7 @@
 
     <!-- Ana uygulama teması -->
     <style name="Theme.AstroSea" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/splash_background</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:fitsSystemWindows">false</item>

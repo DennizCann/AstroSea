@@ -9,13 +9,13 @@ import com.adapty.models.AdaptyPaywallProduct
 import com.adapty.models.AdaptyPeriodUnit
 import com.adapty.models.AdaptyPurchaseResult
 import com.adapty.utils.AdaptyResult
+import com.denizcan.astrosea.BuildConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object BillingConfig {
-    // Canli ortama gecis: gercek Play Billing akisini kullan
-    const val TEST_MODE = false
+    val TEST_MODE: Boolean = BuildConfig.BILLING_TEST_MODE
 
     // Adapty Placement ID - Dashboard'da oluşturacaksın
     const val PLACEMENT_ID = "premium"

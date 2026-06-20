@@ -48,6 +48,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import com.denizcan.astrosea.util.responsiveSize
 import com.denizcan.astrosea.util.screenWidth
@@ -106,64 +109,44 @@ fun HomeScreen(
         }
     }
     
-    // Günlük kartları yenile - ekrana her gelişte Firestore'dan güncel veriyi al
-    LaunchedEffect(Unit) {
-        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            android.util.Log.d("HomeScreen", "Refreshing daily cards for user: $userId")
-            dailyTarotViewModel.refreshCards()
-        }
-    }
-    
-    // Çan için okunmamis bildirim rozeti (dot) gosterimi.
-    val showNotificationBadge = true
-
-    // Okunmamış bildirim sayısını yükle ve periyodik olarak güncelle
-    LaunchedEffect(Unit) {
-        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            scope.launch {
-                try {
-                    unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
-                    android.util.Log.d("HomeScreen", "Initial notification count: $unreadNotificationCount")
-                } catch (e: Exception) {
-                    android.util.Log.e("HomeScreen", "Error loading initial notification count", e)
-                }
-            }
-        } else {
-            android.util.Log.d("HomeScreen", "No user logged in")
-        }
-    }
-    
-    // Bildirim sayacını periyodik olarak güncelle (her 5 saniyede bir)
-    LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.delay(5000) // 5 saniye
-            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
-            if (userId != null) {
+    // Ekrana donunce kartlari ve bildirim sayacini yenile
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
                 scope.launch {
-                    try {
-                        val newCount = notificationManager.getUnreadNotificationCount(userId)
-                        if (newCount != unreadNotificationCount) {
-                            android.util.Log.d("HomeScreen", "Notification count updated: $unreadNotificationCount -> $newCount")
-                            unreadNotificationCount = newCount
+                    val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+                    if (userId != null) {
+                        dailyTarotViewModel.refreshCards()
+                        try {
+                            unreadNotificationCount = notificationManager.getUnreadNotificationCount(userId)
+                        } catch (e: Exception) {
+                            android.util.Log.e("HomeScreen", "Error refreshing notification count", e)
                         }
-                    } catch (e: Exception) {
-                        android.util.Log.e("HomeScreen", "Error updating notification count", e)
                     }
                 }
             }
         }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
+    // Periyodik bildirim guncellemesi
     LaunchedEffect(Unit) {
-        // viewModel init bloğunda loadProfile() çağrılıyor
-    }
-
-    // Günlük kartları sadece bir kez yükle
-    LaunchedEffect(Unit) {
-        // Sadece bir kez yükle, sürekli refresh yapma
-        dailyTarotViewModel.refreshCards()
+        while (true) {
+            kotlinx.coroutines.delay(30_000)
+            val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                try {
+                    val newCount = notificationManager.getUnreadNotificationCount(userId)
+                    if (newCount != unreadNotificationCount) {
+                        unreadNotificationCount = newCount
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("HomeScreen", "Error updating notification count", e)
+                }
+            }
+        }
     }
 
     // Menü seçeneklerini güncelliyoruz
@@ -245,19 +228,25 @@ fun HomeScreen(
                                         Icon(
                                             imageVector = Icons.Default.Notifications,
                                             contentDescription = "Bildirimler",
-                                            tint = Color.White
+                                            tint = if (unreadNotificationCount > 0) {
+                                                Color(0xFFFFD60A)
+                                            } else {
+                                                Color.White
+                                            }
                                         )
                                     }
 
-                                    // Okunmamis bildirimler icin kucuk kirmizi dot.
-                                    if (showNotificationBadge && unreadNotificationCount > 0) {
+                                    if (unreadNotificationCount > 0) {
                                         Box(
                                             modifier = Modifier
-                                                .size(9.dp)
+                                                .size(11.dp)
+                                                .align(Alignment.TopEnd)
+                                                .offset(x = 4.dp, y = 4.dp)
+                                                .clip(CircleShape)
+                                                .background(Color(0xFF0A0E27))
+                                                .padding(1.5.dp)
                                                 .clip(CircleShape)
                                                 .background(Color(0xFFFF3B30))
-                                                .align(Alignment.TopEnd)
-                                                .offset(x = 2.dp, y = (-2).dp)
                                         )
                                     }
                                 }
@@ -353,97 +342,6 @@ fun HomeScreen(
                             )
                         }
                     }
-                }
-
-                // Arama kısmı
-                var searchQuery by remember { mutableStateOf("") }
-                var showSearchAlert by remember { mutableStateOf(false) }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clickable { showSearchAlert = true },
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Black.copy(alpha = 0.6f)
-                    ),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
-                ) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 4.dp),
-                        placeholder = {
-                            Text(
-                                "Aklındaki sorunun cevabını hemen gör...",
-                                color = Color.White.copy(alpha = 0.6f),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontSize = 18.sp,
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
-                                )
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedTextColor = Color.White,
-                            focusedTextColor = Color.White,
-                            cursorColor = Color.White
-                        ),
-                        textStyle = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color.White,
-                            fontSize = 18.sp
-                        ),
-                        singleLine = true,
-                        enabled = false
-                    )
-                }
-
-                // Arama uyarı dialog'u
-                if (showSearchAlert) {
-                    AlertDialog(
-                        onDismissRequest = { showSearchAlert = false },
-                        title = {
-                            Text(
-                                "Yakında Hizmetinizde",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
-                                    fontSize = 20.sp
-                                ),
-                                color = Color.Black
-                            )
-                        },
-                        text = {
-                            Text(
-                                "Bu özellik şu anda geliştirme aşamasındadır. Yakında aklınızdaki sorulara anında cevap alabileceksiniz!",
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 16.sp
-                                ),
-                                color = Color.Black
-                            )
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = { showSearchAlert = false },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF1A2236)
-                                )
-                            ) {
-                                Text(
-                                    "Tamam",
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold))
-                                    )
-                                )
-                            }
-                        },
-                        containerColor = Color.White,
-                        shape = RoundedCornerShape(12.dp)
-                    )
                 }
 
                 // Günlük Açılım başlığı

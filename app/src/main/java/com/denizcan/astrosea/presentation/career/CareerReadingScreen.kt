@@ -21,7 +21,6 @@ import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,8 +28,7 @@ fun CareerReadingScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToGeneralReadings: () -> Unit,
     onNavigateToRelationshipReadings: () -> Unit,
-    onNavigateToReadingDetail: (String) -> Unit,
-    navController: NavController
+    onNavigateToReadingDetail: (String) -> Unit
 ) {
     val context = LocalContext.current
     val viewModel: CareerReadingViewModel = viewModel(factory = CareerReadingViewModel.Factory(context))
@@ -48,12 +46,7 @@ fun CareerReadingScreen(
             topBar = {
                 AstroTopBar(
                     title = "Kariyer Açılımları",
-                    onBackClick = {
-                        // Geri gitme yerine ana menüye yönlendir
-                        navController.navigate("home") {
-                            popUpTo("home") { inclusive = true }
-                        }
-                    }
+                    onBackClick = onNavigateToHome
                 )
             },
             containerColor = Color.Transparent

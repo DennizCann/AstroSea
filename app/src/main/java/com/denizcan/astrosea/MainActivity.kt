@@ -44,12 +44,21 @@ import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.util.JsonLoader
 import android.content.Context
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.background
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
 import androidx.navigation.navArgument
 import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
 import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
 import com.denizcan.astrosea.navigation.SmartNavigationHelper
+import com.denizcan.astrosea.navigation.AppNavigator
 import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
 import com.denizcan.astrosea.notifications.DailyNotificationScheduler
 import com.denizcan.astrosea.notifications.PremiumReminderScheduler
@@ -283,7 +292,12 @@ class MainActivity : ComponentActivity() {
                 Box(Modifier.fillMaxSize()) { /* Splash veya boş ekran */ }
             } else {
                 val context = LocalContext.current
+                val activity = context as ComponentActivity
+                val sharedProfileViewModel: ProfileViewModel = viewModel(activity)
                 val smartNavigation = SmartNavigationHelper(context, navController)
+                val appNavigator = remember(navController, scope) {
+                    AppNavigator(navController, scope)
+                }
                 
                 // Test için info ekranı kayıtlarını temizle (geliştirme aşamasında)
                 // smartNavigation.clearInfoScreenRecords()
@@ -527,47 +541,50 @@ class MainActivity : ComponentActivity() {
                     }
                     
                     composable(Screen.Home.route) {
-                        val viewModel: ProfileViewModel = viewModel()
                         HomeScreen(
-                            viewModel = viewModel,
+                            viewModel = sharedProfileViewModel,
                             onNavigateToProfile = {
-                                navController.navigate(Screen.Profile.route)
+                                appNavigator.navigate(Screen.Profile.route)
                             },
                             onNavigateToHoroscope = {
-                                navController.navigate(Screen.Horoscope.route)
+                                appNavigator.navigate(Screen.Horoscope.route)
                             },
                             onNavigateToTarotMeanings = {
-                                navController.navigate(Screen.TarotMeanings.route)
+                                appNavigator.navigate(Screen.TarotMeanings.route)
                             },
                             onNavigateToBirthChart = {
-                                navController.navigate(Screen.BirthChart.route)
+                                appNavigator.navigate(Screen.BirthChart.route)
                             },
                             onNavigateToMotivation = {
-                                navController.navigate(Screen.Motivation.route)
+                                appNavigator.navigate(Screen.Motivation.route)
                             },
                             onNavigateToYesNo = {
-                                smartNavigation.navigateToReading("EVET – HAYIR AÇILIMI")
+                                appNavigator.run {
+                                    smartNavigation.navigateToReading("EVET – HAYIR AÇILIMI")
+                                }
                             },
                             onNavigateToRelationshipReadings = {
-                                navController.navigate("relationship_readings")
+                                appNavigator.navigate("relationship_readings")
                             },
                             onNavigateToCareerReading = {
-                                navController.navigate("career_reading")
+                                appNavigator.navigate("career_reading")
                             },
                             onNavigateToMore = {
-                                navController.navigate("more")
+                                appNavigator.navigate("more")
                             },
                             onNavigateToGeneralReadings = {
-                                navController.navigate("general_readings")
+                                appNavigator.navigate("general_readings")
                             },
                             onNavigateToCardDetail = { cardId ->
-                                navController.navigate("tarot_detail/$cardId")
+                                appNavigator.navigate("tarot_detail/$cardId")
                             },
                             onNavigateToDailyReadingInfo = {
-                                smartNavigation.navigateToReading("GÜNLÜK AÇILIM")
+                                appNavigator.run {
+                                    smartNavigation.navigateToReading("GÜNLÜK AÇILIM")
+                                }
                             },
                             onNavigateToNotifications = {
-                                navController.navigate(Screen.Notifications.route)
+                                appNavigator.navigate(Screen.Notifications.route)
                             },
                             onSignOut = {
                                 FirebaseAuth.getInstance().signOut()
@@ -579,22 +596,23 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Screen.Horoscope.route) {
                         HoroscopeScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateBack = { appNavigator.popBack() }
                         )
                     }
                     composable(Screen.BirthChart.route) {
                         BirthChartScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateBack = { appNavigator.popBack() }
                         )
                     }
                     composable(Screen.Motivation.route) {
                         MotivationScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateBack = { appNavigator.popBack() }
                         )
                     }
                     composable(Screen.Profile.route) {
                         ProfileScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            viewModel = sharedProfileViewModel,
+                            onNavigateBack = { appNavigator.popBack() }
                         )
                     }
                     composable(route = Screen.TarotMeanings.route) {
@@ -603,7 +621,7 @@ class MainActivity : ComponentActivity() {
                             factory = TarotMeaningsViewModelFactory(JsonLoader(context))
                         )
                         TarotMeaningsScreen(
-                            onNavigateBack = { navController.navigateUp() },
+                            onNavigateBack = { appNavigator.popBack() },
                             viewModel = viewModel,
                             navController = navController
                         )
@@ -618,53 +636,80 @@ class MainActivity : ComponentActivity() {
                             val card = viewModel.cards.find { it.id == cardId }
                             if (card != null) {
                                 TarotDetailScreen(
-                                    onNavigateBack = { navController.navigateUp() },
+                                    onNavigateBack = { appNavigator.popBack() },
                                     card = card
                                 )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(androidx.compose.ui.graphics.Color(0xFF1A0A2E)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            "Kart bulunamadi",
+                                            color = androidx.compose.ui.graphics.Color.White
+                                        )
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        Button(onClick = { appNavigator.popBack() }) {
+                                            Text("Geri")
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                     composable("relationship_readings") {
                         RelationshipReadingsScreen(
-                            onNavigateToHome = { navController.navigate("home") },
-                            onNavigateToGeneralReadings = { navController.navigate("general_readings") },
-                            onNavigateToCareerReadings = { navController.navigate("career_reading") },
+                            onNavigateToHome = { appNavigator.popBackToHome() },
+                            onNavigateToGeneralReadings = {
+                                appNavigator.navigate("general_readings")
+                            },
+                            onNavigateToCareerReadings = {
+                                appNavigator.navigate("career_reading")
+                            },
                             onNavigateToReadingDetail = { readingType ->
-                                smartNavigation.navigateToReading(readingType)
+                                appNavigator.run {
+                                    smartNavigation.navigateToReading(readingType)
+                                }
                             }
                         )
                     }
                     composable("career_reading") {
                         CareerReadingScreen(
-                            onNavigateToHome = { navController.navigate("home") },
-                            onNavigateToGeneralReadings = { navController.navigate("general_readings") },
-                            onNavigateToRelationshipReadings = { navController.navigate("relationship_readings") },
-                            onNavigateToReadingDetail = { readingType ->
-                                smartNavigation.navigateToReading(readingType)
+                            onNavigateToHome = { appNavigator.popBackToHome() },
+                            onNavigateToGeneralReadings = {
+                                appNavigator.navigate("general_readings")
                             },
-                            navController = navController
+                            onNavigateToRelationshipReadings = {
+                                appNavigator.navigate("relationship_readings")
+                            },
+                            onNavigateToReadingDetail = { readingType ->
+                                appNavigator.run {
+                                    smartNavigation.navigateToReading(readingType)
+                                }
+                            }
                         )
                     }
                     composable("more") {
                         MoreScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateBack = { appNavigator.popBack() }
                         )
                     }
                     composable(Screen.GeneralReadings.route) {
                         GeneralReadingsScreen(
-                            onNavigateToHome = {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
-                            },
+                            onNavigateToHome = { appNavigator.popBackToHome() },
                             onNavigateToRelationshipReadings = {
-                                navController.navigate("relationship_readings")
+                                appNavigator.navigate("relationship_readings")
                             },
                             onNavigateToCareerReading = {
-                                navController.navigate("career_reading")
+                                appNavigator.navigate("career_reading")
                             },
                             onNavigateToReadingDetail = { readingType ->
-                                smartNavigation.navigateToReading(readingType)
+                                appNavigator.run {
+                                    smartNavigation.navigateToReading(readingType)
+                                }
                             }
                         )
                     }
@@ -677,11 +722,11 @@ class MainActivity : ComponentActivity() {
                         val readingType = backStackEntry.arguments?.getString("readingType") ?: ""
                         GeneralReadingInfoScreen(
                             readingType = readingType,
-                            onNavigateBack = {
-                                navController.popBackStack()
-                            },
-                            onNavigateToReadingDetail = { readingType ->
-                                smartNavigation.navigateFromInfoToDetail(readingType)
+                            onNavigateBack = { appNavigator.popBack() },
+                            onNavigateToReadingDetail = { type ->
+                                appNavigator.run {
+                                    smartNavigation.navigateFromInfoToDetail(type)
+                                }
                             }
                         )
                     }
@@ -695,31 +740,28 @@ class MainActivity : ComponentActivity() {
                         GeneralReadingDetailScreen(
                             readingType = readingType,
                             onNavigateBack = {
-                                smartNavigation.navigateBackFromDetail(readingType)
+                                appNavigator.run {
+                                    smartNavigation.navigateBackFromDetail(readingType)
+                                }
                             },
                             onNavigateToCardDetail = { cardId ->
-                                navController.navigate("tarot_detail/$cardId")
+                                appNavigator.navigate("tarot_detail/$cardId")
                             },
                             onNavigateToPremium = {
-                                navController.navigate(Screen.Premium.route)
+                                appNavigator.navigate(Screen.Premium.route)
                             }
                         )
                     }
                     composable(Screen.Notifications.route) {
                         NotificationsScreen(
-                            onNavigateBack = { navController.popBackStack() }
+                            onNavigateBack = { appNavigator.popBack() }
                         )
                     }
                     
                     composable(Screen.Premium.route) {
                         com.denizcan.astrosea.presentation.premium.PremiumScreen(
-                            onNavigateBack = { navController.popBackStack() },
-                            onPurchaseComplete = {
-                                // Premium satın alma başarılı - ana sayfaya dön
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(Screen.Home.route) { inclusive = true }
-                                }
-                            }
+                            onNavigateBack = { appNavigator.popBack() },
+                            onPurchaseComplete = { appNavigator.popBackToHome() }
                         )
                     }
                 }

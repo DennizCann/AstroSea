@@ -73,11 +73,12 @@ class NotificationManager(private val context: Context) {
                 .document(userId)
                 .collection("notifications")
                 .whereGreaterThanOrEqualTo("timestamp", visibleWindowStart)
-                .whereEqualTo("isRead", false)
                 .get()
                 .await()
-            
-            snapshot.size()
+
+            snapshot.documents.count { doc ->
+                doc.getBoolean("isRead") != true
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Okunmamış bildirim sayısı alınamadı", e)
             0

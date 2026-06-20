@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +37,8 @@ import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 // outlinedCardBorder fonksiyonunu tanımlıyoruz
 private fun outlinedCardBorder(brush: androidx.compose.ui.graphics.Brush? = null): androidx.compose.foundation.BorderStroke {
@@ -90,6 +93,25 @@ fun NotificationsScreen(
     val userId = auth.currentUser?.uid
     val context = LocalContext.current
     val notificationManager = remember { NotificationManager(context) }
+    var selectedNotification by remember { mutableStateOf<Notification?>(null) }
+
+    fun markNotificationAsRead(notification: Notification) {
+        if (notification.isRead || userId == null) return
+
+        scope.launch {
+            try {
+                notificationManager.markNotificationAsRead(userId, notification.id)
+                val index = notifications.indexOfFirst { it.id == notification.id }
+                if (index != -1) {
+                    notifications.removeAt(index)
+                    notifications.add(index, notification.copy(isRead = true))
+                    unreadCount = notifications.count { !it.isRead }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("NotificationsScreen", "Bildirim okundu işaretlenemedi", e)
+            }
+        }
+    }
     
     // Bildirimleri yükle
     LaunchedEffect(userId) {
@@ -251,34 +273,8 @@ fun NotificationsScreen(
                                 NotificationCard(
                                     notification = notification,
                                     onNotificationClick = {
-                                        android.util.Log.d("NotificationsScreen", "Bildirime tıklandı: id=${notification.id}, isRead=${notification.isRead}")
-                                        
-                                        // Bildirimi okundu olarak işaretle
-                                        if (!notification.isRead && userId != null) {
-                                            android.util.Log.d("NotificationsScreen", "Okundu olarak işaretleniyor... userId=$userId, notificationId=${notification.id}")
-                                            
-                                            scope.launch {
-                                                try {
-                                                    // Önce Firestore'u güncelle
-                                                    notificationManager.markNotificationAsRead(userId, notification.id)
-                                                    android.util.Log.d("NotificationsScreen", "Firestore güncellendi, yerel liste güncelleniyor...")
-                                                    
-                                                    // Sonra yerel listeyi güncelle
-                                                    val index = notifications.indexOfFirst { it.id == notification.id }
-                                                    if (index != -1) {
-                                                        // Listeyi doğrudan güncelle
-                                                        notifications.removeAt(index)
-                                                        notifications.add(index, notification.copy(isRead = true))
-                                                        unreadCount = notifications.count { !it.isRead }
-                                                        android.util.Log.d("NotificationsScreen", "Yerel liste güncellendi, yeni unreadCount=$unreadCount")
-                                                    }
-                                                } catch (e: Exception) {
-                                                    android.util.Log.e("NotificationsScreen", "Bildirim okundu işaretlenemedi", e)
-                                                }
-                                            }
-                                        } else {
-                                            android.util.Log.d("NotificationsScreen", "Bildirim zaten okunmuş veya userId null")
-                                        }
+                                        selectedNotification = notification
+                                        markNotificationAsRead(notification)
                                     }
                                 )
                             }
@@ -286,6 +282,13 @@ fun NotificationsScreen(
                     }
                 }
             }
+        }
+
+        selectedNotification?.let { notification ->
+            NotificationDetailDialog(
+                notification = notification,
+                onDismiss = { selectedNotification = null }
+            )
         }
     }
 }
@@ -373,7 +376,9 @@ fun NotificationCard(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 16.sp
                     ),
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -407,6 +412,136 @@ fun NotificationCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun NotificationDetailDialog(
+    notification: Notification,
+    onDismiss: () -> Unit
+) {
+    val type = notification.getNotificationType()
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .wrapContentHeight(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF1A1F3A)
+            ),
+            shape = RoundedCornerShape(20.dp),
+            border = outlinedCardBorder(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        getNotificationTypeColor(type).copy(alpha = 0.8f),
+                        Color.White.copy(alpha = 0.15f)
+                    )
+                )
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = getNotificationTypeColor(type)
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier.size(44.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = getNotificationTypeIcon(type),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                    }
+                    Text(
+                        text = getNotificationTypeLabel(type),
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 14.sp
+                        ),
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+
+                Text(
+                    text = notification.title,
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                        fontSize = 24.sp,
+                        lineHeight = 30.sp
+                    ),
+                    color = Color.White
+                )
+
+                HorizontalDivider(color = Color.White.copy(alpha = 0.15f))
+
+                Text(
+                    text = notification.message,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 20.sp,
+                        lineHeight = 28.sp
+                    ),
+                    color = Color.White.copy(alpha = 0.92f)
+                )
+
+                Text(
+                    text = formatTimestamp(notification.timestamp),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 15.sp
+                    ),
+                    color = Color.White.copy(alpha = 0.55f)
+                )
+
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2D1B4E)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Tamam",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(Font(R.font.cinzel_regular)),
+                            fontSize = 16.sp
+                        ),
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun getNotificationTypeLabel(type: NotificationType): String {
+    return when (type) {
+        NotificationType.DAILY_TAROT -> "Günlük Tarot"
+        NotificationType.PREMIUM_REMINDER -> "Premium Hatırlatma"
+        NotificationType.WELCOME -> "Hoş Geldin"
+        NotificationType.GENERAL -> "Genel Bildirim"
     }
 }
 
