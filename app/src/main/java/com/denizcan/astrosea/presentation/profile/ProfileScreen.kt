@@ -31,8 +31,11 @@ import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import java.text.SimpleDateFormat
 import android.app.TimePickerDialog
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
+import com.denizcan.astrosea.billing.BillingConfig
 import java.util.Calendar
 import com.denizcan.astrosea.presentation.components.WheelDatePickerDialog
 import com.denizcan.astrosea.util.responsiveSize
@@ -511,7 +514,23 @@ fun PremiumStatusCard(
     onCancelPremium: () -> Unit
 ) {
     var showCancelDialog by remember { mutableStateOf(false) }
-    
+    val context = LocalContext.current
+    val isTestMode = BillingConfig.TEST_MODE
+
+    // Gerçek abonelik Google Play üzerinden yönetilir; uygulama içinden iptal edilemez.
+    fun openPlaySubscriptions() {
+        val url = if (premiumProductId != null) {
+            "https://play.google.com/store/account/subscriptions?sku=$premiumProductId&package=${context.packageName}"
+        } else {
+            "https://play.google.com/store/account/subscriptions"
+        }
+        try {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (e: Exception) {
+            android.util.Log.e("PremiumStatusCard", "Play Store abonelik sayfası açılamadı", e)
+        }
+    }
+
     // Plan adını Türkçe'ye çevir
     val planName = when (premiumProductId) {
         "astrosea_weekly" -> "Haftalık Plan"
@@ -643,9 +662,16 @@ fun PremiumStatusCard(
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                // Üyeliği İptal Et Butonu
+                // Abonelik yönetimi: gerçek satın almalar Google Play'den iptal edilir,
+                // test modunda ise Firestore üzerinde demo iptal yapılır.
                 OutlinedButton(
-                    onClick = { showCancelDialog = true },
+                    onClick = {
+                        if (isTestMode) {
+                            showCancelDialog = true
+                        } else {
+                            openPlaySubscriptions()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = Color(0xFFFF6B6B)
@@ -660,9 +686,19 @@ fun PremiumStatusCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Üyeliği İptal Et (Demo)",
+                        text = if (isTestMode) "Üyeliği İptal Et (Demo)" else "Aboneliği Yönet",
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        )
+                    )
+                }
+
+                if (!isTestMode) {
+                    Text(
+                        text = "Aboneliğinizi Google Play üzerinden iptal edebilirsiniz. İptal etseniz bile dönem sonuna kadar premium erişiminiz devam eder.",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            color = Color.White.copy(alpha = 0.6f)
                         )
                     )
                 }

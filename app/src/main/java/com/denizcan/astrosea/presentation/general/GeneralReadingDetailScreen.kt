@@ -34,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
@@ -92,8 +93,8 @@ fun GeneralReadingDetailScreen(
         factory = DailyTarotViewModel.Factory(context)
     )
     
-    // Ekran durumları
-    var currentScreen by remember { mutableStateOf("detail") } // "detail", "loading", "interpretation"
+    // Ekran durumları - rememberSaveable: kart detayına gidip geri dönünce ekran durumu korunsun
+    var currentScreen by rememberSaveable { mutableStateOf("detail") } // "detail", "loading", "interpretation"
     
     // Premium dialog state
     var showPremiumDialog by remember { mutableStateOf(false) }

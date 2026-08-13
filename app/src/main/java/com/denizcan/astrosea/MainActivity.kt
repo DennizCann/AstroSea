@@ -56,7 +56,6 @@ import androidx.navigation.NavType
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotDetailScreen
 import androidx.navigation.navArgument
 import com.denizcan.astrosea.presentation.general.GeneralReadingDetailScreen
-import com.denizcan.astrosea.presentation.general.GeneralReadingInfoScreen
 import com.denizcan.astrosea.navigation.SmartNavigationHelper
 import com.denizcan.astrosea.navigation.AppNavigator
 import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
@@ -298,9 +297,6 @@ class MainActivity : ComponentActivity() {
                 val appNavigator = remember(navController, scope) {
                     AppNavigator(navController, scope)
                 }
-                
-                // Test için info ekranı kayıtlarını temizle (geliştirme aşamasında)
-                // smartNavigation.clearInfoScreenRecords()
                 
                 NavHost(
                     navController = navController,
@@ -709,23 +705,6 @@ class MainActivity : ComponentActivity() {
                             onNavigateToReadingDetail = { readingType ->
                                 appNavigator.run {
                                     smartNavigation.navigateToReading(readingType)
-                                }
-                            }
-                        )
-                    }
-                    composable(
-                        route = Screen.GeneralReadingInfo.route,
-                        arguments = listOf(
-                            navArgument("readingType") { type = NavType.StringType }
-                        )
-                    ) { backStackEntry ->
-                        val readingType = backStackEntry.arguments?.getString("readingType") ?: ""
-                        GeneralReadingInfoScreen(
-                            readingType = readingType,
-                            onNavigateBack = { appNavigator.popBack() },
-                            onNavigateToReadingDetail = { type ->
-                                appNavigator.run {
-                                    smartNavigation.navigateFromInfoToDetail(type)
                                 }
                             }
                         )
