@@ -147,7 +147,8 @@ fun GeneralReadingDetailScreen(
                 readingType = readingType,
                 onNavigateBack = {
                     currentScreen = "detail"
-                }
+                },
+                onNavigateToCardDetail = onNavigateToCardDetail
             )
         }
         else -> {
@@ -446,7 +447,8 @@ fun GeneralReadingDetailScreen(
 @Composable
 fun GeneralReadingInterpretationScreen(
     readingType: String,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToCardDetail: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val viewModel: GeneralReadingViewModel = viewModel(
@@ -543,7 +545,7 @@ fun GeneralReadingInterpretationScreen(
                             readingInfo = readingInfo,
                             drawnCardMap = revealedCards.associateBy { it.index },
                             onDrawCard = { /* Kartlar zaten açık */ },
-                            onNavigateToCardDetail = { /* Yorum ekranında kart detayına gitme */ },
+                            onNavigateToCardDetail = onNavigateToCardDetail,
                             parentSize = parentContainerSize,
                             forceRevealed = true // Yorum ekranında kartları zorla açık göster
                         )
