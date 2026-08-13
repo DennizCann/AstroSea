@@ -43,6 +43,10 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     var readingError by mutableStateOf<String?>(null)
         private set
     
+    // Yorumun kullanıcıya gösterileceği zaman (epoch millis). Null ise beklemesiz gösterilir.
+    var interpretationReadyAt by mutableStateOf<Long?>(null)
+        private set
+    
     // Günlük açılım state'inin yüklenip yüklenmediğini kontrol etmek için
     private var dailyStateLoaded = false
     
@@ -328,6 +332,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         // Açılım sıfırlanınca kayıtlı yorum da geçersiz olur
         generatedReading = null
         readingError = null
+        interpretationReadyAt = null
         
         // Tüm açılımlar için Firebase'den temizle
         clearReadingFromFirebase(readingType)
@@ -353,7 +358,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                                 "card_1_revealed" to false,
                                 "card_2_revealed" to false,
                                 "daily_interpretation" to "",
-                                "daily_interpretation_date" to ""
+                                "daily_interpretation_date" to "",
+                                "daily_interpretation_ready_at" to 0L
                             )
                         ).await()
                 } else {
@@ -432,6 +438,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     val savedInterpretation = readingData["interpretation"] as? String
                     if (generatedReading == null && !savedInterpretation.isNullOrBlank()) {
                         generatedReading = savedInterpretation
+                        interpretationReadyAt = readingData["interpretationReadyAt"] as? Long
                         Log.d("GeneralReadingViewModel", "Kayıtlı yorum reading state ile birlikte yüklendi")
                     }
                     
@@ -546,7 +553,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             .trim()
     }
     
-    fun generateReading(readingType: String) {
+    fun generateReading(readingType: String, delayMillis: Long = 0L) {
         // Kartların çekilip çekilmediğini kontrol et
         val hasCards = drawnCards.isNotEmpty() && drawnCards.any { it.card != null }
         if (!hasCards) {
@@ -579,6 +586,10 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     return@launch
                 }
                 
+                // Yeni yorum üretiliyor - hazır olacağı zamanı belirle (10 dk / 5 dk bekleme)
+                val readyAt = System.currentTimeMillis() + delayMillis
+                interpretationReadyAt = readyAt
+                
                 // Reading format'ını al - readingType'ı JSON key formatına çevir
                 val normalizedReadingType = normalizeReadingType(readingType)
                 val format = readingFormats?.readingFormats?.get(normalizedReadingType)
@@ -606,13 +617,45 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 Log.d("GeneralReadingViewModel", "Yorum başarıyla oluşturuldu")
                 
                 // Yorumu Firestore'a kaydet - açılım sıfırlanana kadar tekrar üretilmesin
-                saveInterpretation(readingType, reading)
+                saveInterpretation(readingType, reading, readyAt)
                 
             } catch (e: Exception) {
                 Log.e("GeneralReadingViewModel", "Yorum oluşturulurken hata", e)
                 readingError = "Yorum oluşturulurken bir hata oluştu: ${e.message}"
             } finally {
                 isGeneratingReading = false
+            }
+        }
+    }
+    
+    /**
+     * Bekleme sırasında reklam izlendiğinde kalan süreyi kısaltır (10 dk -> 5 dk).
+     */
+    fun speedUpInterpretation(readingType: String) {
+        val current = interpretationReadyAt ?: return
+        val newReadyAt = maxOf(System.currentTimeMillis(), current - com.denizcan.astrosea.ads.AdConfig.SPEED_UP_MILLIS)
+        interpretationReadyAt = newReadyAt
+        Log.d("GeneralReadingViewModel", "Yorum süresi kısaltıldı: $current -> $newReadyAt")
+        
+        // Firestore'daki kaydı da güncelle
+        viewModelScope.launch {
+            try {
+                if (userId == null) return@launch
+                if (readingType.trim() == "GÜNLÜK AÇILIM") {
+                    firestore.collection("users").document(userId!!)
+                        .set(mapOf("daily_interpretation_ready_at" to newReadyAt), SetOptions.merge())
+                        .await()
+                } else {
+                    val key = firestoreReadingKey(readingType)
+                    val userDoc = firestore.collection("users").document(userId!!).get().await()
+                    val readingData = (userDoc.get(key) as? Map<String, Any>)?.toMutableMap() ?: return@launch
+                    readingData["interpretationReadyAt"] = newReadyAt
+                    firestore.collection("users").document(userId!!)
+                        .set(mapOf(key to readingData), SetOptions.merge())
+                        .await()
+                }
+            } catch (e: Exception) {
+                Log.e("GeneralReadingViewModel", "Süre kısaltma kaydedilemedi", e)
             }
         }
     }
@@ -629,10 +672,17 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 // Günlük açılımın yorumu sadece aynı gün geçerli
                 val savedDate = userDoc.getString("daily_interpretation_date")
                 val text = userDoc.getString("daily_interpretation")
-                if (savedDate == getCurrentDateString() && !text.isNullOrBlank()) text else null
+                if (savedDate == getCurrentDateString() && !text.isNullOrBlank()) {
+                    interpretationReadyAt = userDoc.getLong("daily_interpretation_ready_at")
+                    text
+                } else null
             } else {
                 val readingData = userDoc.get(firestoreReadingKey(readingType)) as? Map<String, Any>
-                (readingData?.get("interpretation") as? String)?.takeIf { it.isNotBlank() }
+                val text = (readingData?.get("interpretation") as? String)?.takeIf { it.isNotBlank() }
+                if (text != null) {
+                    interpretationReadyAt = readingData?.get("interpretationReadyAt") as? Long
+                }
+                text
             }
         } catch (e: Exception) {
             Log.e("GeneralReadingViewModel", "Kayıtlı yorum yüklenirken hata", e)
@@ -640,7 +690,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         }
     }
     
-    private suspend fun saveInterpretation(readingType: String, interpretation: String) {
+    private suspend fun saveInterpretation(readingType: String, interpretation: String, readyAt: Long) {
         if (userId == null) return
         try {
             if (readingType.trim() == "GÜNLÜK AÇILIM") {
@@ -648,7 +698,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     .set(
                         mapOf(
                             "daily_interpretation" to interpretation,
-                            "daily_interpretation_date" to getCurrentDateString()
+                            "daily_interpretation_date" to getCurrentDateString(),
+                            "daily_interpretation_ready_at" to readyAt
                         ),
                         SetOptions.merge()
                     ).await()
@@ -657,11 +708,12 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 val userDoc = firestore.collection("users").document(userId!!).get().await()
                 val readingData = (userDoc.get(key) as? Map<String, Any>)?.toMutableMap() ?: mutableMapOf()
                 readingData["interpretation"] = interpretation
+                readingData["interpretationReadyAt"] = readyAt
                 firestore.collection("users").document(userId!!)
                     .set(mapOf(key to readingData), SetOptions.merge())
                     .await()
             }
-            Log.d("GeneralReadingViewModel", "Yorum Firestore'a kaydedildi")
+            Log.d("GeneralReadingViewModel", "Yorum Firestore'a kaydedildi (hazır olma: $readyAt)")
         } catch (e: Exception) {
             Log.e("GeneralReadingViewModel", "Yorum kaydedilirken hata", e)
         }

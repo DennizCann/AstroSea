@@ -25,6 +25,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
+import com.denizcan.astrosea.ads.AdConfig
+import com.denizcan.astrosea.ads.AdRightsManager
+import com.denizcan.astrosea.ads.RewardedAdManager
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
@@ -98,6 +101,17 @@ fun GeneralReadingDetailScreen(
     
     // Premium dialog state
     var showPremiumDialog by remember { mutableStateOf(false) }
+    // Günlük reklam hakkı bittiği için mi premium dialog gösteriliyor
+    var adLimitReached by remember { mutableStateOf(false) }
+    // Reklam izle dialogu state
+    var showAdDialog by remember { mutableStateOf(false) }
+    var remainingAdUnlocks by remember { mutableStateOf(0) }
+    var isAdShowing by remember { mutableStateOf(false) }
+    
+    // Reklam yöneticileri
+    val rewardedAdManager = remember { RewardedAdManager(context) }
+    val adRightsManager = remember { AdRightsManager() }
+    LaunchedEffect(Unit) { rewardedAdManager.preload() }
     
     // Günlük açılım mı kontrolü
     val isDailyReading = readingType.trim() == "GÜNLÜK AÇILIM"
@@ -105,28 +119,14 @@ fun GeneralReadingDetailScreen(
     // Profil durumu (anlık kontrolden sonra güncellenir)
     val profileState = profileViewModel.profileState
     
-    // Sayfa yüklendiğinde ANLIK Firestore kontrolü yap
+    // Sayfa yüklendiğinde state'i yükle - kart çekmek herkese açık,
+    // yorum reklam/premium ile açılır
     LaunchedEffect(readingType) {
         if (isDailyReading) {
-            // Günlük açılım için DailyTarotViewModel'i set et
             Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set ediliyor")
             viewModel.setDailyTarotViewModel(dailyTarotViewModel)
-            Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set edildi")
         } else {
-            // Diğer açılımlar için Firestore'dan ANLIK premium kontrolü yap
-            Log.d("GeneralReadingDetailScreen", "Firestore'dan anlık premium kontrolü yapılıyor...")
-            val isPremium = profileViewModel.checkPremiumStatusFromFirestore()
-            Log.d("GeneralReadingDetailScreen", "Anlık premium kontrolü sonucu: $isPremium")
-            
-            if (!isPremium) {
-                // Premium değilse dialog göster
-                showPremiumDialog = true
-                Log.d("GeneralReadingDetailScreen", "Premium değil, dialog gösteriliyor")
-            } else {
-                // Premium ise state'i yükle
-                Log.d("GeneralReadingDetailScreen", "Premium kullanıcı, açılım yükleniyor")
-                viewModel.loadReadingState(readingType)
-            }
+            viewModel.loadReadingState(readingType)
         }
     }
     
@@ -291,7 +291,6 @@ fun GeneralReadingDetailScreen(
                                 // Yorumunu Gör Butonu
                                 Button(
                                     onClick = { 
-                                        // Premium kontrolü - Firestore'dan ANLIK kontrol
                                         scope.launch {
                                             try {
                                                 val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
@@ -299,7 +298,15 @@ fun GeneralReadingDetailScreen(
                                                 
                                                 if (userId == null) {
                                                     Log.e("GeneralReadingDetailScreen", "userId null! Premium dialog gösteriliyor")
+                                                    adLimitReached = false
                                                     showPremiumDialog = true
+                                                    return@launch
+                                                }
+                                                
+                                                // Bu açılım için yorum zaten üretilmişse (reklam/premium ile
+                                                // daha önce açılmış) doğrudan göster - tekrar hak istemez
+                                                if (viewModel.generatedReading != null) {
+                                                    currentScreen = "interpretation"
                                                     return@launch
                                                 }
                                                 
@@ -314,17 +321,25 @@ fun GeneralReadingDetailScreen(
                                                 Log.d("GeneralReadingDetailScreen", "Firestore'dan okunan isPremium: $isPremium")
                                                 
                                                 if (isPremium) {
-                                                    // Premium kullanıcı - AI ile yorum oluştur
+                                                    // Premium kullanıcı - yorum üret, 10 dk'da hazır olur
                                                     Log.d("GeneralReadingDetailScreen", "Premium kullanıcı - yorum oluşturuluyor")
-                                                    viewModel.generateReading(readingType)
-                                                    currentScreen = "loading"
+                                                    viewModel.generateReading(readingType, AdConfig.PREMIUM_INTERPRETATION_DELAY_MILLIS)
+                                                    currentScreen = "interpretation"
                                                 } else {
-                                                    // Premium değil - Premium dialog göster
-                                                    Log.d("GeneralReadingDetailScreen", "Premium DEĞİL - dialog gösteriliyor")
-                                                    showPremiumDialog = true
+                                                    // Ücretsiz kullanıcı - reklam hakkı kontrolü
+                                                    val remaining = adRightsManager.getRemainingUnlocks()
+                                                    Log.d("GeneralReadingDetailScreen", "Kalan reklam hakkı: $remaining")
+                                                    if (remaining > 0) {
+                                                        remainingAdUnlocks = remaining
+                                                        showAdDialog = true
+                                                    } else {
+                                                        adLimitReached = true
+                                                        showPremiumDialog = true
+                                                    }
                                                 }
                                             } catch (e: Exception) {
-                                                Log.e("GeneralReadingDetailScreen", "Premium kontrol hatası", e)
+                                                Log.e("GeneralReadingDetailScreen", "Yorum akışı hatası", e)
+                                                adLimitReached = false
                                                 showPremiumDialog = true
                                             }
                                         }
@@ -354,19 +369,102 @@ fun GeneralReadingDetailScreen(
         }
     }
     
-    // Premium Dialog
-    if (showPremiumDialog) {
-        // Dialog içeriği açılım türüne göre değişir
-        val isAccessBlocked = !isDailyReading && !profileState.profileData.isPremium  // Açılıma erişim engelli mi
-        
+    // Reklam İzle Dialogu - ücretsiz kullanıcı, günlük hakkı varsa
+    if (showAdDialog) {
         AlertDialog(
-            onDismissRequest = { 
-                showPremiumDialog = false
-                // Günlük açılım değilse ve erişim engelliyse geri dön
-                if (isAccessBlocked) {
-                    onNavigateBack()
+            onDismissRequest = { if (!isAdShowing) showAdDialog = false },
+            containerColor = Color(0xFF1A2236),
+            shape = RoundedCornerShape(16.dp),
+            title = {
+                Text(
+                    text = "🎬 Reklam İzle, Yorumunu Aç",
+                    color = Color(0xFFD4AF37),
+                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Kısa bir reklam izleyerek bu açılımın yapay zeka yorumunu ücretsiz açabilirsiniz. Yorumunuz 5 dakika içinde hazır olur.\n\nBugün kalan hakkınız: $remainingAdUnlocks/${AdConfig.DAILY_AD_UNLOCK_LIMIT}",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    if (isAdShowing) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        CircularProgressIndicator(color = Color(0xFFD4AF37), modifier = Modifier.size(28.dp))
+                    }
                 }
             },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val activity = context as? android.app.Activity ?: return@Button
+                        isAdShowing = true
+                        rewardedAdManager.show(
+                            activity = activity,
+                            onRewarded = {
+                                scope.launch {
+                                    val consumed = adRightsManager.consumeUnlock()
+                                    isAdShowing = false
+                                    showAdDialog = false
+                                    if (consumed) {
+                                        viewModel.generateReading(readingType, AdConfig.AD_INTERPRETATION_DELAY_MILLIS)
+                                        currentScreen = "interpretation"
+                                    } else {
+                                        adLimitReached = true
+                                        showPremiumDialog = true
+                                    }
+                                }
+                            },
+                            onFailed = {
+                                isAdShowing = false
+                                Log.w("GeneralReadingDetailScreen", "Reklam gösterilemedi")
+                            }
+                        )
+                    },
+                    enabled = !isAdShowing,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD4AF37)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = if (isAdShowing) "Yükleniyor..." else "Reklam İzle",
+                        color = Color.Black,
+                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                        fontSize = 14.sp
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showAdDialog = false
+                        onNavigateToPremium()
+                    },
+                    enabled = !isAdShowing
+                ) {
+                    Text(
+                        text = "Reklamsız: Premium'a Geç",
+                        color = Color(0xFFD4AF37).copy(alpha = 0.8f),
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        )
+    }
+    
+    // Premium Dialog
+    if (showPremiumDialog) {
+        AlertDialog(
+            onDismissRequest = { showPremiumDialog = false },
             containerColor = Color(0xFF1A2236),
             shape = RoundedCornerShape(16.dp),
             title = {
@@ -385,7 +483,7 @@ fun GeneralReadingDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = if (isAccessBlocked) "Premium Açılım" else "AI Destekli Tarot Yorumu",
+                        text = if (adLimitReached) "Bugünlük Reklam Hakkınız Bitti" else "AI Destekli Tarot Yorumu",
                         color = Color.White,
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
                         fontSize = 18.sp,
@@ -393,10 +491,10 @@ fun GeneralReadingDetailScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = if (isAccessBlocked) 
-                            "Bu açılım sadece Premium üyelere özeldir.\n\nPremium üye olarak tüm açılımlara ve yapay zeka destekli kişiselleştirilmiş yorumlara erişebilirsiniz."
+                        text = if (adLimitReached) 
+                            "Reklam izleyerek günde en fazla ${AdConfig.DAILY_AD_UNLOCK_LIMIT} yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üye olarak reklamsız şekilde tüm açılımların yorumlarına erişebilirsiniz."
                         else 
-                            "Yapay zeka destekli kişiselleştirilmiş tarot yorumları sadece Premium üyelere özeldir.\n\nPremium üye olarak tüm açılımların detaylı yorumlarına erişebilirsiniz.",
+                            "Yapay zeka destekli kişiselleştirilmiş tarot yorumlarına Premium üyelikle ya da reklam izleyerek erişebilirsiniz.",
                         color = Color.White.copy(alpha = 0.9f),
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 16.sp,
@@ -425,16 +523,10 @@ fun GeneralReadingDetailScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { 
-                        showPremiumDialog = false
-                        // Günlük açılım değilse ve erişim engelliyse geri dön
-                        if (isAccessBlocked) {
-                            onNavigateBack()
-                        }
-                    }
+                    onClick = { showPremiumDialog = false }
                 ) {
                     Text(
-                        text = if (isAccessBlocked) "Geri Dön" else "Daha Sonra",
+                        text = "Daha Sonra",
                         color = Color.White.copy(alpha = 0.7f),
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 14.sp
@@ -562,6 +654,18 @@ fun GeneralReadingInterpretationScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    // Geri sayım: yorum hazır olma zamanı gelmediyse bekleme ekranı göster
+                    val readyAt = viewModel.interpretationReadyAt
+                    var now by remember { mutableStateOf(System.currentTimeMillis()) }
+                    LaunchedEffect(readyAt) {
+                        while (readyAt != null && System.currentTimeMillis() < readyAt) {
+                            delay(1000)
+                            now = System.currentTimeMillis()
+                        }
+                        now = System.currentTimeMillis()
+                    }
+                    val isReady = readyAt == null || now >= readyAt
+                    
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -572,21 +676,95 @@ fun GeneralReadingInterpretationScreen(
                         ),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                     ) {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            item {
+                        if (!isReady && readyAt != null) {
+                            // Bekleme ekranı - geri sayım + süreyi kısaltma reklamı
+                            val remainingMillis = (readyAt - now).coerceAtLeast(0)
+                            val minutes = remainingMillis / 60000
+                            val seconds = (remainingMillis % 60000) / 1000
+                            val canSpeedUp = remainingMillis > AdConfig.SPEED_UP_MILLIS
+                            
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
                                 Text(
-                                    text = displayInterpretation,
-                                    color = Color.White,
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 18.sp,
-                                    lineHeight = 28.sp,
-                                    textAlign = TextAlign.Start
+                                    text = "✨ Falınız hazırlanıyor...",
+                                    color = Color(0xFFD4AF37),
+                                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = String.format("%02d:%02d", minutes, seconds),
+                                    color = Color.White,
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                    fontSize = 32.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Kartlarınızın enerjisi okunuyor. Yorumunuz hazır olduğunda burada görünecek.",
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 15.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                if (canSpeedUp) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    val activity = context as? android.app.Activity
+                                    val speedUpAdManager = remember { com.denizcan.astrosea.ads.RewardedAdManager(context) }
+                                    LaunchedEffect(Unit) { speedUpAdManager.preload() }
+                                    var isSpeedUpAdShowing by remember { mutableStateOf(false) }
+                                    
+                                    Button(
+                                        onClick = {
+                                            if (activity != null) {
+                                                isSpeedUpAdShowing = true
+                                                speedUpAdManager.show(
+                                                    activity = activity,
+                                                    onRewarded = {
+                                                        isSpeedUpAdShowing = false
+                                                        viewModel.speedUpInterpretation(readingType)
+                                                        now = System.currentTimeMillis()
+                                                    },
+                                                    onFailed = { isSpeedUpAdShowing = false }
+                                                )
+                                            }
+                                        },
+                                        enabled = !isSpeedUpAdShowing,
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD4AF37)),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(
+                                            text = if (isSpeedUpAdShowing) "Yükleniyor..." else "🎬 Reklam İzle, 5 Dk Erken Gelsin",
+                                            color = Color.Black,
+                                            fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                            fontSize = 13.sp
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                item {
+                                    Text(
+                                        text = displayInterpretation,
+                                        color = Color.White,
+                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                        fontSize = 18.sp,
+                                        lineHeight = 28.sp,
+                                        textAlign = TextAlign.Start
+                                    )
+                                }
                             }
                         }
                     }
