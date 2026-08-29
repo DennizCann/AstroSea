@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
@@ -93,14 +94,14 @@ fun AstroDrawer(
                                 icon = { 
                                     Icon(
                                         Icons.Default.Person,
-                                        contentDescription = "Profil",
+                                        contentDescription = stringResource(R.string.cd_profile),
                                         tint = Color.White,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 },
                                 label = { 
                                     Text(
-                                        "Profil",
+                                        stringResource(R.string.profile_title),
                                         color = Color.White,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -123,14 +124,14 @@ fun AstroDrawer(
                                 icon = { 
                                     Icon(
                                         Icons.Default.ExitToApp,
-                                        contentDescription = "Çıkış Yap",
+                                        contentDescription = stringResource(R.string.cd_logout),
                                         tint = Color.White,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 },
                                 label = { 
                                     Text(
-                                        "Çıkış Yap",
+                                        stringResource(R.string.cd_logout),
                                         color = Color.White,
                                         style = MaterialTheme.typography.bodyMedium
                                     )

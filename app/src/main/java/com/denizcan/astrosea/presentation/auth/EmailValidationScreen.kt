@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +68,7 @@ fun EmailValidationScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Email Doğrulama",
+                    title = stringResource(R.string.auth_email_validation_title),
                     onBackClick = onBackClick
                 )
             },
@@ -102,7 +103,7 @@ fun EmailValidationScreen(
                         // Email ikonu
                         Icon(
                             imageVector = Icons.Default.Email,
-                            contentDescription = "Email",
+                            contentDescription = stringResource(R.string.auth_email),
                             modifier = Modifier.size(80.dp),
                             tint = Color.White
                         )
@@ -111,7 +112,7 @@ fun EmailValidationScreen(
                         
                         // Başlık
                         Text(
-                            text = "Email Adresinizi Doğrulayın",
+                            text = stringResource(R.string.auth_verify_your_email),
                             style = MaterialTheme.typography.headlineMedium,
                             color = Color.White,
                             textAlign = TextAlign.Center
@@ -121,7 +122,7 @@ fun EmailValidationScreen(
                         
                         // Açıklama
                         Text(
-                            text = "Hesabınızı aktifleştirmek için $email adresine gönderdiğimiz doğrulama linkine tıklayın.",
+                            text = stringResource(R.string.auth_verification_instruction, email),
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.White.copy(alpha = 0.9f),
                             textAlign = TextAlign.Center
@@ -162,14 +163,14 @@ fun EmailValidationScreen(
                                     modifier = Modifier.padding(16.dp)
                                 ) {
                                     Text(
-                                        text = "✅ Email Gönderildi",
+                                        text = stringResource(R.string.auth_email_sent),
                                         color = Color.White,
                                         style = MaterialTheme.typography.titleMedium,
                                         textAlign = TextAlign.Center
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = "Doğrulama emaili $email adresine gönderildi.\n\nLütfen email kutunuzu kontrol edin ve doğrulama linkine tıklayın.",
+                                        text = stringResource(R.string.auth_email_sent_detail, email),
                                         color = Color.White,
                                         style = MaterialTheme.typography.bodyMedium,
                                         textAlign = TextAlign.Center
@@ -202,12 +203,12 @@ fun EmailValidationScreen(
                                 } else {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
-                                        contentDescription = "Yeniden Gönder",
+                                        contentDescription = stringResource(R.string.auth_resend_cd),
                                         tint = Color.White
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        "Email'i Yeniden Gönder",
+                                        stringResource(R.string.auth_resend_email),
                                         color = Color.White,
                                         style = MaterialTheme.typography.titleMedium
                                     )
@@ -226,7 +227,7 @@ fun EmailValidationScreen(
                                 border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                             ) {
                                 Text(
-                                    "Durumu Yenile",
+                                    stringResource(R.string.auth_refresh_status),
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyLarge
                                 )
@@ -246,7 +247,7 @@ fun EmailValidationScreen(
                                 border = BorderStroke(1.dp, Color.Yellow.copy(alpha = 0.5f))
                             ) {
                                 Text(
-                                    "TEST: Manuel Doğrula",
+                                    stringResource(R.string.auth_test_manual_verify),
                                     color = Color.Yellow,
                                     style = MaterialTheme.typography.bodyLarge
                                 )
@@ -257,7 +258,7 @@ fun EmailValidationScreen(
                         
                         // Bilgi metni
                         Text(
-                            text = "Email doğrulandıktan sonra otomatik olarak ana sayfaya yönlendirileceksiniz.",
+                            text = stringResource(R.string.auth_verification_auto_redirect),
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.White.copy(alpha = 0.7f),
                             textAlign = TextAlign.Center

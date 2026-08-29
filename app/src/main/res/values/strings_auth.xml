@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Auth options / common -->
+    <string name="auth_sign_in">Sign In</string>
+    <string name="auth_sign_up">Sign Up</string>
+    <string name="auth_or">or</string>
+    <string name="auth_google_sign_in_cd">Sign in with Google</string>
+    <string name="auth_background_cd">Background image</string>
+
+    <!-- Form fields -->
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_confirm_password">Confirm Password</string>
+    <string name="auth_remember_me">Remember Me</string>
+
+    <!-- Validation / error messages -->
+    <string name="auth_error_email_empty">Email field cannot be empty</string>
+    <string name="auth_error_password_empty">Password field cannot be empty</string>
+    <string name="auth_error_confirm_password_empty">Confirm password field cannot be empty</string>
+    <string name="auth_error_invalid_email">Please enter a valid email address</string>
+    <string name="auth_error_password_short">Password must be at least 6 characters</string>
+    <string name="auth_error_passwords_mismatch">Passwords do not match</string>
+    <string name="auth_error_kvkk_required">You must accept the Privacy Policy</string>
+    <string name="auth_error_verify_email_first">Please verify your email address first</string>
+    <string name="auth_error_wrong_password">Incorrect password</string>
+    <string name="auth_error_user_not_found">This email address is not registered</string>
+    <string name="auth_error_sign_in_failed">Sign in failed. Please check your credentials</string>
+
+    <!-- Email verification screen -->
+    <string name="auth_email_validation_title">Email Verification</string>
+    <string name="auth_verify_your_email">Verify Your Email Address</string>
+    <string name="auth_verification_instruction">To activate your account, click the verification link we sent to %1$s.</string>
+    <string name="auth_email_sent">✅ Email Sent</string>
+    <string name="auth_email_sent_detail">A verification email has been sent to %1$s.\n\nPlease check your inbox and click the verification link.</string>
+    <string name="auth_resend_email">Resend Email</string>
+    <string name="auth_resend_cd">Resend</string>
+    <string name="auth_refresh_status">Refresh Status</string>
+    <string name="auth_test_manual_verify">TEST: Verify Manually</string>
+    <string name="auth_verification_auto_redirect">Once your email is verified, you will be redirected to the home page automatically.</string>
+
+    <!-- Transition screen -->
+    <string name="auth_redirecting">Redirecting...</string>
+    <string name="auth_check_email_redirect">Please check your inbox.\nRedirecting to the sign-in page...</string>
+
+    <!-- Welcome notification (Google sign-in) -->
+    <string name="auth_welcome_title">Welcome! ✨</string>
+    <string name="auth_welcome_message">Welcome to AstroSea! Do your first daily tarot reading to discover the energies of your day.</string>
+</resources>

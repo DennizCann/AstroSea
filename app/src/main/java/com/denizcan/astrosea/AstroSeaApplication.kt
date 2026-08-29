@@ -14,8 +14,13 @@ class AstroSeaApplication : Application() {
         private const val TAG = "AstroSeaApplication"
     }
 
+    override fun attachBaseContext(base: android.content.Context) {
+        super.attachBaseContext(com.denizcan.astrosea.util.LanguageManager.wrap(base))
+    }
+
     override fun onCreate() {
         super.onCreate()
+        com.denizcan.astrosea.util.LanguageManager.init(this)
 
         // AdMob'u başlat (test modunda reklamlar simüle edildiği için gerek yok)
         if (!AdConfig.TEST_MODE) {

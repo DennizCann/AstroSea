@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.denizcan.astrosea.MainActivity
 import com.denizcan.astrosea.R
+import com.denizcan.astrosea.util.LanguageManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -28,8 +29,6 @@ class PremiumReminderReceiver : BroadcastReceiver() {
     companion object {
         private const val TAG = "PremiumReminderReceiver"
         private const val CHANNEL_ID = "premium_reminder_channel"
-        private const val CHANNEL_NAME = "Premium Hatırlatmaları"
-        private const val CHANNEL_DESCRIPTION = "Premium üyelik hatırlatma bildirimleri"
         private const val NOTIFICATION_ID = 3001
     }
     
@@ -92,12 +91,13 @@ class PremiumReminderReceiver : BroadcastReceiver() {
     
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val localizedContext = LanguageManager.wrap(context)
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                localizedContext.getString(R.string.notif_channel_premium_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = CHANNEL_DESCRIPTION
+                description = localizedContext.getString(R.string.notif_channel_premium_desc)
                 enableVibration(true)
                 enableLights(true)
                 setShowBadge(true)
@@ -123,7 +123,7 @@ class PremiumReminderReceiver : BroadcastReceiver() {
         )
         
         // Bildirim mesajları - türe göre seç
-        val (title, message) = getNotificationContent(reminderType)
+        val (title, message) = getNotificationContent(context, reminderType)
         
         // Renkli logo için bitmap
         val largeIcon = BitmapFactory.decodeResource(context.resources, R.drawable.astrosea_icon)
@@ -148,27 +148,28 @@ class PremiumReminderReceiver : BroadcastReceiver() {
         Log.d(TAG, "Premium bildirim gönderildi: $title")
     }
     
-    private fun getNotificationContent(reminderType: String): Pair<String, String> {
+    private fun getNotificationContent(context: Context, reminderType: String): Pair<String, String> {
+        val localizedContext = LanguageManager.wrap(context)
         return when (reminderType) {
             "instant" -> Pair(
-                "Premium ile Daha Fazlasını Keşfet! ✨",
-                "Tüm tarot yorumlarının kilidini aç ve geleceğine tam bir bakış at!"
+                localizedContext.getString(R.string.notif_premium_instant_title),
+                localizedContext.getString(R.string.notif_premium_instant_message)
             )
             "24hour" -> Pair(
-                "Sınırsız Tarot Deneyimi Seni Bekliyor! 🔮",
-                "Premium üyelikle günlük açılımlarının tam yorumunu oku, sınırsız açılım yap!"
+                localizedContext.getString(R.string.notif_premium_24hour_title),
+                localizedContext.getString(R.string.notif_premium_24hour_message)
             )
             "5day" -> Pair(
-                "Premium Fırsatını Kaçırma! 💫",
-                "Detaylı AI yorumları, sınırsız açılımlar ve daha fazlası premium üyelikte!"
+                localizedContext.getString(R.string.notif_premium_5day_title),
+                localizedContext.getString(R.string.notif_premium_5day_message)
             )
             "weekly" -> Pair(
-                "AstroSea Premium'a Geç! ⭐",
-                "Tarot deneyimini tamamla! Premium ile tüm özelliklere eriş."
+                localizedContext.getString(R.string.notif_premium_weekly_title),
+                localizedContext.getString(R.string.notif_premium_weekly_message)
             )
             else -> Pair(
-                "Premium Üyelik Fırsatı! ✨",
-                "AstroSea'nin tüm özelliklerini keşfet!"
+                localizedContext.getString(R.string.notif_premium_default_title),
+                localizedContext.getString(R.string.notif_premium_default_message)
             )
         }
     }
@@ -202,7 +203,7 @@ class PremiumReminderReceiver : BroadcastReceiver() {
     
     private suspend fun saveNotificationToFirestore(context: Context, userId: String, reminderType: String) {
         try {
-            val (title, message) = getNotificationContent(reminderType)
+            val (title, message) = getNotificationContent(context, reminderType)
             
             val notificationManager = com.denizcan.astrosea.presentation.notifications.NotificationManager(context)
             notificationManager.saveNotificationToFirestore(

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -114,7 +115,7 @@ fun ProfileCompletionScreen2(
         ) {
             // Başlık
             Text(
-                text = "Yıldızlar kaderinizi şekillendirsin.",
+                text = stringResource(R.string.onb_profile_slogan),
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                     fontSize = 26.sp,
@@ -131,7 +132,7 @@ fun ProfileCompletionScreen2(
                 onValueChange = { },
                 placeholder = { 
                     Text(
-                        "Doğum tarihiniz...",
+                        stringResource(R.string.onb_profile_birth_date_hint),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             fontSize = 18.sp
@@ -176,7 +177,7 @@ fun ProfileCompletionScreen2(
                 onValueChange = { },
                 placeholder = { 
                     Text(
-                        "Doğum saatiniz...",
+                        stringResource(R.string.onb_profile_birth_time_hint),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             fontSize = 18.sp
@@ -235,7 +236,7 @@ fun ProfileCompletionScreen2(
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     Text(
-                        text = "GERİ",
+                        text = stringResource(R.string.onb_profile_back_caps),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                             fontSize = 20.sp,
@@ -276,7 +277,7 @@ fun ProfileCompletionScreen2(
                         )
                     } else {
                         Text(
-                            text = "İLERİ",
+                            text = stringResource(R.string.onb_profile_next_caps),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                 fontSize = 20.sp,

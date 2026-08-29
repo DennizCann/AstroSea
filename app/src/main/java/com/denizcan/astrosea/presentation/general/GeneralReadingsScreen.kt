@@ -28,12 +28,13 @@ fun GeneralReadingsScreen(
     onNavigateToCareerReading: () -> Unit,
     onNavigateToReadingDetail: (String) -> Unit
 ) {
+    // İlk eleman navigasyon/veri anahtarıdır; ekranda gösterilen ad ve açıklama ReadingTexts ile çevrilir.
     val readings = listOf(
-        Triple("GÜNLÜK AÇILIM", "Günlük düşünce, hissiyat ve sürecin/konunun gidişatını görmek için yapılan kısa açılım.", 3),
-        Triple("TEK KART AÇILIMI", "Gününüzün genel enerjilerini gösteren ve kısa tavsiyeler veren tek kartlık açılım.", 1),
-        Triple("EVET – HAYIR AÇILIMI", "Aklınızdaki sorunun cevabı; evet mi, hayır mı?", 1),
-        Triple("GEÇMİŞ, ŞİMDİ, GELECEK", "Geçmişte nasıldı, şimdi nasıl ve gelecekte nasıl sorularının cevaplarını veren açılım.", 3),
-        Triple("DURUM, AKSİYON, SONUÇ", "Bir durum hakkında sürecin; sürecin/konunun sonuçlarını gösteren kısa açılım.", 3)
+        "GÜNLÜK AÇILIM" to 3,
+        "TEK KART AÇILIMI" to 1,
+        "EVET – HAYIR AÇILIMI" to 1,
+        "GEÇMİŞ, ŞİMDİ, GELECEK" to 3,
+        "DURUM, AKSİYON, SONUÇ" to 3
     )
     val cardArrangements = listOf(
         listOf(3), // Günlük Açılım
@@ -53,7 +54,7 @@ fun GeneralReadingsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Genel Açılımlar",
+                    title = androidx.compose.ui.res.stringResource(R.string.title_general_readings),
                     onBackClick = onNavigateToHome
                 )
             },
@@ -72,7 +73,7 @@ fun GeneralReadingsScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    readings.forEachIndexed { idx, (title, desc, cardCount) ->
+                    readings.forEachIndexed { idx, (title, _) ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -96,7 +97,7 @@ fun GeneralReadingsScreen(
                                     repeat(cardArrangements[idx][0]) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = androidx.compose.ui.res.stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(12.dp)
                                                 .height(21.dp),
@@ -111,7 +112,7 @@ fun GeneralReadingsScreen(
                                         .padding(start = 8.dp)
                                 ) {
                                     Text(
-                                        text = title,
+                                        text = com.denizcan.astrosea.util.ReadingTexts.displayName(title),
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                             fontSize = 18.sp
@@ -120,7 +121,7 @@ fun GeneralReadingsScreen(
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = desc,
+                                        text = com.denizcan.astrosea.util.ReadingTexts.description(title),
                                         style = MaterialTheme.typography.bodySmall.copy(
                                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                             fontSize = 14.sp
@@ -157,7 +158,7 @@ fun GeneralReadingsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "İLİŞKİ AÇILIMLARI",
+                                text = androidx.compose.ui.res.stringResource(R.string.tab_relationship_readings),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 16.sp
@@ -183,7 +184,7 @@ fun GeneralReadingsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "KARİYER AÇILIMI",
+                                text = androidx.compose.ui.res.stringResource(R.string.tab_career_reading),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 16.sp

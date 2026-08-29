@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +34,7 @@ fun MoreScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Daha Fazlası",
+                    title = stringResource(R.string.title_more),
                     onBackClick = onNavigateBack
                 )
             },
@@ -48,7 +49,7 @@ fun MoreScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "YAKINDA BURADA OLACAKLAR",
+                    text = stringResource(R.string.more_coming_heading),
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
@@ -58,11 +59,7 @@ fun MoreScreen(
                 )
                 
                 Text(
-                    text = "• Burç Yorumları\n" +
-                          "• Doğum Haritası\n" +
-                          "• Astroloji Eğitimleri\n" +
-                          "• Günlük Motivasyon\n" +
-                          "• Ve daha fazlası...",
+                    text = stringResource(R.string.more_coming_list),
                     color = Color.White,
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),

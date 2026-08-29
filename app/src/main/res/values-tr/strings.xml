@@ -1,0 +1,117 @@
+<resources>
+    <string name="app_name">AstroSea</string>
+    <string name="web_client_id" translatable="false">YOUR_WEB_CLIENT_ID</string>
+
+    <!-- Home -->
+    <string name="home_welcome">Hoş Geldin, </string>
+    <string name="home_daily_reading">Günlük Açılım</string>
+    <string name="home_all_meanings">Tüm Anlamlar</string>
+    <string name="home_relationship_readings">İlişki Açılımları</string>
+    <string name="home_general_readings">Genel Açılımlar</string>
+    <string name="home_career_reading">Kariyer Açılımı</string>
+    <string name="home_yes_no">Evet - Hayır</string>
+    <string name="home_more">Daha Fazlası</string>
+    <string name="cd_profile">Profil</string>
+    <string name="cd_notifications">Bildirimler</string>
+    <string name="cd_logout">Çıkış Yap</string>
+    <string name="cd_card_back">Kart Arkası</string>
+    <string name="logging_out">Çıkış yapılıyor…</string>
+    <string name="coming_soon">Yakında</string>
+
+    <!-- Screen titles -->
+    <string name="title_general_readings">Genel Açılımlar</string>
+    <string name="title_relationship_readings">İLİŞKİ AÇILIMLARI</string>
+    <string name="title_career_readings">Kariyer Açılımları</string>
+    <string name="tab_general_readings">GENEL AÇILIMLAR</string>
+    <string name="tab_relationship_readings">İLİŞKİ AÇILIMLARI</string>
+    <string name="tab_career_reading">KARİYER AÇILIMI</string>
+
+    <!-- Reading names (display) -->
+    <string name="reading_name_gunluk_acilim">GÜNLÜK AÇILIM</string>
+    <string name="reading_name_tek_kart">TEK KART AÇILIMI</string>
+    <string name="reading_name_evet_hayir">EVET – HAYIR AÇILIMI</string>
+    <string name="reading_name_gecmis_simdi_gelecek">GEÇMİŞ, ŞİMDİ, GELECEK</string>
+    <string name="reading_name_durum_aksiyon_sonuc">DURUM, AKSİYON, SONUÇ</string>
+    <string name="reading_name_iliski">İLİŞKİ AÇILIMI</string>
+    <string name="reading_name_uyumluluk">UYUMLULUK AÇILIMI</string>
+    <string name="reading_name_detayli_iliski">DETAYLI İLİŞKİ AÇILIMI</string>
+    <string name="reading_name_mucadeleler">MÜCADELELER AÇILIMI</string>
+    <string name="reading_name_tamam_mi_devam_mi">TAMAM MI, DEVAM MI</string>
+    <string name="reading_name_gelecege_giden_yol">GELECEĞİNE GİDEN YOL</string>
+    <string name="reading_name_is_problemleri">İŞ YERİNDEKİ PROBLEMLER</string>
+    <string name="reading_name_finansal_durum">FİNANSAL DURUM</string>
+
+    <!-- Reading descriptions -->
+    <string name="reading_desc_gunluk_acilim">Günlük düşünce, hissiyat ve sürecin/konunun gidişatını görmek için yapılan kısa açılım.</string>
+    <string name="reading_desc_tek_kart">Gününüzün genel enerjilerini gösteren ve kısa tavsiyeler veren tek kartlık açılım.</string>
+    <string name="reading_desc_evet_hayir">Aklınızdaki sorunun cevabı; evet mi, hayır mı?</string>
+    <string name="reading_desc_gecmis_simdi_gelecek">Geçmişte nasıldı, şimdi nasıl ve gelecekte nasıl sorularının cevaplarını veren açılım.</string>
+    <string name="reading_desc_durum_aksiyon_sonuc">Bir durum hakkında sürecin; sürecin/konunun sonuçlarını gösteren kısa açılım.</string>
+    <string name="reading_desc_iliski">İlişkinizde yaşanan güncel durumları gösteren temel açılım. Geçmiş, şimdi ve gelecekte ilişkinin durumunu anlamak için kullanılır.</string>
+    <string name="reading_desc_uyumluluk">Karşınızdaki insanla gerçekte ne kadar uyumlusunuz? Duygu, düşünce ve fiziksel uyumunuzu gösteren 7 kartlık açılım.</string>
+    <string name="reading_desc_detayli_iliski">Kalp, düşünce ve aksiyon hanelerini içeren ve geçmiş, şimdi ve gelecek ekseninde yorumlanan detaylı açılım. 9 kart ile ilişkinin tüm boyutlarını analiz eder.</string>
+    <string name="reading_desc_mucadeleler">İlişki içerisindeki tartışma ve zorlukları inceleyen ve çözümler öneren 7 kartlık açılım.</string>
+    <string name="reading_desc_tamam_mi_devam_mi">Bu ilişki için çabalamalı mı, yoksa bitmesine izin mi vermeli? 6 kart ile rehberlik sunar.</string>
+    <string name="reading_desc_gelecege_giden_yol">İstediğin geleceği biliyorsun, peki oraya nasıl ulaşacaksınız? Size yol haritası çizen açılım.</string>
+    <string name="reading_desc_is_problemleri">İş yerinde karşılaştığınız problemlerin sebebini inceleyen açılım.</string>
+    <string name="reading_desc_finansal_durum">Finansal durumunuzu gösteren ve neye ihtiyacınız olduğunu söyleyen açılım.</string>
+
+    <!-- Reading detail -->
+    <string name="btn_redraw">Yeniden Çek</string>
+    <string name="btn_daily_once">Günlük Açılım - Günde Bir Kez</string>
+    <string name="btn_see_interpretation">Yorumunu Gör</string>
+    <string name="interpretation_loading">Yorumunuz hazırlanıyor…</string>
+    <string name="preparing_title">✨ Falınız hazırlanıyor…</string>
+    <string name="preparing_desc">Kartlarınızın enerjisi okunuyor. Yorumunuz hazır olduğunda burada görünecek.</string>
+    <string name="btn_speed_up_ad">🎬 Reklam İzle, 5 Dk Erken Gelsin</string>
+    <string name="btn_loading">Yükleniyor…</string>
+
+    <!-- Ad dialog -->
+    <string name="ad_dialog_title">🎬 Reklam İzle, Yorumunu Aç</string>
+    <string name="ad_dialog_text">Kısa bir reklam izleyerek bu açılımın yapay zeka yorumunu ücretsiz açabilirsiniz.\n\nBugün kalan hakkınız: %1$d/%2$d</string>
+    <string name="btn_watch_ad">Reklam İzle</string>
+    <string name="btn_premium_instead">Reklamsız: Premium\'a Geç</string>
+
+    <!-- Premium dialog -->
+    <string name="premium_dialog_title">🌟 Premium Özellik</string>
+    <string name="premium_limit_title">Bugünlük Reklam Hakkınız Bitti</string>
+    <string name="premium_ai_title">AI Destekli Tarot Yorumu</string>
+    <string name="premium_limit_text">Reklam izleyerek günde en fazla %1$d yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üye olarak reklamsız şekilde tüm açılımların yorumlarına erişebilirsiniz.</string>
+    <string name="premium_ai_text">Yapay zeka destekli kişiselleştirilmiş tarot yorumlarına Premium üyelikle ya da reklam izleyerek erişebilirsiniz.</string>
+    <string name="btn_go_premium">Premium\'a Geç</string>
+    <string name="btn_later">Daha Sonra</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profil</string>
+    <string name="field_name">Ad</string>
+    <string name="field_surname">Soyad</string>
+    <string name="field_birth_date">Doğum Tarihi</string>
+    <string name="field_birth_time">Doğum Saati</string>
+    <string name="field_country">Ülke</string>
+    <string name="field_city">Şehir</string>
+    <string name="btn_save">Kaydet</string>
+
+    <!-- Language -->
+    <string name="language_label">Dil</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_english">English</string>
+
+    <!-- Premium status card -->
+    <string name="membership_status">Üyelik Durumu</string>
+    <string name="status_label">Durum</string>
+    <string name="premium_member">Premium Üye ✨</string>
+    <string name="standard_member">Standart Üye</string>
+    <string name="plan_label">Plan</string>
+    <string name="end_date_label">Bitiş Tarihi</string>
+    <string name="plan_weekly">Haftalık Plan</string>
+    <string name="plan_monthly">Aylık Plan</string>
+    <string name="plan_yearly">Yıllık Plan</string>
+    <string name="plan_unknown">Bilinmiyor</string>
+    <string name="btn_cancel_demo">Üyeliği İptal Et (Demo)</string>
+    <string name="btn_manage_subscription">Aboneliği Yönet</string>
+    <string name="manage_sub_hint">Aboneliğinizi Google Play üzerinden iptal edebilirsiniz. İptal etseniz bile dönem sonuna kadar premium erişiminiz devam eder.</string>
+    <string name="cancel_dialog_title">Üyeliği İptal Et</string>
+    <string name="cancel_dialog_text">Premium üyeliğinizi iptal etmek istediğinizden emin misiniz?\n\nBu işlem sonrasında premium özelliklere erişiminiz sona erecektir.</string>
+    <string name="btn_cancel_confirm">İptal Et</string>
+    <string name="btn_dismiss">Vazgeç</string>
+</resources>

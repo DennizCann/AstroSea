@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.R
@@ -69,7 +70,7 @@ fun AuthOptionsScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.astrosea_logo),
-                    contentDescription = "AstroSea Logo",
+                    contentDescription = stringResource(R.string.cd_logo),
                     modifier = Modifier
                         .size(logoSize),  // Responsive logo boyutu
                     contentScale = ContentScale.Fit
@@ -104,7 +105,7 @@ fun AuthOptionsScreen(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        "Giriş Yap",
+                        stringResource(R.string.auth_sign_in),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = buttonFontSize
@@ -128,7 +129,7 @@ fun AuthOptionsScreen(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        "Kayıt Ol",
+                        stringResource(R.string.auth_sign_up),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = buttonFontSize
@@ -148,7 +149,7 @@ fun AuthOptionsScreen(
                         thickness = 1.dp
                     )
                     Text(
-                        "veya",
+                        stringResource(R.string.auth_or),
                         modifier = Modifier.padding(horizontal = 16.dp),
                         color = Color.White,
                         style = MaterialTheme.typography.bodyMedium
@@ -178,7 +179,7 @@ fun AuthOptionsScreen(
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.google_icon),
-                            contentDescription = "Google ile giriş yap",
+                            contentDescription = stringResource(R.string.auth_google_sign_in_cd),
                             modifier = Modifier
                                 .size(32.dp)
                                 .padding(4.dp)

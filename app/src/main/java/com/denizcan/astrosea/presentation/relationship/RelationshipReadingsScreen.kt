@@ -11,6 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.denizcan.astrosea.util.ReadingTexts
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -45,7 +47,7 @@ fun RelationshipReadingsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "İLİŞKİ AÇILIMLARI",
+                    title = stringResource(R.string.title_relationship_readings),
                     onBackClick = onNavigateToHome
                 )
             },
@@ -91,7 +93,7 @@ fun RelationshipReadingsScreen(
                                     repeat(3) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(14.dp)
                                                 .height(21.dp),
@@ -105,7 +107,7 @@ fun RelationshipReadingsScreen(
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             ) {
                                 Text(
-                                    text = "İLİŞKİ AÇILIMI",
+                                    text = ReadingTexts.displayName("İLİŞKİ AÇILIMI"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -114,7 +116,7 @@ fun RelationshipReadingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "İlişkinizde yaşanan güncel durumları gösteren temel açılım. Geçmiş, şimdi ve gelecekte ilişkinin durumunu anlamak için kullanılır.",
+                                    text = ReadingTexts.description("İLİŞKİ AÇILIMI"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -153,7 +155,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -163,7 +165,7 @@ fun RelationshipReadingsScreen(
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
@@ -173,7 +175,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -183,7 +185,7 @@ fun RelationshipReadingsScreen(
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
@@ -193,7 +195,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -205,7 +207,7 @@ fun RelationshipReadingsScreen(
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             ) {
                                 Text(
-                                    text = "UYUMLULUK AÇILIMI",
+                                    text = ReadingTexts.displayName("UYUMLULUK AÇILIMI"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -214,7 +216,7 @@ fun RelationshipReadingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Karşınızdaki insanla gerçekte ne kadar uyumlusunuz? Duygu, düşünce ve fiziksel uyumunuzu gösteren 7 kartlık açılım.",
+                                    text = ReadingTexts.description("UYUMLULUK AÇILIMI"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -254,7 +256,7 @@ fun RelationshipReadingsScreen(
                                             repeat(3) {
                                                 Image(
                                                     painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                    contentDescription = "Kart Arkası",
+                                                    contentDescription = stringResource(R.string.cd_card_back),
                                                     modifier = Modifier.width(14.dp).height(21.dp),
                                                     contentScale = ContentScale.Fit
                                                 )
@@ -269,7 +271,7 @@ fun RelationshipReadingsScreen(
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             ) {
                                 Text(
-                                    text = "DETAYLI İLİŞKİ AÇILIMI",
+                                    text = ReadingTexts.displayName("DETAYLI İLİŞKİ AÇILIMI"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -278,7 +280,7 @@ fun RelationshipReadingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Kalp, düşünce ve aksiyon hanelerini içeren ve geçmiş, şimdi ve gelecek ekseninde yorumlanan detaylı açılım. 9 kart ile ilişkinin tüm boyutlarını analiz eder.",
+                                    text = ReadingTexts.description("DETAYLI İLİŞKİ AÇILIMI"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -317,7 +319,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -327,7 +329,7 @@ fun RelationshipReadingsScreen(
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
@@ -337,7 +339,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -347,7 +349,7 @@ fun RelationshipReadingsScreen(
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier.width(8.dp).height(12.dp),
                                                 contentScale = ContentScale.Fit
                                             )
@@ -357,7 +359,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(8.dp).height(12.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -369,7 +371,7 @@ fun RelationshipReadingsScreen(
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             ) {
                                 Text(
-                                    text = "MÜCADELELER AÇILIMI",
+                                    text = ReadingTexts.displayName("MÜCADELELER AÇILIMI"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -378,7 +380,7 @@ fun RelationshipReadingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "İlişki içerisindeki tartışma ve zorlukları inceleyen ve çözümler öneren 7 kartlık açılım.",
+                                    text = ReadingTexts.description("MÜCADELELER AÇILIMI"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -417,7 +419,7 @@ fun RelationshipReadingsScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier.width(10.dp).height(15.dp),
                                             contentScale = ContentScale.Fit
                                         )
@@ -427,7 +429,7 @@ fun RelationshipReadingsScreen(
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier.width(10.dp).height(15.dp),
                                                 contentScale = ContentScale.Fit
                                             )
@@ -439,7 +441,7 @@ fun RelationshipReadingsScreen(
                                         repeat(3) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier.width(10.dp).height(15.dp),
                                                 contentScale = ContentScale.Fit
                                             )
@@ -453,7 +455,7 @@ fun RelationshipReadingsScreen(
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             ) {
                                 Text(
-                                    text = "TAMAM MI, DEVAM MI",
+                                    text = ReadingTexts.displayName("TAMAM MI, DEVAM MI"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -462,7 +464,7 @@ fun RelationshipReadingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Bu ilişki için çabalamalı mı, yoksa bitmesine izin mi vermeli? 6 kart ile rehberlik sunar.",
+                                    text = ReadingTexts.description("TAMAM MI, DEVAM MI"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -498,7 +500,7 @@ fun RelationshipReadingsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "GENEL AÇILIMLAR",
+                                text = stringResource(R.string.tab_general_readings),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 16.sp
@@ -525,7 +527,7 @@ fun RelationshipReadingsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "KARİYER AÇILIMI",
+                                text = stringResource(R.string.tab_career_reading),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 16.sp

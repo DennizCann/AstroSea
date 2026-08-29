@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onb_hero_text">Geçmiş, gelecek ve şimdi hakkında\nmerak ettiklerinizin cevabı...</string>
+    <string name="onb_skip_caps">ATLA</string>
+    <string name="onb_page_tarot_title">Tarot Falı</string>
+    <string name="onb_page_tarot_desc">Tarot ile sorularınızın cevaplarını\nve bilmeniz gerekenleri öğrenin</string>
+    <string name="onb_page_horoscope_title">Burç Yorumları</string>
+    <string name="onb_page_horoscope_desc">Yıldızların yazdığı öykünüzü\nburçlarınızla yorumlayalım</string>
+    <string name="onb_page_rune_title">Rün Falı</string>
+    <string name="onb_page_rune_desc">Antik rünlerin gücü,\nyaşamının gizli mesajlarını ortaya çıkarır</string>
+    <string name="onb_page_birth_chart_title">Doğum Haritası</string>
+    <string name="onb_page_birth_chart_desc">Hayatının kozmik öyküsü,\ndoğum haritanın çizgilerinde gizli</string>
+
+    <!-- Introduction popup -->
+    <string name="onb_intro_tarot_title">TAROT AÇILIMLARI</string>
+    <string name="onb_intro_tarot_desc">İpucu: Kaderinizi görmek için kartlara tıklayarak açabilirsiniz.</string>
+    <string name="onb_intro_tarot_tip">İPUCU: KADERİNİZİ GÖRMEK İÇİN KARTLARA TIKLAYARAK AÇABİLİRSİNİZ.</string>
+    <string name="onb_intro_horoscope_title">BURÇ YORUMLARI</string>
+    <string name="onb_intro_horoscope_desc">Evrensel öykünüzü görmek için burcunuzu yorumlayalım.</string>
+    <string name="onb_intro_horoscope_tip">EVRENSEL ÖYKÜNÜZÜ GÖRMEK İÇİN BURCUNUZU YORUMLAYALIM.</string>
+    <string name="onb_intro_birth_chart_title">DOĞUM HARİTASI</string>
+    <string name="onb_intro_birth_chart_desc">Doğduğun an evren sana bir şifre fışıldadı: Duymaya hazır mısın?</string>
+    <string name="onb_intro_birth_chart_tip">DOĞDUĞUN AN EVREN SANA BİR ŞİFRE FIŞILDADI: DUYMAYA HAZIR MISIN?</string>
+    <string name="onb_intro_rune_title">RÜN FALI</string>
+    <string name="onb_intro_rune_desc">İpucu: Nors bilgeliğinin ışığının yolunu ve amacını aydınlatması için rüne tıkla ve sonucu gör</string>
+    <string name="onb_intro_rune_tip">İPUCU: NORS BİLGELİĞİNİN IŞIĞININ YOLUNU VE AMACINI AYDINLATMASI İÇİN RÜNE TIKLA VE SONUCU GÖR</string>
+    <string name="onb_intro_cards_tip">İPUCU: KADERİNİZİ GÖRMEK İÇİN\nKARTLARA TIKLAYARAK AÇABİLİRSİNİZ.</string>
+    <string name="onb_intro_start_free_trial">Ücretsiz Denemeyi Başlat</string>
+    <string name="onb_intro_do_spread">Açılımı Yap</string>
+    <string name="onb_intro_see_horoscope">Yorumu Gör</string>
+    <string name="onb_intro_draw_chart">Haritanı Çiz</string>
+    <string name="onb_intro_get_reading">Fal Bak</string>
+    <string name="onb_intro_back">Geri</string>
+    <string name="onb_intro_skip">Atla</string>
+    <string name="onb_intro_close">Kapat</string>
+    <string name="onb_intro_card_back_desc">Kapalı Tarot Kartı</string>
+    <string name="onb_intro_card_desc">Kart</string>
+    <string name="onb_intro_card_closed_desc">Kapalı Kart</string>
+
+    <!-- Profile completion screens -->
+    <string name="onb_profile_slogan">Yıldızlar kaderinizi şekillendirsin.</string>
+    <string name="onb_profile_first_name_hint">Adınız...</string>
+    <string name="onb_profile_last_name_hint">Soyadınız...</string>
+    <string name="onb_profile_birth_date_hint">Doğum tarihiniz...</string>
+    <string name="onb_profile_birth_time_hint">Doğum saatiniz...</string>
+    <string name="onb_profile_country_hint">Doğduğunuz ülke...</string>
+    <string name="onb_profile_city_hint">Doğduğunuz şehir...</string>
+    <string name="onb_profile_next_caps">İLERİ</string>
+    <string name="onb_profile_next">İleri</string>
+    <string name="onb_profile_back_caps">GERİ</string>
+    <string name="onb_profile_back">Geri</string>
+    <string name="onb_profile_complete_caps">TAMAMLA</string>
+    <string name="onb_profile_complete">Tamamla</string>
+</resources>

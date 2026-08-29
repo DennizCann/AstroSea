@@ -20,6 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.denizcan.astrosea.R
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -31,23 +32,23 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPage(
-            title = "Tarot Falı",
-            description = "Tarot ile sorularınızın cevaplarını\nve bilmeniz gerekenleri öğrenin",
+            title = stringResource(R.string.onb_page_tarot_title),
+            description = stringResource(R.string.onb_page_tarot_desc),
             imageRes = R.drawable.tarot
         ),
         OnboardingPage(
-            title = "Burç Yorumları",
-            description = "Yıldızların yazdığı öykünüzü\nburçlarınızla yorumlayalım",
+            title = stringResource(R.string.onb_page_horoscope_title),
+            description = stringResource(R.string.onb_page_horoscope_desc),
             imageRes = R.drawable.zodiac
         ),
         OnboardingPage(
-            title = "Rün Falı",
-            description = "Antik rünlerin gücü,\nyaşamının gizli mesajlarını ortaya çıkarır",
+            title = stringResource(R.string.onb_page_rune_title),
+            description = stringResource(R.string.onb_page_rune_desc),
             imageRes = R.drawable.rune
         ),
         OnboardingPage(
-            title = "Doğum Haritası",
-            description = "Hayatının kozmik öyküsü,\ndoğum haritanın çizgilerinde gizli",
+            title = stringResource(R.string.onb_page_birth_chart_title),
+            description = stringResource(R.string.onb_page_birth_chart_desc),
             imageRes = R.drawable.birthchart
         )
     )
@@ -89,7 +90,7 @@ fun OnboardingScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.astrosea_logo),
-                    contentDescription = "AstroSea Logo",
+                    contentDescription = stringResource(R.string.cd_logo),
                     modifier = Modifier
                         .size(280.dp)
                         .padding(bottom = 16.dp),
@@ -97,7 +98,7 @@ fun OnboardingScreen(
                 )
                 
                 Text(
-                    text = "Geçmiş, gelecek ve şimdi hakkında\nmerak ettiklerinizin cevabı...",
+                    text = stringResource(R.string.onb_hero_text),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.9f),
@@ -159,7 +160,7 @@ fun OnboardingScreen(
                 )
             ) {
                 Text(
-                    "ATLA",
+                    stringResource(R.string.onb_skip_caps),
                     color = Color.White,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold

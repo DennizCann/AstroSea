@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +54,7 @@ fun ProfileCompletionScreen1(
         ) {
             // Başlık
             Text(
-                text = "Yıldızlar kaderinizi şekillendirsin.",
+                text = stringResource(R.string.onb_profile_slogan),
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                     fontSize = 26.sp,
@@ -70,7 +71,7 @@ fun ProfileCompletionScreen1(
                 onValueChange = { viewModel.updateFirstName(it) },
                 placeholder = { 
                     Text(
-                        "Adınız...",
+                        stringResource(R.string.onb_profile_first_name_hint),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             fontSize = 18.sp
@@ -109,7 +110,7 @@ fun ProfileCompletionScreen1(
                 onValueChange = { viewModel.updateLastName(it) },
                 placeholder = { 
                     Text(
-                        "Soyadınız...",
+                        stringResource(R.string.onb_profile_last_name_hint),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             fontSize = 18.sp
@@ -173,7 +174,7 @@ fun ProfileCompletionScreen1(
                     )
                 } else {
                     Text(
-                        text = "İLERİ",
+                        text = stringResource(R.string.onb_profile_next_caps),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                             fontSize = 20.sp,

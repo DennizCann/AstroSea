@@ -11,18 +11,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.denizcan.astrosea.R
 import kotlinx.coroutines.delay
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TransitionScreen(
-    message: String = "Yönlendiriliyorsunuz...",
+    message: String? = null,
     onTransitionComplete: () -> Unit
 ) {
+    val displayMessage = message ?: stringResource(R.string.auth_redirecting)
     // Animasyon için alpha değeri
     var alpha by remember { mutableStateOf(0f) }
     
@@ -80,7 +83,7 @@ fun TransitionScreen(
             
             // Mesaj
             Text(
-                text = message,
+                text = displayMessage,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,

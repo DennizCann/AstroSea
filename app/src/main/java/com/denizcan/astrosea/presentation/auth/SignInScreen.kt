@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,7 +58,7 @@ fun SignInScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Giriş Yap",
+                    title = stringResource(R.string.auth_sign_in),
                     onBackClick = onBackClick
                 )
             },
@@ -124,7 +125,7 @@ fun SignInScreen(
                                     email = it
                                     errorMessage = null  // Input değişince hata mesajını temizle
                                 },
-                                label = { Text("E-posta", color = Color.White) },
+                                label = { Text(stringResource(R.string.auth_email), color = Color.White) },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -142,7 +143,7 @@ fun SignInScreen(
                                     password = it
                                     errorMessage = null  // Input değişince hata mesajını temizle
                                 },
-                                label = { Text("Şifre", color = Color.White) },
+                                label = { Text(stringResource(R.string.auth_password), color = Color.White) },
                                 visualTransformation = PasswordVisualTransformation(),
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -170,7 +171,7 @@ fun SignInScreen(
                                     )
                                 )
                                 Text(
-                                    text = "Beni Hatırla",
+                                    text = stringResource(R.string.auth_remember_me),
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -181,10 +182,10 @@ fun SignInScreen(
                         Button(
                             onClick = {
                                 when {
-                                    email.isEmpty() -> errorMessage = "E-posta alanı boş bırakılamaz"
-                                    password.isEmpty() -> errorMessage = "Şifre alanı boş bırakılamaz"
-                                    !email.contains("@") -> errorMessage = "Geçerli bir e-posta adresi giriniz"
-                                    password.length < 6 -> errorMessage = "Şifre en az 6 karakter olmalıdır"
+                                    email.isEmpty() -> errorMessage = context.getString(R.string.auth_error_email_empty)
+                                    password.isEmpty() -> errorMessage = context.getString(R.string.auth_error_password_empty)
+                                    !email.contains("@") -> errorMessage = context.getString(R.string.auth_error_invalid_email)
+                                    password.length < 6 -> errorMessage = context.getString(R.string.auth_error_password_short)
                                     else -> {
                                         scope.launch {
                                             isLoading = true
@@ -210,24 +211,24 @@ fun SignInScreen(
                                                                 }
                                                                 onSignInSuccess()
                                                             } else {
-                                                                errorMessage = "Lütfen önce email adresinizi doğrulayın"
+                                                                errorMessage = context.getString(R.string.auth_error_verify_email_first)
                                                                 // Email doğrulanmamış kullanıcıyı çıkış yaptır
                                                                 auth.signOut()
                                                             }
                                                         } else {
                                                             errorMessage = when {
-                                                                task.exception?.message?.contains("password") == true -> "Şifre hatalı"
-                                                                task.exception?.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
-                                                                else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
+                                                                task.exception?.message?.contains("password") == true -> context.getString(R.string.auth_error_wrong_password)
+                                                                task.exception?.message?.contains("user") == true -> context.getString(R.string.auth_error_user_not_found)
+                                                                else -> context.getString(R.string.auth_error_sign_in_failed)
                                                             }
                                                         }
                                                         isLoading = false
                                                     }
                                             } catch (e: Exception) {
                                                 errorMessage = when {
-                                                    e.message?.contains("password") == true -> "Şifre hatalı"
-                                                    e.message?.contains("user") == true -> "Bu e-posta adresi kayıtlı değil"
-                                                    else -> "Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin"
+                                                    e.message?.contains("password") == true -> context.getString(R.string.auth_error_wrong_password)
+                                                    e.message?.contains("user") == true -> context.getString(R.string.auth_error_user_not_found)
+                                                    else -> context.getString(R.string.auth_error_sign_in_failed)
                                                 }
                                                 isLoading = false
                                             }
@@ -247,7 +248,7 @@ fun SignInScreen(
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                             } else {
                                 Text(
-                                    "Giriş Yap",
+                                    stringResource(R.string.auth_sign_in),
                                     color = Color.White,
                                     style = MaterialTheme.typography.titleLarge
                                 )

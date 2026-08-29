@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.res.stringResource
+import com.denizcan.astrosea.R
 import com.denizcan.astrosea.util.KvkkTexts
 
 /**
@@ -110,7 +112,7 @@ fun KvkkDialog(
                         )
                     ) {
                         Text(
-                            text = if (KvkkTexts.isDeviceTurkishLocale()) "Kapat" else "Close"
+                            text = stringResource(R.string.btn_close)
                         )
                     }
 
@@ -126,7 +128,7 @@ fun KvkkDialog(
                             )
                         ) {
                             Text(
-                                text = if (KvkkTexts.isDeviceTurkishLocale()) "Kabul Et" else "Accept",
+                                text = stringResource(R.string.btn_accept),
                                 color = if (isScrolledToBottom) Color.White else Color.White.copy(alpha = 0.5f)
                             )
                         }
@@ -136,10 +138,7 @@ fun KvkkDialog(
                 // Scroll ipucu
                 if (!isScrolledToBottom && showAcceptButton && onAccept != null) {
                     Text(
-                        text = if (KvkkTexts.isDeviceTurkishLocale()) 
-                            "Kabul etmek için metni sonuna kadar okuyun" 
-                        else 
-                            "Scroll to the end to accept",
+                        text = stringResource(R.string.kvkk_scroll_hint),
                         color = Color.White.copy(alpha = 0.6f),
                         fontSize = 12.sp,
                         modifier = Modifier

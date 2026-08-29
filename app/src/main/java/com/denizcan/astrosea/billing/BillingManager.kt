@@ -10,6 +10,7 @@ import com.adapty.models.AdaptyPeriodUnit
 import com.adapty.models.AdaptyPurchaseResult
 import com.adapty.utils.AdaptyResult
 import com.denizcan.astrosea.BuildConfig
+import com.denizcan.astrosea.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -75,30 +76,31 @@ class BillingManager(private val context: Context) {
 
     private var adaptyProducts: List<AdaptyPaywallProduct> = emptyList()
 
-    private val testProducts = listOf(
+    private val testProducts: List<SubscriptionProduct>
+        get() = listOf(
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_WEEKLY,
-            name = "Haftalık",
+            name = context.getString(R.string.prem_plan_weekly_short),
             price = "₺49.99",
-            duration = "/hafta",
+            duration = context.getString(R.string.prem_duration_week),
             durationDays = BillingConfig.DURATION_WEEKLY,
             isPopular = false
         ),
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_MONTHLY,
-            name = "Aylık",
+            name = context.getString(R.string.prem_plan_monthly_short),
             price = "₺99.99",
-            duration = "/ay",
+            duration = context.getString(R.string.prem_duration_month),
             durationDays = BillingConfig.DURATION_MONTHLY,
             isPopular = true
         ),
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_YEARLY,
-            name = "Yıllık",
+            name = context.getString(R.string.prem_plan_yearly_short),
             price = "₺599.99",
-            duration = "/yıl",
+            duration = context.getString(R.string.prem_duration_year),
             durationDays = BillingConfig.DURATION_YEARLY,
-            pricePerMonth = "Aylık ₺50",
+            pricePerMonth = context.getString(R.string.prem_price_monthly_fallback),
             isPopular = false
         )
     )
@@ -123,7 +125,7 @@ class BillingManager(private val context: Context) {
                 }
                 is AdaptyResult.Error -> {
                     Log.e(TAG, "Adapty paywall hatası: ${result.error.message}")
-                    _billingState.value = BillingState.Error("Ürünler yüklenemedi: ${result.error.message}")
+                    _billingState.value = BillingState.Error(context.getString(R.string.prem_products_load_failed))
                 }
             }
         }
@@ -140,9 +142,9 @@ class BillingManager(private val context: Context) {
                         val periodUnit = subscriptionDetails?.subscriptionPeriod?.unit
                         
                         val (duration, durationDays, isPopular) = when (periodUnit) {
-                            AdaptyPeriodUnit.WEEK -> Triple("/hafta", 7, false)
-                            AdaptyPeriodUnit.MONTH -> Triple("/ay", 30, true)
-                            AdaptyPeriodUnit.YEAR -> Triple("/yıl", 365, false)
+                            AdaptyPeriodUnit.WEEK -> Triple(context.getString(R.string.prem_duration_week), 7, false)
+                            AdaptyPeriodUnit.MONTH -> Triple(context.getString(R.string.prem_duration_month), 30, true)
+                            AdaptyPeriodUnit.YEAR -> Triple(context.getString(R.string.prem_duration_year), 365, false)
                             else -> Triple("", 30, false)
                         }
                         
@@ -163,7 +165,7 @@ class BillingManager(private val context: Context) {
                 }
                 is AdaptyResult.Error -> {
                     Log.e(TAG, "Adapty ürün yükleme hatası: ${result.error.message}")
-                    _billingState.value = BillingState.Error("Ürünler yüklenemedi")
+                    _billingState.value = BillingState.Error(context.getString(R.string.prem_products_load_failed))
                 }
             }
         }
@@ -178,7 +180,7 @@ class BillingManager(private val context: Context) {
 
         val product = adaptyProducts.find { it.vendorProductId == productId }
         if (product == null) {
-            _billingState.value = BillingState.Error("Ürün bulunamadı: $productId")
+            _billingState.value = BillingState.Error(context.getString(R.string.prem_product_not_found, productId))
             return
         }
 
@@ -194,17 +196,17 @@ class BillingManager(private val context: Context) {
                         }
                         is AdaptyPurchaseResult.UserCanceled -> {
                             Log.d(TAG, "Kullanıcı satın almayı iptal etti")
-                            _billingState.value = BillingState.PurchaseCancelled("Satın alma iptal edildi")
+                            _billingState.value = BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_cancelled))
                         }
                         is AdaptyPurchaseResult.Pending -> {
                             Log.d(TAG, "Satın alma beklemede")
-                            _billingState.value = BillingState.PurchaseCancelled("Satın alma işlemi beklemede")
+                            _billingState.value = BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_pending))
                         }
                     }
                 }
                 is AdaptyResult.Error -> {
                     Log.e(TAG, "Adapty satın alma hatası: ${result.error.message}")
-                    _billingState.value = BillingState.Error("Satın alma hatası: ${result.error.message}")
+                    _billingState.value = BillingState.Error(context.getString(R.string.prem_purchase_error, result.error.message))
                 }
             }
         }

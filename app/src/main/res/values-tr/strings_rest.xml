@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <string name="btn_close">Kapat</string>
+    <string name="btn_accept">Kabul Et</string>
+    <string name="btn_cancel">İptal</string>
+    <string name="btn_ok">Tamam</string>
+    <string name="btn_back">Geri</string>
+    <string name="cd_back">Geri</string>
+    <string name="cd_logo">AstroSea Logo</string>
+    <string name="cd_frame">Çerçeve</string>
+    <string name="cd_tarot_card">Tarot kartı</string>
+    <string name="cd_card_not_found">Kart bulunamadı</string>
+    <string name="cd_closed_card">Kapalı Kart</string>
+    <string name="cd_selected">Seçili</string>
+    <string name="please_wait">Lütfen bekleyin</string>
+
+    <!-- KVKK dialog extras -->
+    <string name="kvkk_scroll_hint">Kabul etmek için metni sonuna kadar okuyun</string>
+
+    <!-- Date picker -->
+    <string name="date_picker_title">Doğum Tarihi Seçin</string>
+    <string name="date_picker_day">Gün</string>
+    <string name="date_picker_month">Ay</string>
+    <string name="date_picker_year">Yıl</string>
+    <string-array name="month_names">
+        <item>Ocak</item>
+        <item>Şubat</item>
+        <item>Mart</item>
+        <item>Nisan</item>
+        <item>Mayıs</item>
+        <item>Haziran</item>
+        <item>Temmuz</item>
+        <item>Ağustos</item>
+        <item>Eylül</item>
+        <item>Ekim</item>
+        <item>Kasım</item>
+        <item>Aralık</item>
+    </string-array>
+
+    <!-- Premium screen -->
+    <string name="prem_test_mode">🔧 TEST MODU</string>
+    <string name="prem_upgrade_title">Premium\'a Yükseltin</string>
+    <string name="prem_upgrade_subtitle">Sınırsız Tarot Açılımları ve Özel İçeriklere Erişin</string>
+    <string name="prem_choose_plan">Planınızı Seçin</string>
+    <string name="prem_processing">İşleniyor…</string>
+    <string name="prem_go_to_payment">Ödemeye Geç</string>
+    <string name="prem_cancel_anytime">İstediğiniz zaman iptal edebilirsiniz</string>
+    <string name="prem_restore">Satın Almaları Geri Yükle</string>
+    <string name="prem_confirm_title">Satın Almayı Onayla</string>
+    <string name="prem_fallback_name">Premium</string>
+    <string name="prem_test_warning">⚠️ Bu bir test satın almasıdır.\nGerçek ödeme alınmayacaktır.</string>
+    <string name="prem_auto_renew">Aboneliğiniz otomatik olarak yenilenecektir.\nİstediğiniz zaman iptal edebilirsiniz.</string>
+    <string name="prem_test_it">Test Et</string>
+    <string name="prem_buy">Satın Al</string>
+    <string name="prem_popular">Popüler</string>
+    <string name="prem_feature_1">Sınırsız Tarot Açılımları</string>
+    <string name="prem_feature_2">Tüm Burç Yorumlarına Erişim</string>
+    <string name="prem_feature_3">Kişiselleştirilmiş Doğum Haritası</string>
+    <string name="prem_feature_4">Rün Falı ve Özel İçerikler</string>
+    <string name="prem_feature_5">Reklamsız Deneyim</string>
+    <string name="prem_feature_6">Günlük Bildirimler ve Hatırlatmalar</string>
+    <string name="prem_select_plan">Lütfen bir plan seçin</string>
+    <string name="prem_no_session">Kullanıcı oturumu bulunamadı</string>
+    <string name="prem_save_failed">Premium durumu kaydedilemedi: %1$s</string>
+    <string name="prem_restore_failed">Geri yükleme kaydedilemedi</string>
+    <string name="prem_nothing_to_restore">Geri yüklenecek satın alma bulunamadı</string>
+    <string name="prem_products_load_failed">Ürünler yüklenemedi</string>
+    <string name="prem_product_not_found">Ürün bulunamadı: %1$s</string>
+    <string name="prem_purchase_cancelled">Satın alma iptal edildi</string>
+    <string name="prem_purchase_pending">Satın alma işlemi beklemede</string>
+    <string name="prem_purchase_error">Satın alma hatası: %1$s</string>
+    <string name="prem_plan_weekly_short">Haftalık</string>
+    <string name="prem_plan_monthly_short">Aylık</string>
+    <string name="prem_plan_yearly_short">Yıllık</string>
+    <string name="prem_price_monthly_fallback">Aylık ₺50</string>
+    <string name="prem_duration_week">/hafta</string>
+    <string name="prem_duration_month">/ay</string>
+    <string name="prem_duration_year">/yıl</string>
+
+    <!-- Coming soon / more -->
+    <string name="coming_soon_exclaim">Çok Yakında!</string>
+    <string name="title_horoscope">Burç Yorumları</string>
+    <string name="title_motivation">Motivasyon</string>
+    <string name="title_birth_chart">Doğum Haritası</string>
+    <string name="title_tarot_spreads">Tarot Açılımları</string>
+    <string name="title_more">Daha Fazlası</string>
+    <string name="horoscope_coming_body">Günlük, haftalık ve aylık burç yorumlarınız çok yakında burada olacak.</string>
+    <string name="motivation_coming_body">Günlük motivasyon mesajları ve özel tavsiyeler çok yakında burada olacak.</string>
+    <string name="birth_chart_coming_body">Detaylı doğum haritası analiziniz çok yakında burada olacak.</string>
+    <string name="spreads_coming_body">Farklı konular için hazırlanmış tarot açılımlarını yakında burada bulabileceksiniz.</string>
+    <string name="more_coming_heading">YAKINDA BURADA OLACAKLAR</string>
+    <string name="more_coming_list">• Burç Yorumları\n• Doğum Haritası\n• Astroloji Eğitimleri\n• Günlük Motivasyon\n• Ve daha fazlası...</string>
+
+    <!-- Tarot meanings -->
+    <string name="title_all_meanings">Tüm Anlamlar</string>
+    <string name="tab_tarot">Tarot</string>
+    <string name="tab_rune">Rün</string>
+    <string name="filter_all">Hepsi</string>
+    <string name="suit_major">Major</string>
+    <string name="suit_cups">Kupalar</string>
+    <string name="suit_swords">Kılıçlar</string>
+    <string name="suit_pentacles">Tılsımlar</string>
+    <string name="suit_wands">Değnekler</string>
+    <string name="rune_description">Rünler, eski İskandinav ve Germen kültürlerinde kullanılan, sembolik anlamlar taşıyan kadim harflerdir. Fal ve spiritüel rehberlikte de kullanılır.</string>
+    <string name="rune_coming_soon">Çok yakında rün anlamları burada olacak!</string>
+    <string name="card_news_heading">Kartın Getirdiği Haberler:</string>
+    <string name="card_zodiac_label">Burçlar: %1$s</string>
+    <string name="card_not_found_error">Kart bulunamadı</string>
+
+    <!-- Auth VM errors -->
+    <string name="auth_error_email_in_use">Bu e-posta adresi zaten kullanımda</string>
+    <string name="auth_error_verification_send_failed">Doğrulama emaili gönderilemedi: %1$s</string>
+    <string name="auth_error_verification_check_failed">Doğrulama kontrolü başarısız: %1$s</string>
+    <string name="auth_error_resend_failed">Doğrulama emaili yeniden gönderilemedi: %1$s</string>
+    <string name="auth_error_manual_verify_failed">Manuel doğrulama başarısız: %1$s</string>
+    <string name="auth_email_verified_redirect">Email doğrulandı! Ana sayfaya yönlendiriliyorsunuz...</string>
+
+    <!-- Reading errors / fallback interpretation -->
+    <string name="err_draw_cards_first">Önce kartları çekmeniz gerekiyor.</string>
+    <string name="err_reveal_one_card">En az bir kartı açmanız gerekiyor.</string>
+    <string name="err_format_not_found">Bu açılım türü için format bulunamadı: %1$s</string>
+    <string name="err_no_valid_card">Geçerli kart bulunamadı.</string>
+    <string name="err_interpretation_failed">Yorum oluşturulurken bir hata oluştu: %1$s</string>
+    <string name="err_interpretation_api_failed">Yapay zeka servisine ulaşılamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="err_api_key_missing">Yapay zeka servisi yapılandırılmamış. Lütfen destek ile iletişime geçin.</string>
+    <string name="fallback_interp_title">%1$s Yorumu</string>
+    <string name="fallback_card_n">Kart %1$d</string>
+    <string name="fallback_unknown_card">Bilinmeyen Kart</string>
+    <string name="fallback_card_uninterpreted">Bu kart henüz yorumlanmamış.</string>
+    <string name="fallback_card_archetype">Bu pozisyonda %1$s kartının düz anlamını açılım bağlamında değerlendirin.</string>
+    <string name="fallback_overall_heading">Genel Yorum:</string>
+    <string name="fallback_overall_body">Bu açılım size hayatınızın bu alanında rehberlik etmek için tasarlanmıştır. Çektiğiniz kartların anlamlarını dikkatlice değerlendirin ve iç sesinizi dinleyin. Her kart size özel bir mesaj taşımaktadır.</string>
+    <string name="fallback_no_cards">Henüz kart çekilmemiş. Lütfen önce kartlarınızı çekin.</string>
+    <string name="fallback_showing_default">Varsayılan yorum gösteriliyor:\n\n</string>
+    <string name="fallback_error_prefix">Hata: %1$s</string>
+
+    <!-- Slot names -->
+    <string-array name="slots_gunluk">
+        <item>Düşünce</item>
+        <item>His</item>
+        <item>Aksiyon</item>
+    </string-array>
+    <string-array name="slots_tek_kart">
+        <item>Günün Kartı</item>
+    </string-array>
+    <string-array name="slots_evet_hayir">
+        <item>Cevap</item>
+    </string-array>
+    <string-array name="slots_gecmis_simdi_gelecek">
+        <item>Geçmiş</item>
+        <item>Şimdi</item>
+        <item>Gelecek</item>
+    </string-array>
+    <string-array name="slots_durum_aksiyon_sonuc">
+        <item>Durum</item>
+        <item>Aksiyon</item>
+        <item>Sonuç</item>
+    </string-array>
+    <string-array name="slots_iliski">
+        <item>Sen</item>
+        <item>O</item>
+        <item>İlişkiniz</item>
+    </string-array>
+    <string-array name="slots_uyumluluk">
+        <item>Duygusal uyumunuz</item>
+        <item>Sizin istekleriniz</item>
+        <item>Partnerinizin istekleri</item>
+        <item>Fiziksel uyumunuz</item>
+        <item>Farklılıklar</item>
+        <item>Benzerlikler</item>
+        <item>Mental uyumunuz</item>
+    </string-array>
+    <string-array name="slots_detayli_iliski">
+        <item>Geçmişteki Düşünceler</item>
+        <item>Mevcut Düşünceler</item>
+        <item>Gelecekteki Düşünceler</item>
+        <item>Geçmişteki Duygular</item>
+        <item>Mevcut Duygular</item>
+        <item>Gelecekteki Duygular</item>
+        <item>Geçmişteki Eylemler</item>
+        <item>Mevcut Eylemler</item>
+        <item>Gelecekteki Eylemler/Sonuç</item>
+    </string-array>
+    <string-array name="slots_mucadeleler">
+        <item>Dış etkiler</item>
+        <item>İlişkinizdeki problemde sizin rolünüz</item>
+        <item>Problemde partnerinizin rolü</item>
+        <item>İlişkiniz kurtarılabilir mi?</item>
+        <item>Sizin için tavsiye</item>
+        <item>Partneriniz için tavsiye</item>
+        <item>İlişkiniz kurtarılmaya değer mi?</item>
+    </string-array>
+    <string-array name="slots_tamam_mi">
+        <item>İlişkinin Mevcut Durumu</item>
+        <item>Devam Etmenin Potansiyeli</item>
+        <item>Bitirmenin Potansiyeli</item>
+        <item>İlişki devam ederse hissedecekleriniz</item>
+        <item>Genel tavsiye</item>
+        <item>İlişkiniz biterse hissedecekleriniz</item>
+    </string-array>
+    <string-array name="slots_gelecege_giden_yol">
+        <item>Hayalinizdeki kariyer</item>
+        <item>Potansiyel yollar</item>
+        <item>Yardımcı olabilecek kaynaklar</item>
+        <item>Yetenekleriniz</item>
+        <item>Dikkat etmeniz gerekenler</item>
+    </string-array>
+    <string-array name="slots_is_problemleri">
+        <item>İşinizin Size Kazandırdıkları</item>
+        <item>Sizi İşinizden Geri Çeken Etmenler</item>
+        <item>Hedefiniz</item>
+        <item>İşinizdeki Engel</item>
+        <item>Sizi İşinizde İleri İten Etmenler</item>
+        <item>Gizli Kalmış Sebepler</item>
+    </string-array>
+    <string-array name="slots_finansal">
+        <item>Kök Neden</item>
+        <item>Karşıt Güçler</item>
+        <item>Eylem Planı</item>
+        <item>Destekleyici Güçler</item>
+        <item>Yardım Kaynakları</item>
+        <item>Olası Sonuç</item>
+    </string-array>
+    <string-array name="slots_default">
+        <item>Kart</item>
+    </string-array>
+</resources>

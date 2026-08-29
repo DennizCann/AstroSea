@@ -9,7 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.denizcan.astrosea.presentation.components.KvkkCheckbox
 import com.denizcan.astrosea.presentation.components.KvkkDialog
-import com.denizcan.astrosea.util.KvkkTexts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,10 +47,8 @@ fun SignUpScreen(
     // KVKK state
     var kvkkAccepted by remember { mutableStateOf(false) }
     var showKvkkDialog by remember { mutableStateOf(false) }
-    
-    // Dil kontrolü
-    val isTurkish = KvkkTexts.isDeviceTurkishLocale()
 
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
 
@@ -65,7 +64,7 @@ fun SignUpScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Kayıt Ol",
+                    title = stringResource(R.string.auth_sign_up),
                     onBackClick = onBackClick
                 )
             },
@@ -132,7 +131,7 @@ fun SignUpScreen(
                                     email = it
                                     errorMessage = null
                                 },
-                                label = { Text("E-posta", color = Color.White) },
+                                label = { Text(stringResource(R.string.auth_email), color = Color.White) },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
@@ -150,7 +149,7 @@ fun SignUpScreen(
                                     password = it
                                     errorMessage = null
                                 },
-                                label = { Text("Şifre", color = Color.White) },
+                                label = { Text(stringResource(R.string.auth_password), color = Color.White) },
                                 visualTransformation = PasswordVisualTransformation(),
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -169,7 +168,7 @@ fun SignUpScreen(
                                     confirmPassword = it
                                     errorMessage = null
                                 },
-                                label = { Text("Şifre Tekrar", color = Color.White) },
+                                label = { Text(stringResource(R.string.auth_confirm_password), color = Color.White) },
                                 visualTransformation = PasswordVisualTransformation(),
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -197,13 +196,13 @@ fun SignUpScreen(
                         Button(
                             onClick = {
                                 when {
-                                    email.isEmpty() -> errorMessage = if (isTurkish) "E-posta alanı boş bırakılamaz" else "Email field cannot be empty"
-                                    password.isEmpty() -> errorMessage = if (isTurkish) "Şifre alanı boş bırakılamaz" else "Password field cannot be empty"
-                                    confirmPassword.isEmpty() -> errorMessage = if (isTurkish) "Şifre tekrar alanı boş bırakılamaz" else "Confirm password field cannot be empty"
-                                    !email.contains("@") -> errorMessage = if (isTurkish) "Geçerli bir e-posta adresi giriniz" else "Please enter a valid email address"
-                                    password.length < 6 -> errorMessage = if (isTurkish) "Şifre en az 6 karakter olmalıdır" else "Password must be at least 6 characters"
-                                    password != confirmPassword -> errorMessage = if (isTurkish) "Şifreler eşleşmiyor" else "Passwords do not match"
-                                    !kvkkAccepted -> errorMessage = if (isTurkish) "KVKK Aydınlatma Metni'ni kabul etmelisiniz" else "You must accept the Privacy Policy"
+                                    email.isEmpty() -> errorMessage = context.getString(R.string.auth_error_email_empty)
+                                    password.isEmpty() -> errorMessage = context.getString(R.string.auth_error_password_empty)
+                                    confirmPassword.isEmpty() -> errorMessage = context.getString(R.string.auth_error_confirm_password_empty)
+                                    !email.contains("@") -> errorMessage = context.getString(R.string.auth_error_invalid_email)
+                                    password.length < 6 -> errorMessage = context.getString(R.string.auth_error_password_short)
+                                    password != confirmPassword -> errorMessage = context.getString(R.string.auth_error_passwords_mismatch)
+                                    !kvkkAccepted -> errorMessage = context.getString(R.string.auth_error_kvkk_required)
                                     else -> {
                                         // Email doğrulama ekranına yönlendir
                                         onSignUpSuccess(email, password, kvkkAccepted)
@@ -222,7 +221,7 @@ fun SignUpScreen(
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                             } else {
                                 Text(
-                                    "Kayıt Ol",
+                                    stringResource(R.string.auth_sign_up),
                                     color = Color.White,
                                     style = MaterialTheme.typography.titleLarge
                                 )

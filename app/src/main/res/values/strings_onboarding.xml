@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding screen -->
+    <string name="onb_hero_text">The answers to everything you wonder\nabout the past, present and future…</string>
+    <string name="onb_skip_caps">SKIP</string>
+    <string name="onb_page_tarot_title">Tarot Reading</string>
+    <string name="onb_page_tarot_desc">Discover the answers to your questions\nand what you need to know with tarot</string>
+    <string name="onb_page_horoscope_title">Horoscopes</string>
+    <string name="onb_page_horoscope_desc">Let us interpret the story\nthe stars have written for you</string>
+    <string name="onb_page_rune_title">Rune Reading</string>
+    <string name="onb_page_rune_desc">The power of ancient runes\nreveals the hidden messages of your life</string>
+    <string name="onb_page_birth_chart_title">Birth Chart</string>
+    <string name="onb_page_birth_chart_desc">The cosmic story of your life\nis hidden in the lines of your birth chart</string>
+
+    <!-- Introduction popup -->
+    <string name="onb_intro_tarot_title">TAROT SPREADS</string>
+    <string name="onb_intro_tarot_desc">Tip: Tap the cards to reveal your destiny.</string>
+    <string name="onb_intro_tarot_tip">TIP: TAP THE CARDS TO REVEAL YOUR DESTINY.</string>
+    <string name="onb_intro_horoscope_title">HOROSCOPES</string>
+    <string name="onb_intro_horoscope_desc">Let us interpret your zodiac sign to reveal your universal story.</string>
+    <string name="onb_intro_horoscope_tip">LET US INTERPRET YOUR ZODIAC SIGN TO REVEAL YOUR UNIVERSAL STORY.</string>
+    <string name="onb_intro_birth_chart_title">BIRTH CHART</string>
+    <string name="onb_intro_birth_chart_desc">The moment you were born, the universe whispered you a secret: are you ready to hear it?</string>
+    <string name="onb_intro_birth_chart_tip">THE MOMENT YOU WERE BORN, THE UNIVERSE WHISPERED YOU A SECRET: ARE YOU READY TO HEAR IT?</string>
+    <string name="onb_intro_rune_title">RUNE READING</string>
+    <string name="onb_intro_rune_desc">Tip: Tap a rune and see the result, letting the light of Norse wisdom illuminate your path and purpose</string>
+    <string name="onb_intro_rune_tip">TIP: TAP A RUNE AND SEE THE RESULT, LETTING THE LIGHT OF NORSE WISDOM ILLUMINATE YOUR PATH AND PURPOSE</string>
+    <string name="onb_intro_cards_tip">TIP: TAP THE CARDS\nTO REVEAL YOUR DESTINY.</string>
+    <string name="onb_intro_start_free_trial">Start Free Trial</string>
+    <string name="onb_intro_do_spread">Draw the Spread</string>
+    <string name="onb_intro_see_horoscope">See Your Horoscope</string>
+    <string name="onb_intro_draw_chart">Draw Your Chart</string>
+    <string name="onb_intro_get_reading">Get a Reading</string>
+    <string name="onb_intro_back">Back</string>
+    <string name="onb_intro_skip">Skip</string>
+    <string name="onb_intro_close">Close</string>
+    <string name="onb_intro_card_back_desc">Face-down tarot card</string>
+    <string name="onb_intro_card_desc">Card</string>
+    <string name="onb_intro_card_closed_desc">Face-down card</string>
+
+    <!-- Profile completion screens -->
+    <string name="onb_profile_slogan">Let the stars shape your destiny.</string>
+    <string name="onb_profile_first_name_hint">Your first name…</string>
+    <string name="onb_profile_last_name_hint">Your last name…</string>
+    <string name="onb_profile_birth_date_hint">Your birth date…</string>
+    <string name="onb_profile_birth_time_hint">Your birth time…</string>
+    <string name="onb_profile_country_hint">Your country of birth…</string>
+    <string name="onb_profile_city_hint">Your city of birth…</string>
+    <string name="onb_profile_next_caps">NEXT</string>
+    <string name="onb_profile_next">Next</string>
+    <string name="onb_profile_back_caps">BACK</string>
+    <string name="onb_profile_back">Back</string>
+    <string name="onb_profile_complete_caps">COMPLETE</string>
+    <string name="onb_profile_complete">Complete</string>
+</resources>

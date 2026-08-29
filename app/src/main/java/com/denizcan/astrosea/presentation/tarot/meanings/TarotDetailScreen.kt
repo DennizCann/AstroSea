@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,7 +49,7 @@ fun TarotDetailScreen(
         ) {
             // Üst Bar
             AstroTopBar(
-                title = card.turkishName ?: card.name,
+                title = card.displayName(),
                 onBackClick = onNavigateBack
             )
 
@@ -97,7 +98,7 @@ fun TarotDetailScreen(
                         if (imageResId != 0) {
                             Image(
                                 painter = painterResource(id = imageResId),
-                                contentDescription = card.name,
+                                contentDescription = card.displayName(),
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .aspectRatio(140f / 220f),
@@ -125,7 +126,7 @@ fun TarotDetailScreen(
                     ) {
                         // Açıklama
                         Text(
-                            text = card.description,
+                            text = card.displayDescription(),
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                 fontSize = 20.sp
@@ -133,9 +134,9 @@ fun TarotDetailScreen(
                             color = Color.White
                         )
 
-                        // Getirdiği Haberler
+                        // Kartın getirdiği haberler iki dilde de gösterilir.
                         Text(
-                            text = "Kartın Getirdiği Haberler:",
+                            text = stringResource(R.string.card_news_heading),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
@@ -143,7 +144,7 @@ fun TarotDetailScreen(
                             ),
                             color = Color.White
                         )
-                        card.predictions?.forEach {
+                        card.displayPredictions().forEach {
                             Text(
                                 text = "• $it",
                                 style = MaterialTheme.typography.bodyLarge.copy(
@@ -156,7 +157,7 @@ fun TarotDetailScreen(
 
                         // Burçlar
                         Text(
-                            text = "Burçlar: ${card.zodiacSigns}",
+                            text = stringResource(R.string.card_zodiac_label, card.displayZodiacSigns() ?: ""),
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                 fontSize = 20.sp
@@ -169,4 +170,4 @@ fun TarotDetailScreen(
             }
         }
     }
-} 
+}

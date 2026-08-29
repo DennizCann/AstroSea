@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.denizcan.astrosea.R
 import com.denizcan.astrosea.util.JsonLoader
 import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
@@ -90,8 +91,8 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                         try {
                             notificationManager.saveNotificationToFirestore(
                                 userId = userId!!,
-                                title = "Günlük Kartlarınız Hazır! 🔮",
-                                message = "Bugün için yeni kartlarınız çekildi. Kartlarınızı açarak günlük yorumunuzu keşfedin."
+                                title = context.getString(R.string.notif_daily_ready_title),
+                                message = context.getString(R.string.notif_daily_ready_message)
                             )
                             Log.d("DailyTarotViewModel", "Daily cards notification saved to Firestore")
                         } catch (e: Exception) {

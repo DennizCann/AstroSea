@@ -14,6 +14,7 @@ import com.denizcan.astrosea.MainActivity
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.notifications.NotificationManager as AppNotificationManager
 import com.denizcan.astrosea.presentation.notifications.NotificationType
+import com.denizcan.astrosea.util.LanguageManager
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,19 +29,18 @@ class DailyNotificationReceiver : BroadcastReceiver() {
     companion object {
         private const val TAG = "DailyNotificationReceiver"
         private const val CHANNEL_ID = "daily_tarot_channel"
-        private const val CHANNEL_NAME = "Günlük Tarot Açılımları"
-        private const val CHANNEL_DESCRIPTION = "Günlük tarot kartı açılımları ve hatırlatmalar"
         private const val NOTIFICATION_ID = 2001
     }
     
     override fun onReceive(context: Context, intent: Intent?) {
         Log.d(TAG, "Alarm tetiklendi! Bildirim gönderiliyor...")
+        val localizedContext = LanguageManager.wrap(context)
         
         // Bildirim kanalını oluştur
-        createNotificationChannel(context)
+        createNotificationChannel(localizedContext)
         
         // Bildirimi göster
-        showNotification(context)
+        showNotification(localizedContext)
         
         // Bir sonraki günün alarmını kur (tekrarlayan alarm için)
         DailyNotificationScheduler.scheduleDailyNotification(context)
@@ -50,10 +50,10 @@ class DailyNotificationReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(R.string.notif_channel_daily_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = CHANNEL_DESCRIPTION
+                description = context.getString(R.string.notif_channel_daily_desc)
                 enableVibration(true)
                 enableLights(true)
                 setShowBadge(true)
@@ -80,14 +80,16 @@ class DailyNotificationReceiver : BroadcastReceiver() {
         
         // Bildirim mesajları - rastgele seç
         val messages = listOf(
-            Pair("✨ Günlük Kartlarınız Hazır!", "Bugün için 3 kart çekildi. Günlük yorumunuzu keşfedin."),
-            Pair("🌟 Yeni Bir Gün, Yeni Bir Açılım!", "Bugünün enerjisini öğrenmek için kartlarınızı açın."),
-            Pair("🔮 Günlük Tarot Zamanı!", "Kartlarınız sizi bekliyor. Bugün size ne söylüyorlar?"),
-            Pair("⭐ Günlük Açılımınız Hazır!", "Bugünün mesajlarını almak için uygulamayı açın."),
-            Pair("🌙 Bugün Neler Olacak?", "Günlük tarot kartlarınız çekildi. Hemen keşfedin!")
+            Pair(R.string.notif_daily_title_1, R.string.notif_daily_body_1),
+            Pair(R.string.notif_daily_title_2, R.string.notif_daily_body_2),
+            Pair(R.string.notif_daily_title_3, R.string.notif_daily_body_3),
+            Pair(R.string.notif_daily_title_4, R.string.notif_daily_body_4),
+            Pair(R.string.notif_daily_title_5, R.string.notif_daily_body_5)
         )
         
-        val (title, message) = messages.random()
+        val (titleRes, messageRes) = messages.random()
+        val title = context.getString(titleRes)
+        val message = context.getString(messageRes)
         
         // Renkli logo için bitmap
         val largeIcon = BitmapFactory.decodeResource(context.resources, R.drawable.astrosea_icon)

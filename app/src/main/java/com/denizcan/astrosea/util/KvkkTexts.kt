@@ -1,18 +1,16 @@
 package com.denizcan.astrosea.util
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalConfiguration
-import java.util.Locale
 
 /**
  * KVKK (Kişisel Verilerin Korunması Kanunu) metinleri
- * Cihaz diline göre Türkçe veya İngilizce metin döndürür
+ * Uygulama diline göre Türkçe veya İngilizce metin döndürür
  */
 object KvkkTexts {
     
     @Composable
     fun getTitle(): String {
-        return if (isDeviceTurkish()) {
+        return if (isAppTurkish()) {
             "ASTROSEA KİŞİSEL VERİLERİN KORUNMASI VE İŞLENMESİ AYDINLATMA METNİ"
         } else {
             "ASTROSEA PRIVACY POLICY AND CLARIFICATION TEXT"
@@ -21,7 +19,7 @@ object KvkkTexts {
     
     @Composable
     fun getShortTitle(): String {
-        return if (isDeviceTurkish()) {
+        return if (isAppTurkish()) {
             "KVKK Aydınlatma Metni"
         } else {
             "Privacy Policy"
@@ -30,7 +28,7 @@ object KvkkTexts {
     
     @Composable
     fun getConsentText(): String {
-        return if (isDeviceTurkish()) {
+        return if (isAppTurkish()) {
             "KVKK Aydınlatma Metni'ni okudum ve kabul ediyorum"
         } else {
             "I have read and accept the Privacy Policy"
@@ -39,19 +37,13 @@ object KvkkTexts {
     
     @Composable
     fun getFullText(): String {
-        return if (isDeviceTurkish()) TURKISH_TEXT else ENGLISH_TEXT
+        return if (isAppTurkish()) TURKISH_TEXT else ENGLISH_TEXT
     }
     
     @Composable
-    private fun isDeviceTurkish(): Boolean {
-        val locale = LocalConfiguration.current.locales[0]
-        return locale.language == "tr"
-    }
+    private fun isAppTurkish(): Boolean = LanguageManager.isAppTurkish()
     
-    // Non-composable version for use outside Compose
-    fun isDeviceTurkishLocale(): Boolean {
-        return Locale.getDefault().language == "tr"
-    }
+    fun isDeviceTurkishLocale(): Boolean = LanguageManager.isAppTurkish()
     
     fun getFullTextNonComposable(): String {
         return if (isDeviceTurkishLocale()) TURKISH_TEXT else ENGLISH_TEXT

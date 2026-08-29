@@ -152,32 +152,32 @@ fun HomeScreen(
     // Menü seçeneklerini güncelliyoruz
     val menuItems = listOf(
         MenuItem(
-            title = "Tüm Anlamlar",
+            title = androidx.compose.ui.res.stringResource(R.string.home_all_meanings),
             icon = R.drawable.tarotacilimlariimage,
             route = "tarot_meanings"
         ),
         MenuItem(
-            title = "İlişki Açılımları",
+            title = androidx.compose.ui.res.stringResource(R.string.home_relationship_readings),
             icon = R.drawable.gununkartiimaji,
             route = "relationship_readings"
         ),
         MenuItem(
-            title = "Genel Açılımlar",
+            title = androidx.compose.ui.res.stringResource(R.string.home_general_readings),
             icon = R.drawable.tarot,
             route = "general_readings"
         ),
         MenuItem(
-            title = "Kariyer Açılımı",
+            title = androidx.compose.ui.res.stringResource(R.string.home_career_reading),
             icon = R.drawable.kariyer,
             route = "career_reading"
         ),
         MenuItem(
-            title = "Evet - Hayır",
+            title = androidx.compose.ui.res.stringResource(R.string.home_yes_no),
             icon = R.drawable.evet_hayir,
             route = "yes_no"
         ),
         MenuItem(
-            title = "Daha Fazlası",
+            title = androidx.compose.ui.res.stringResource(R.string.home_more),
             icon = R.drawable.zodiac,
             route = "more"
         )
@@ -209,7 +209,7 @@ fun HomeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Person,
-                                    contentDescription = "Profil",
+                                    contentDescription = androidx.compose.ui.res.stringResource(R.string.cd_profile),
                                     tint = Color.White
                                 )
                             }
@@ -227,7 +227,7 @@ fun HomeScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Notifications,
-                                            contentDescription = "Bildirimler",
+                                            contentDescription = androidx.compose.ui.res.stringResource(R.string.cd_notifications),
                                             tint = if (unreadNotificationCount > 0) {
                                                 Color(0xFFFFD60A)
                                             } else {
@@ -257,7 +257,7 @@ fun HomeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ExitToApp,
-                                    contentDescription = "Çıkış Yap",
+                                    contentDescription = androidx.compose.ui.res.stringResource(R.string.cd_logout),
                                     tint = Color.White
                                 )
                             }
@@ -299,18 +299,17 @@ fun HomeScreen(
                             // Profil bilgileri eksikse boş bir alan bırak
                             Spacer(modifier = Modifier.height(32.dp))
                         } else {
+                            val welcomeText = androidx.compose.ui.res.stringResource(R.string.home_welcome)
                             Text(
                                 text = buildAnnotatedString {
-                                    append("H")
-                                    withStyle(SpanStyle(
-                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                        fontSize = 32.sp
-                                    )) { append("oş ") }
-                                    append("G")
-                                    withStyle(SpanStyle(
-                                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                        fontSize = 32.sp
-                                    )) { append("eldin, ") }
+                                    // "Hoş Geldin, " / "Welcome, " — her kelimenin ilk harfi büyük stilde
+                                    welcomeText.trim().split(" ").forEach { word ->
+                                        append(word.first().toString())
+                                        withStyle(SpanStyle(
+                                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
+                                            fontSize = 32.sp
+                                        )) { append(word.substring(1) + " ") }
+                                    }
                                     profileState.profileData.name?.split(" ")?.forEach { word ->
                                         withStyle(SpanStyle(
                                             fontFamily = FontFamily(Font(R.font.cinzel_black)),
@@ -372,7 +371,7 @@ fun HomeScreen(
                         )
 
                         Text(
-                            "Günlük Açılım",
+                            androidx.compose.ui.res.stringResource(R.string.home_daily_reading),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
                                 fontSize = 24.sp
@@ -540,7 +539,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     
                     Text(
-                        text = "Çıkış yapılıyor...",
+                        text = androidx.compose.ui.res.stringResource(R.string.logging_out),
                         color = Color.White,
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 20.sp,
@@ -603,7 +602,7 @@ private fun ServiceCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Yakında",
+                        androidx.compose.ui.res.stringResource(R.string.coming_soon),
                         color = Color.White.copy(alpha = 0.5f),
                         style = MaterialTheme.typography.bodyLarge
                     )

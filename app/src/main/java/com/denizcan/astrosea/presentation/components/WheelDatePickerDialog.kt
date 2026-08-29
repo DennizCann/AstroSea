@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -37,11 +39,7 @@ fun WheelDatePickerDialog(
     var selectedMonth by remember { mutableStateOf(initialMonth) }
     var selectedDay by remember { mutableStateOf(initialDay) }
 
-    // Ay isimleri
-    val monthNames = listOf(
-        "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-        "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
-    )
+    val monthNames = stringArrayResource(R.array.month_names).toList()
 
     // Yıl listesi
     val years = (minYear..maxYear).toList().reversed()
@@ -82,7 +80,7 @@ fun WheelDatePickerDialog(
             ) {
                 // Başlık
                 Text(
-                    text = "Doğum Tarihi Seçin",
+                    text = stringResource(R.string.date_picker_title),
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 22.sp,
@@ -102,7 +100,7 @@ fun WheelDatePickerDialog(
                     WheelPicker(
                         items = days,
                         selectedIndex = days.indexOf(selectedDay).coerceAtLeast(0),
-                        label = "Gün",
+                        label = stringResource(R.string.date_picker_day),
                         onItemSelected = { selectedDay = it }
                     )
 
@@ -110,7 +108,7 @@ fun WheelDatePickerDialog(
                     WheelPicker(
                         items = monthNames,
                         selectedIndex = selectedMonth,
-                        label = "Ay",
+                        label = stringResource(R.string.date_picker_month),
                         onItemSelected = { monthName -> 
                             selectedMonth = monthNames.indexOf(monthName).coerceAtLeast(0)
                         }
@@ -120,7 +118,7 @@ fun WheelDatePickerDialog(
                     WheelPicker(
                         items = years,
                         selectedIndex = years.indexOf(selectedYear).coerceAtLeast(0),
-                        label = "Yıl",
+                        label = stringResource(R.string.date_picker_year),
                         onItemSelected = { selectedYear = it }
                     )
                 }
@@ -142,7 +140,7 @@ fun WheelDatePickerDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "İptal",
+                            stringResource(R.string.btn_cancel),
                             color = Color.White,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
@@ -163,7 +161,7 @@ fun WheelDatePickerDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Tamam",
+                            stringResource(R.string.btn_ok),
                             color = Color.White,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))

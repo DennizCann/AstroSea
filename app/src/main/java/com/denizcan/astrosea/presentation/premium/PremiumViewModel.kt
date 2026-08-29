@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.adapty.Adapty
+import com.denizcan.astrosea.R
 import com.denizcan.astrosea.billing.BillingConfig
 import com.denizcan.astrosea.billing.BillingManager
 import com.denizcan.astrosea.billing.BillingState
@@ -134,7 +135,7 @@ class PremiumViewModel(
     fun startPurchase(activity: Activity) {
         val selectedProduct = _uiState.value.products.getOrNull(_uiState.value.selectedProductIndex)
         if (selectedProduct == null) {
-            _uiState.value = _uiState.value.copy(errorMessage = "Lütfen bir plan seçin")
+            _uiState.value = _uiState.value.copy(errorMessage = context.getString(R.string.prem_select_plan))
             return
         }
         
@@ -156,7 +157,7 @@ class PremiumViewModel(
                 if (userId == null) {
                     _uiState.value = _uiState.value.copy(
                         isPurchasing = false,
-                        errorMessage = "Kullanıcı oturumu bulunamadı"
+                        errorMessage = context.getString(R.string.prem_no_session)
                     )
                     return@launch
                 }
@@ -199,7 +200,7 @@ class PremiumViewModel(
                 Log.e(TAG, "Premium kaydetme hatası", e)
                 _uiState.value = _uiState.value.copy(
                     isPurchasing = false,
-                    errorMessage = "Premium durumu kaydedilemedi: ${e.message}"
+                    errorMessage = context.getString(R.string.prem_save_failed, e.message ?: "")
                 )
             }
         }
@@ -232,14 +233,14 @@ class PremiumViewModel(
                         Log.e(TAG, "Restore kaydetme hatası", e)
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            errorMessage = "Geri yükleme kaydedilemedi"
+                            errorMessage = context.getString(R.string.prem_restore_failed)
                         )
                     }
                 }
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = "Geri yüklenecek satın alma bulunamadı"
+                    errorMessage = context.getString(R.string.prem_nothing_to_restore)
                 )
             }
         }

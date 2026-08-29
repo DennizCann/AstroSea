@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalDensity
@@ -106,7 +107,7 @@ fun AnimatedReadingCard(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                    contentDescription = "Tarot kartı",
+                    contentDescription = stringResource(R.string.cd_tarot_card),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
                 )
@@ -153,7 +154,7 @@ fun AnimatedReadingCard(
                             // Resim bulunamadıysa varsayılan
                             Image(
                                 painter = painterResource(id = R.drawable.placeholder_card),
-                                contentDescription = "Kart bulunamadı",
+                                contentDescription = stringResource(R.string.cd_card_not_found),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Fit
                             )
@@ -162,7 +163,7 @@ fun AnimatedReadingCard(
                         // Kart henüz çekilmemişse arka yüzü göster
                         Image(
                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                            contentDescription = "Kapalı Kart",
+                            contentDescription = stringResource(R.string.cd_closed_card),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit
                         )

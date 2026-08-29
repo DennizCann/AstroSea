@@ -12,6 +12,16 @@ class JsonLoader(private val context: Context) {
             val jsonString = context.assets.open("tarot_cards.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<TarotCardsResponse>() {}.type
             val response = Gson().fromJson<TarotCardsResponse>(jsonString, type)
+            val translationType = object : TypeToken<Map<String, EnglishTarotTranslation>>() {}.type
+            val englishTranslations: Map<String, EnglishTarotTranslation> = context.assets
+                .open("tarot_card_translations_en.json")
+                .bufferedReader()
+                .use { Gson().fromJson(it, translationType) }
+            val descriptionType = object : TypeToken<Map<String, String>>() {}.type
+            val englishDescriptions: Map<String, String> = context.assets
+                .open("tarot_card_descriptions_en.json")
+                .bufferedReader()
+                .use { Gson().fromJson(it, descriptionType) }
             
             // Tüm kartları birleştir
             val allCards = mutableListOf<TarotCard>()
@@ -21,7 +31,15 @@ class JsonLoader(private val context: Context) {
             allCards.addAll(response.minor_arcana.wands)
             allCards.addAll(response.minor_arcana.pentacles)
             
-            allCards
+            allCards.map { card ->
+                englishTranslations[card.id]?.let { translation ->
+                    card.copy(
+                        englishMeaningUpright = translation.upright,
+                        englishMeaningReversed = translation.reversed,
+                        englishDescription = englishDescriptions[card.id]
+                    )
+                } ?: card.copy(englishDescription = englishDescriptions[card.id])
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
@@ -49,4 +67,9 @@ data class MinorArcana(
     val swords: List<TarotCard>,
     val wands: List<TarotCard>,
     val pentacles: List<TarotCard>
-) 
+)
+
+data class EnglishTarotTranslation(
+    val upright: String,
+    val reversed: String
+)

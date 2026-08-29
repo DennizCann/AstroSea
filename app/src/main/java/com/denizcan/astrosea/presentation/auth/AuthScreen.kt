@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,7 +28,7 @@ fun AuthScreen(
         // Arka plan görseli
         Image(
             painter = painterResource(id = R.drawable.anabackground),
-            contentDescription = "Arka plan görseli",
+            contentDescription = stringResource(R.string.auth_background_cd),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
@@ -90,7 +91,7 @@ fun AuthScreen(
             
             composable("transition_to_auth") {
                 TransitionScreen(
-                    message = "Mail adresinizi kontrol edin.\nGiriş sayfasına yönlendiriliyorsunuz...",
+                    message = stringResource(R.string.auth_check_email_redirect),
                     onTransitionComplete = {
                         navController.navigate("sign_in") {
                             popUpTo("auth_options") { inclusive = false }

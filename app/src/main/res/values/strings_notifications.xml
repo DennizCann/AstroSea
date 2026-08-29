@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notifications screen -->
+    <string name="notif_screen_title">Notifications</string>
+    <string name="notif_last_7_days">Last 7 Days</string>
+    <string name="notif_unread">Unread</string>
+    <string name="notif_empty_icon_cd">No Notifications</string>
+    <string name="notif_empty_title">No notifications yet</string>
+    <string name="notif_empty_message">You\'ll see a notification here when your daily spread cards are refreshed</string>
+    <string name="notif_ok">OK</string>
+
+    <!-- Notification type labels -->
+    <string name="notif_type_daily_tarot">Daily Tarot</string>
+    <string name="notif_type_premium_reminder">Premium Reminder</string>
+    <string name="notif_type_welcome">Welcome</string>
+    <string name="notif_type_general">General Notification</string>
+
+    <!-- Relative time -->
+    <string name="notif_time_just_now">Just now</string>
+    <string name="notif_time_minutes_ago">%1$d minutes ago</string>
+    <string name="notif_time_hours_ago">%1$d hours ago</string>
+    <string name="notif_time_days_ago">%1$d days ago</string>
+
+    <!-- Daily tarot notification channel -->
+    <string name="notif_channel_daily_name">Daily Tarot Spreads</string>
+    <string name="notif_channel_daily_desc">Daily tarot card spreads and reminders</string>
+
+    <!-- Daily tarot notification messages -->
+    <string name="notif_daily_title_1">✨ Your Daily Cards Are Ready!</string>
+    <string name="notif_daily_body_1">3 cards have been drawn for today. Discover your daily reading.</string>
+    <string name="notif_daily_title_2">🌟 A New Day, A New Spread!</string>
+    <string name="notif_daily_body_2">Reveal your cards to discover today\'s energy.</string>
+    <string name="notif_daily_title_3">🔮 Time for Your Daily Tarot!</string>
+    <string name="notif_daily_body_3">Your cards are waiting. What are they telling you today?</string>
+    <string name="notif_daily_title_4">⭐ Your Daily Spread Is Ready!</string>
+    <string name="notif_daily_body_4">Open the app to receive today\'s messages.</string>
+    <string name="notif_daily_title_5">🌙 What Does Today Hold?</string>
+    <string name="notif_daily_body_5">Your daily tarot cards have been drawn. Discover them now!</string>
+
+    <!-- Premium reminder notification channel -->
+    <string name="notif_channel_premium_name">Premium Reminders</string>
+    <string name="notif_channel_premium_desc">Premium membership reminder notifications</string>
+
+    <!-- Premium reminder messages -->
+    <string name="notif_premium_instant_title">Discover More with Premium! ✨</string>
+    <string name="notif_premium_instant_message">Unlock all tarot readings and get a complete look into your future!</string>
+    <string name="notif_premium_24hour_title">An Unlimited Tarot Experience Awaits You! 🔮</string>
+    <string name="notif_premium_24hour_message">With a premium membership, read the full interpretation of your daily spreads and do unlimited spreads!</string>
+    <string name="notif_premium_5day_title">Don\'t Miss Out on Premium! 💫</string>
+    <string name="notif_premium_5day_message">Detailed AI interpretations, unlimited spreads, and much more with a premium membership!</string>
+    <string name="notif_premium_weekly_title">Upgrade to AstroSea Premium! ⭐</string>
+    <string name="notif_premium_weekly_message">Complete your tarot experience! Access all features with Premium.</string>
+    <string name="notif_premium_default_title">Premium Membership Offer! ✨</string>
+    <string name="notif_premium_default_message">Discover everything AstroSea has to offer!</string>
+
+    <!-- Daily cards ready (in-app notification) -->
+    <string name="notif_daily_ready_title">Your Daily Cards Are Ready! 🔮</string>
+    <string name="notif_daily_ready_message">Your new cards have been drawn for today. Reveal them to discover your daily reading.</string>
+</resources>

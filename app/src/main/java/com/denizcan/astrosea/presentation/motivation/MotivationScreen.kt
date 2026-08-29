@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 
@@ -33,7 +34,7 @@ fun MotivationScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Motivasyon",
+                    title = stringResource(R.string.title_motivation),
                     onBackClick = onNavigateBack
                 )
             }
@@ -47,7 +48,7 @@ fun MotivationScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Çok Yakında!",
+                    text = stringResource(R.string.coming_soon_exclaim),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_regular))
                     ),
@@ -58,7 +59,7 @@ fun MotivationScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
-                    text = "Günlük motivasyon mesajları ve özel tavsiyeler çok yakında burada olacak.",
+                    text = stringResource(R.string.motivation_coming_body),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                     ),

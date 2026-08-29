@@ -1,4 +1,117 @@
 <resources>
     <string name="app_name">AstroSea</string>
     <string name="web_client_id">YOUR_WEB_CLIENT_ID</string>
+
+    <!-- Home -->
+    <string name="home_welcome">Welcome, </string>
+    <string name="home_daily_reading">Daily Spread</string>
+    <string name="home_all_meanings">All Meanings</string>
+    <string name="home_relationship_readings">Relationship Spreads</string>
+    <string name="home_general_readings">General Spreads</string>
+    <string name="home_career_reading">Career Spread</string>
+    <string name="home_yes_no">Yes - No</string>
+    <string name="home_more">More</string>
+    <string name="cd_profile">Profile</string>
+    <string name="cd_notifications">Notifications</string>
+    <string name="cd_logout">Log Out</string>
+    <string name="cd_card_back">Card Back</string>
+    <string name="logging_out">Logging out…</string>
+    <string name="coming_soon">Coming Soon</string>
+
+    <!-- Screen titles -->
+    <string name="title_general_readings">General Spreads</string>
+    <string name="title_relationship_readings">RELATIONSHIP SPREADS</string>
+    <string name="title_career_readings">Career Spreads</string>
+    <string name="tab_general_readings">GENERAL SPREADS</string>
+    <string name="tab_relationship_readings">RELATIONSHIP SPREADS</string>
+    <string name="tab_career_reading">CAREER SPREAD</string>
+
+    <!-- Reading names (display) -->
+    <string name="reading_name_gunluk_acilim">DAILY SPREAD</string>
+    <string name="reading_name_tek_kart">ONE CARD SPREAD</string>
+    <string name="reading_name_evet_hayir">YES – NO SPREAD</string>
+    <string name="reading_name_gecmis_simdi_gelecek">PAST, PRESENT, FUTURE</string>
+    <string name="reading_name_durum_aksiyon_sonuc">SITUATION, ACTION, OUTCOME</string>
+    <string name="reading_name_iliski">RELATIONSHIP SPREAD</string>
+    <string name="reading_name_uyumluluk">COMPATIBILITY SPREAD</string>
+    <string name="reading_name_detayli_iliski">DETAILED RELATIONSHIP SPREAD</string>
+    <string name="reading_name_mucadeleler">STRUGGLES SPREAD</string>
+    <string name="reading_name_tamam_mi_devam_mi">STAY OR GO</string>
+    <string name="reading_name_gelecege_giden_yol">PATH TO YOUR FUTURE</string>
+    <string name="reading_name_is_problemleri">PROBLEMS AT WORK</string>
+    <string name="reading_name_finansal_durum">FINANCIAL SITUATION</string>
+
+    <!-- Reading descriptions -->
+    <string name="reading_desc_gunluk_acilim">A short spread showing your daily thoughts, feelings and the course of events.</string>
+    <string name="reading_desc_tek_kart">A one-card spread showing the general energies of your day with brief advice.</string>
+    <string name="reading_desc_evet_hayir">The answer to the question on your mind; yes or no?</string>
+    <string name="reading_desc_gecmis_simdi_gelecek">A spread answering how things were in the past, how they are now and how they will be.</string>
+    <string name="reading_desc_durum_aksiyon_sonuc">A short spread showing the process and outcome of a situation.</string>
+    <string name="reading_desc_iliski">A basic spread showing the current state of your relationship across past, present and future.</string>
+    <string name="reading_desc_uyumluluk">How compatible are you really? A 7-card spread showing your emotional, mental and physical compatibility.</string>
+    <string name="reading_desc_detayli_iliski">A detailed spread covering heart, mind and action across past, present and future. Analyzes every dimension of the relationship with 9 cards.</string>
+    <string name="reading_desc_mucadeleler">A 7-card spread examining conflicts and difficulties in the relationship and suggesting solutions.</string>
+    <string name="reading_desc_tamam_mi_devam_mi">Should you fight for this relationship or let it go? Guidance with 6 cards.</string>
+    <string name="reading_desc_gelecege_giden_yol">You know the future you want — but how will you get there? A spread that draws your roadmap.</string>
+    <string name="reading_desc_is_problemleri">A spread examining the causes of the problems you face at work.</string>
+    <string name="reading_desc_finansal_durum">A spread showing your financial situation and telling you what you need.</string>
+
+    <!-- Reading detail -->
+    <string name="btn_redraw">Redraw</string>
+    <string name="btn_daily_once">Daily Spread – Once a Day</string>
+    <string name="btn_see_interpretation">See Interpretation</string>
+    <string name="interpretation_loading">Preparing your interpretation…</string>
+    <string name="preparing_title">✨ Your reading is being prepared…</string>
+    <string name="preparing_desc">The energy of your cards is being read. Your interpretation will appear here when it is ready.</string>
+    <string name="btn_speed_up_ad">🎬 Watch an Ad, Get It 5 Min Earlier</string>
+    <string name="btn_loading">Loading…</string>
+
+    <!-- Ad dialog -->
+    <string name="ad_dialog_title">🎬 Watch an Ad, Unlock Your Reading</string>
+    <string name="ad_dialog_text">Watch a short ad to unlock the AI interpretation of this spread for free.\n\nRemaining today: %1$d/%2$d</string>
+    <string name="btn_watch_ad">Watch Ad</string>
+    <string name="btn_premium_instead">Ad-free: Go Premium</string>
+
+    <!-- Premium dialog -->
+    <string name="premium_dialog_title">🌟 Premium Feature</string>
+    <string name="premium_limit_title">You Are Out of Ad Credits for Today</string>
+    <string name="premium_ai_title">AI-Powered Tarot Interpretation</string>
+    <string name="premium_limit_text">You can unlock up to %1$d interpretations per day by watching ads, and you have used today\'s credits.\n\nGo Premium to access all spread interpretations without ads.</string>
+    <string name="premium_ai_text">You can access personalized AI tarot interpretations with a Premium membership or by watching an ad.</string>
+    <string name="btn_go_premium">Go Premium</string>
+    <string name="btn_later">Later</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="field_name">Name</string>
+    <string name="field_surname">Surname</string>
+    <string name="field_birth_date">Birth Date</string>
+    <string name="field_birth_time">Birth Time</string>
+    <string name="field_country">Country</string>
+    <string name="field_city">City</string>
+    <string name="btn_save">Save</string>
+
+    <!-- Language -->
+    <string name="language_label">Language</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_english">English</string>
+
+    <!-- Premium status card -->
+    <string name="membership_status">Membership Status</string>
+    <string name="status_label">Status</string>
+    <string name="premium_member">Premium Member ✨</string>
+    <string name="standard_member">Standard Member</string>
+    <string name="plan_label">Plan</string>
+    <string name="end_date_label">End Date</string>
+    <string name="plan_weekly">Weekly Plan</string>
+    <string name="plan_monthly">Monthly Plan</string>
+    <string name="plan_yearly">Yearly Plan</string>
+    <string name="plan_unknown">Unknown</string>
+    <string name="btn_cancel_demo">Cancel Membership (Demo)</string>
+    <string name="btn_manage_subscription">Manage Subscription</string>
+    <string name="manage_sub_hint">You can cancel your subscription via Google Play. Even if you cancel, your premium access continues until the end of the period.</string>
+    <string name="cancel_dialog_title">Cancel Membership</string>
+    <string name="cancel_dialog_text">Are you sure you want to cancel your premium membership?\n\nAfter this, your access to premium features will end.</string>
+    <string name="btn_cancel_confirm">Cancel</string>
+    <string name="btn_dismiss">Keep</string>
 </resources>

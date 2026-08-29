@@ -1,5 +1,6 @@
 package com.denizcan.astrosea.presentation.general
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -44,31 +46,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 
 // Varsayılan yorum oluşturma fonksiyonu
-fun generateDefaultInterpretation(readingType: String, drawnCards: List<ReadingCardState>, readingInfo: ReadingInfo): String {
+fun generateDefaultInterpretation(
+    context: Context,
+    readingType: String,
+    drawnCards: List<ReadingCardState>,
+    readingInfo: ReadingInfo
+): String {
     val revealedCards = drawnCards.filter { it.isRevealed }
     return if (revealedCards.isNotEmpty()) {
         val interpretation = StringBuilder()
-        interpretation.append("$readingType Yorumu\n\n")
+        interpretation.append(context.getString(R.string.fallback_interp_title, com.denizcan.astrosea.util.ReadingTexts.displayName(context, readingType)))
+        interpretation.append("\n\n")
         
         // Eski format kullan (fallback)
         revealedCards.forEachIndexed { index, cardState ->
-            val meaning = readingInfo.cardMeanings.getOrNull(index) ?: "Kart ${index + 1}"
-            val cardName = cardState.card?.turkishName ?: cardState.card?.name ?: "Bilinmeyen Kart"
-            val cardMeaning = cardState.card?.meaningUpright ?: "Bu kart henüz yorumlanmamış."
+            val meaning = readingInfo.cardMeanings.getOrNull(index)
+                ?: context.getString(R.string.fallback_card_n, index + 1)
+            val cardName = cardState.card?.displayName()
+                ?: context.getString(R.string.fallback_unknown_card)
+            val cardMeaning = cardState.card?.displayMeaning(context)
+                ?: context.getString(R.string.fallback_card_uninterpreted)
             
             interpretation.append("$meaning: $cardName\n")
             interpretation.append("$cardMeaning\n\n")
         }
         
-        // Genel yorum ekle
-        interpretation.append("Genel Yorum:\n")
-        interpretation.append("Bu açılım size hayatınızın bu alanında rehberlik etmek için tasarlanmıştır. ")
-        interpretation.append("Çektiğiniz kartların anlamlarını dikkatlice değerlendirin ve iç sesinizi dinleyin. ")
-        interpretation.append("Her kart size özel bir mesaj taşımaktadır.\n\n")
+        interpretation.append(context.getString(R.string.fallback_overall_heading))
+        interpretation.append("\n")
+        interpretation.append(context.getString(R.string.fallback_overall_body))
+        interpretation.append("\n\n")
         
         interpretation.toString()
     } else {
-        "Henüz kart çekilmemiş. Lütfen önce kartlarınızı çekin."
+        context.getString(R.string.fallback_no_cards)
     }
 }
 
@@ -130,8 +140,9 @@ fun GeneralReadingDetailScreen(
         }
     }
     
-    val readingInfo = remember(readingType) {
-        getReadingInfo(readingType)
+    val slots = com.denizcan.astrosea.util.ReadingTexts.slotNames(readingType)
+    val readingInfo = remember(readingType, slots) {
+        getReadingInfo(readingType).copy(cardMeanings = slots)
     }
     
     when (currentScreen) {
@@ -165,7 +176,7 @@ fun GeneralReadingDetailScreen(
                 Scaffold(
                     topBar = {
                         AstroTopBar(
-                            title = readingType,
+                            title = com.denizcan.astrosea.util.ReadingTexts.displayName(readingType),
                             onBackClick = onNavigateBack
                         )
                     },
@@ -187,7 +198,7 @@ fun GeneralReadingDetailScreen(
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.acilimlarsayfasitak),
-                                contentDescription = "Çerçeve",
+                                contentDescription = stringResource(R.string.cd_frame),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.FillBounds
                             )
@@ -236,13 +247,13 @@ fun GeneralReadingDetailScreen(
                                     // Günlük açılım için özel mantık: kart açılmışsa ismini göster, açılmamışsa sadece anlamı göster
                                     val displayText = if (readingType.trim() == "GÜNLÜK AÇILIM") {
                                         if (isCardRevealed) {
-                                            "${index + 1}. $meaning: ${card?.turkishName ?: card?.name ?: ""}"
+            "${index + 1}. $meaning: ${card?.displayName() ?: ""}"
                                         } else {
                                             "${index + 1}. $meaning"
                                         }
                                     } else {
                                         // Diğer açılımlar için normal mantık
-                                        "${index + 1}. $meaning: ${card?.turkishName ?: card?.name ?: "..."}"
+                                        "${index + 1}. $meaning: ${card?.displayName() ?: "..."}"
                                     }
                                     
                                     MeaningCard(
@@ -281,7 +292,7 @@ fun GeneralReadingDetailScreen(
                                     border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                                 ) {
                                     Text(
-                                        text = if (isDailyReading) "Günlük Açılım - Günde Bir Kez" else "Yeniden Çek",
+                                        text = if (isDailyReading) androidx.compose.ui.res.stringResource(R.string.btn_daily_once) else androidx.compose.ui.res.stringResource(R.string.btn_redraw),
                                         color = if (isDailyReading) Color.Gray else Color.White,
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 16.sp
@@ -321,7 +332,6 @@ fun GeneralReadingDetailScreen(
                                                 Log.d("GeneralReadingDetailScreen", "Firestore'dan okunan isPremium: $isPremium")
                                                 
                                                 if (isPremium) {
-                                                    // Premium kullanıcı - yorum üret, 10 dk'da hazır olur
                                                     Log.d("GeneralReadingDetailScreen", "Premium kullanıcı - yorum oluşturuluyor")
                                                     viewModel.generateReading(readingType, AdConfig.PREMIUM_INTERPRETATION_DELAY_MILLIS)
                                                     currentScreen = "interpretation"
@@ -355,7 +365,7 @@ fun GeneralReadingDetailScreen(
                                     border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                                 ) {
                                     Text(
-                                        text = "Yorumunu Gör",
+                                        text = androidx.compose.ui.res.stringResource(R.string.btn_see_interpretation),
                                         color = if (viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount) Color.White else Color.Gray,
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 16.sp
@@ -377,7 +387,7 @@ fun GeneralReadingDetailScreen(
             shape = RoundedCornerShape(16.dp),
             title = {
                 Text(
-                    text = "🎬 Reklam İzle, Yorumunu Aç",
+                    text = androidx.compose.ui.res.stringResource(R.string.ad_dialog_title),
                     color = Color(0xFFD4AF37),
                     fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                     fontSize = 20.sp,
@@ -391,7 +401,7 @@ fun GeneralReadingDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Kısa bir reklam izleyerek bu açılımın yapay zeka yorumunu ücretsiz açabilirsiniz. Yorumunuz 5 dakika içinde hazır olur.\n\nBugün kalan hakkınız: $remainingAdUnlocks/${AdConfig.DAILY_AD_UNLOCK_LIMIT}",
+                        text = androidx.compose.ui.res.stringResource(R.string.ad_dialog_text, remainingAdUnlocks, AdConfig.DAILY_AD_UNLOCK_LIMIT),
                         color = Color.White.copy(alpha = 0.9f),
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 16.sp,
@@ -435,7 +445,7 @@ fun GeneralReadingDetailScreen(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = if (isAdShowing) "Yükleniyor..." else "Reklam İzle",
+                        text = if (isAdShowing) androidx.compose.ui.res.stringResource(R.string.btn_loading) else androidx.compose.ui.res.stringResource(R.string.btn_watch_ad),
                         color = Color.Black,
                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                         fontSize = 14.sp
@@ -451,7 +461,7 @@ fun GeneralReadingDetailScreen(
                     enabled = !isAdShowing
                 ) {
                     Text(
-                        text = "Reklamsız: Premium'a Geç",
+                        text = androidx.compose.ui.res.stringResource(R.string.btn_premium_instead),
                         color = Color(0xFFD4AF37).copy(alpha = 0.8f),
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 14.sp
@@ -469,7 +479,7 @@ fun GeneralReadingDetailScreen(
             shape = RoundedCornerShape(16.dp),
             title = {
                 Text(
-                    text = "🌟 Premium Özellik",
+                    text = androidx.compose.ui.res.stringResource(R.string.premium_dialog_title),
                     color = Color(0xFFD4AF37),
                     fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                     fontSize = 22.sp,
@@ -483,7 +493,7 @@ fun GeneralReadingDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = if (adLimitReached) "Bugünlük Reklam Hakkınız Bitti" else "AI Destekli Tarot Yorumu",
+                        text = if (adLimitReached) androidx.compose.ui.res.stringResource(R.string.premium_limit_title) else androidx.compose.ui.res.stringResource(R.string.premium_ai_title),
                         color = Color.White,
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
                         fontSize = 18.sp,
@@ -492,9 +502,9 @@ fun GeneralReadingDetailScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = if (adLimitReached) 
-                            "Reklam izleyerek günde en fazla ${AdConfig.DAILY_AD_UNLOCK_LIMIT} yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üye olarak reklamsız şekilde tüm açılımların yorumlarına erişebilirsiniz."
+                            androidx.compose.ui.res.stringResource(R.string.premium_limit_text, AdConfig.DAILY_AD_UNLOCK_LIMIT)
                         else 
-                            "Yapay zeka destekli kişiselleştirilmiş tarot yorumlarına Premium üyelikle ya da reklam izleyerek erişebilirsiniz.",
+                            androidx.compose.ui.res.stringResource(R.string.premium_ai_text),
                         color = Color.White.copy(alpha = 0.9f),
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 16.sp,
@@ -514,7 +524,7 @@ fun GeneralReadingDetailScreen(
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = "Premium'a Geç",
+                        text = androidx.compose.ui.res.stringResource(R.string.btn_go_premium),
                         color = Color.Black,
                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                         fontSize = 14.sp
@@ -526,7 +536,7 @@ fun GeneralReadingDetailScreen(
                     onClick = { showPremiumDialog = false }
                 ) {
                     Text(
-                        text = "Daha Sonra",
+                        text = androidx.compose.ui.res.stringResource(R.string.btn_later),
                         color = Color.White.copy(alpha = 0.7f),
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 14.sp
@@ -564,24 +574,29 @@ fun GeneralReadingInterpretationScreen(
         viewModel.loadReadingState(readingType)
     }
     
-    val readingInfo = remember(readingType) {
-        getReadingInfo(readingType)
+    val slots = com.denizcan.astrosea.util.ReadingTexts.slotNames(readingType)
+    val readingInfo = remember(readingType, slots) {
+        getReadingInfo(readingType).copy(cardMeanings = slots)
     }
     
-    // Gemini yorumunu veya varsayılan yorumu kullan
-    val displayInterpretation = remember(viewModel.generatedReading, viewModel.readingError, viewModel.drawnCards, readingInfo) {
+    // Gemini yorumunu göster; yüklenirken fallback gösterme
+    val isWaitingForReading = viewModel.isGeneratingReading ||
+        (viewModel.generatedReading == null && viewModel.readingError == null)
+
+    val displayInterpretation = remember(
+        viewModel.generatedReading,
+        viewModel.readingError,
+        viewModel.drawnCards,
+        readingInfo
+    ) {
         when {
             viewModel.readingError != null -> {
-                "Hata: ${viewModel.readingError}\n\n" +
-                "Varsayılan yorum gösteriliyor:\n\n" +
-                generateDefaultInterpretation(readingType, viewModel.drawnCards, readingInfo)
+                "${context.getString(R.string.fallback_error_prefix, viewModel.readingError)}\n\n" +
+                    context.getString(R.string.fallback_showing_default) +
+                    generateDefaultInterpretation(context, readingType, viewModel.drawnCards, readingInfo)
             }
-            viewModel.generatedReading != null -> {
-                viewModel.generatedReading!!
-            }
-            else -> {
-                generateDefaultInterpretation(readingType, viewModel.drawnCards, readingInfo)
-            }
+            viewModel.generatedReading != null -> viewModel.generatedReading!!
+            else -> ""
         }
     }
     
@@ -596,7 +611,7 @@ fun GeneralReadingInterpretationScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = readingType,
+                    title = com.denizcan.astrosea.util.ReadingTexts.displayName(readingType),
                     onBackClick = onNavigateBack
                 )
             },
@@ -618,7 +633,7 @@ fun GeneralReadingInterpretationScreen(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.acilimlarsayfasitak),
-                        contentDescription = "Çerçeve",
+                        contentDescription = stringResource(R.string.cd_frame),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.FillBounds
                     )
@@ -654,17 +669,17 @@ fun GeneralReadingInterpretationScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // Geri sayım: yorum hazır olma zamanı gelmediyse bekleme ekranı göster
                     val readyAt = viewModel.interpretationReadyAt
                     var now by remember { mutableStateOf(System.currentTimeMillis()) }
                     LaunchedEffect(readyAt) {
                         while (readyAt != null && System.currentTimeMillis() < readyAt) {
-                            delay(1000)
+                            delay(400)
                             now = System.currentTimeMillis()
                         }
                         now = System.currentTimeMillis()
                     }
                     val isReady = readyAt == null || now >= readyAt
+                    val showLoading = !isReady || isWaitingForReading
                     
                     Card(
                         modifier = Modifier
@@ -676,13 +691,7 @@ fun GeneralReadingInterpretationScreen(
                         ),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                     ) {
-                        if (!isReady && readyAt != null) {
-                            // Bekleme ekranı - geri sayım + süreyi kısaltma reklamı
-                            val remainingMillis = (readyAt - now).coerceAtLeast(0)
-                            val minutes = remainingMillis / 60000
-                            val seconds = (remainingMillis % 60000) / 1000
-                            val canSpeedUp = remainingMillis > AdConfig.SPEED_UP_MILLIS
-                            
+                        if (showLoading) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -690,8 +699,14 @@ fun GeneralReadingInterpretationScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
+                                CircularProgressIndicator(
+                                    color = Color(0xFFD4AF37),
+                                    modifier = Modifier.size(36.dp),
+                                    strokeWidth = 3.dp
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    text = "✨ Falınız hazırlanıyor...",
+                                    text = androidx.compose.ui.res.stringResource(R.string.preparing_title),
                                     color = Color(0xFFD4AF37),
                                     fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                     fontSize = 20.sp,
@@ -699,54 +714,12 @@ fun GeneralReadingInterpretationScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = String.format("%02d:%02d", minutes, seconds),
-                                    color = Color.White,
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_bold)),
-                                    fontSize = 32.sp,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "Kartlarınızın enerjisi okunuyor. Yorumunuz hazır olduğunda burada görünecek.",
+                                    text = androidx.compose.ui.res.stringResource(R.string.preparing_desc),
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                     fontSize = 15.sp,
                                     textAlign = TextAlign.Center
                                 )
-                                if (canSpeedUp) {
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    val activity = context as? android.app.Activity
-                                    val speedUpAdManager = remember { com.denizcan.astrosea.ads.RewardedAdManager(context) }
-                                    LaunchedEffect(Unit) { speedUpAdManager.preload() }
-                                    var isSpeedUpAdShowing by remember { mutableStateOf(false) }
-                                    
-                                    Button(
-                                        onClick = {
-                                            if (activity != null) {
-                                                isSpeedUpAdShowing = true
-                                                speedUpAdManager.show(
-                                                    activity = activity,
-                                                    onRewarded = {
-                                                        isSpeedUpAdShowing = false
-                                                        viewModel.speedUpInterpretation(readingType)
-                                                        now = System.currentTimeMillis()
-                                                    },
-                                                    onFailed = { isSpeedUpAdShowing = false }
-                                                )
-                                            }
-                                        },
-                                        enabled = !isSpeedUpAdShowing,
-                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD4AF37)),
-                                        shape = RoundedCornerShape(8.dp)
-                                    ) {
-                                        Text(
-                                            text = if (isSpeedUpAdShowing) "Yükleniyor..." else "🎬 Reklam İzle, 5 Dk Erken Gelsin",
-                                            color = Color.Black,
-                                            fontFamily = FontFamily(Font(R.font.cinzel_bold)),
-                                            fontSize = 13.sp
-                                        )
-                                    }
-                                }
                             }
                         } else {
                             LazyColumn(
@@ -820,7 +793,7 @@ fun LoadingScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "Yorumunuz hazırlanıyor...",
+                text = androidx.compose.ui.res.stringResource(R.string.interpretation_loading),
                 color = Color.White,
                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                 fontSize = 20.sp,

@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -65,36 +66,36 @@ fun IntroductionPopupScreen(
 
     val pages = listOf(
         IntroPage(
-            title = "TAROT AÇILIMLARI",
-            description = "İpucu: Kaderinizi görmek için kartlara tıklayarak açabilirsiniz.",
+            title = stringResource(R.string.onb_intro_tarot_title),
+            description = stringResource(R.string.onb_intro_tarot_desc),
             imageRes = R.drawable.tarotacilimlariimage,
-            primaryButtonText = "Ücretsiz Denemeyi Başlat",
-            secondaryButtonText = "Açılımı Yap",
-            tip = "İPUCU: KADERİNİZİ GÖRMEK İÇİN KARTLARA TIKLAYARAK AÇABİLİRSİNİZ."
+            primaryButtonText = stringResource(R.string.onb_intro_start_free_trial),
+            secondaryButtonText = stringResource(R.string.onb_intro_do_spread),
+            tip = stringResource(R.string.onb_intro_tarot_tip)
         ),
         IntroPage(
-            title = "BURÇ YORUMLARI",
-            description = "Evrensel öykünüzü görmek için burcunuzu yorumlayalım.",
+            title = stringResource(R.string.onb_intro_horoscope_title),
+            description = stringResource(R.string.onb_intro_horoscope_desc),
             imageRes = R.drawable.zodiac,
-            primaryButtonText = "Ücretsiz Denemeyi Başlat",
-            secondaryButtonText = "Yorumu Gör",
-            tip = "EVRENSEL ÖYKÜNÜZÜ GÖRMEK İÇİN BURCUNUZU YORUMLAYALIM."
+            primaryButtonText = stringResource(R.string.onb_intro_start_free_trial),
+            secondaryButtonText = stringResource(R.string.onb_intro_see_horoscope),
+            tip = stringResource(R.string.onb_intro_horoscope_tip)
         ),
         IntroPage(
-            title = "DOĞUM HARİTASI",
-            description = "Doğduğun an evren sana bir şifre fışıldadı: Duymaya hazır mısın?",
+            title = stringResource(R.string.onb_intro_birth_chart_title),
+            description = stringResource(R.string.onb_intro_birth_chart_desc),
             imageRes = R.drawable.birthchart,
-            primaryButtonText = "Ücretsiz Denemeyi Başlat",
-            secondaryButtonText = "Haritanı Çiz",
-            tip = "DOĞDUĞUN AN EVREN SANA BİR ŞİFRE FIŞILDADI: DUYMAYA HAZIR MISIN?"
+            primaryButtonText = stringResource(R.string.onb_intro_start_free_trial),
+            secondaryButtonText = stringResource(R.string.onb_intro_draw_chart),
+            tip = stringResource(R.string.onb_intro_birth_chart_tip)
         ),
         IntroPage(
-            title = "RÜN FALI",
-            description = "İpucu: Nors bilgeliğinin ışığının yolunu ve amacını aydınlatması için rüne tıkla ve sonucu gör",
+            title = stringResource(R.string.onb_intro_rune_title),
+            description = stringResource(R.string.onb_intro_rune_desc),
             imageRes = R.drawable.rune,
-            primaryButtonText = "Ücretsiz Denemeyi Başlat",
-            secondaryButtonText = "Fal Bak",
-            tip = "İPUCU: NORS BİLGELİĞİNİN IŞIĞININ YOLUNU VE AMACINI AYDINLATMASI İÇİN RÜNE TIKLA VE SONUCU GÖR"
+            primaryButtonText = stringResource(R.string.onb_intro_start_free_trial),
+            secondaryButtonText = stringResource(R.string.onb_intro_get_reading),
+            tip = stringResource(R.string.onb_intro_rune_tip)
         )
     )
 
@@ -154,7 +155,7 @@ fun IntroductionPopupScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Kapat",
+                        contentDescription = stringResource(R.string.onb_intro_close),
                         tint = Color.White,
                         modifier = Modifier.size(26.dp)
                     )
@@ -236,13 +237,13 @@ fun IntroductionPopupScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = "Geri",
+                                    contentDescription = stringResource(R.string.onb_intro_back),
                                     tint = Color.White.copy(alpha = 0.8f),
                                     modifier = Modifier.size(20.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    "Geri",
+                                    stringResource(R.string.onb_intro_back),
                                     color = Color.White.copy(alpha = 0.8f),
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 15.sp
@@ -264,7 +265,7 @@ fun IntroductionPopupScreen(
                             modifier = Modifier.height(44.dp)
                         ) {
                             Text(
-                                "Atla",
+                                stringResource(R.string.onb_intro_skip),
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                 fontSize = 15.sp
@@ -273,7 +274,7 @@ fun IntroductionPopupScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Icon(
                                     imageVector = Icons.Default.ArrowForward,
-                                    contentDescription = "Atla",
+                                    contentDescription = stringResource(R.string.onb_intro_skip),
                                     tint = Color.White.copy(alpha = 0.8f),
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -480,7 +481,7 @@ private fun IntroTarotCards() {
     ) {
         // Başlık
         Text(
-            text = "TAROT AÇILIMLARI",
+            text = stringResource(R.string.onb_intro_tarot_title),
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                 fontSize = 24.sp,
@@ -547,7 +548,7 @@ private fun IntroTarotCards() {
         
         // Açıklama
         Text(
-            text = "İPUCU: KADERİNİZİ GÖRMEK İÇİN\nKARTLARA TIKLAYARAK AÇABİLİRSİNİZ.",
+            text = stringResource(R.string.onb_intro_cards_tip),
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                 fontSize = 13.sp,
@@ -608,7 +609,7 @@ private fun IntroTarotCard(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                    contentDescription = "Kapalı Tarot Kartı",
+                    contentDescription = stringResource(R.string.onb_intro_card_back_desc),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
                 )
@@ -645,7 +646,7 @@ private fun IntroTarotCard(
                     } else {
                         Image(
                             painter = painterResource(id = R.drawable.placeholder_card),
-                            contentDescription = "Kart",
+                            contentDescription = stringResource(R.string.onb_intro_card_desc),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit
                         )
@@ -653,7 +654,7 @@ private fun IntroTarotCard(
                 } else {
                     Image(
                         painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                        contentDescription = "Kapalı Kart",
+                        contentDescription = stringResource(R.string.onb_intro_card_closed_desc),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit
                     )

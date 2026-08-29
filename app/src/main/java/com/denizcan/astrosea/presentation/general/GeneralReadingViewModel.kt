@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.denizcan.astrosea.R
 import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.util.JsonLoader
 import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
@@ -51,7 +52,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     private var dailyStateLoaded = false
     
     // Groq Service
-    private val groqService = GroqService()
+    private val groqService = GroqService(context)
     
     // Reading Formats
     private val readingFormats by lazy {
@@ -557,13 +558,13 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         // Kartların çekilip çekilmediğini kontrol et
         val hasCards = drawnCards.isNotEmpty() && drawnCards.any { it.card != null }
         if (!hasCards) {
-            readingError = "Önce kartları çekmeniz gerekiyor."
+            readingError = context.getString(R.string.err_draw_cards_first)
             return
         }
         
         val revealedCards = drawnCards.filter { it.isRevealed && it.card != null }
         if (revealedCards.isEmpty()) {
-            readingError = "En az bir kartı açmanız gerekiyor."
+            readingError = context.getString(R.string.err_reveal_one_card)
             return
         }
         
@@ -586,7 +587,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                     return@launch
                 }
                 
-                // Yeni yorum üretiliyor - hazır olacağı zamanı belirle (10 dk / 5 dk bekleme)
+                // Yeni yorum üretiliyor - hazır olacağı zamanı belirle (gizli bekleme)
                 val readyAt = System.currentTimeMillis() + delayMillis
                 interpretationReadyAt = readyAt
                 
@@ -594,7 +595,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 val normalizedReadingType = normalizeReadingType(readingType)
                 val format = readingFormats?.readingFormats?.get(normalizedReadingType)
                 if (format == null) {
-                    readingError = "Bu açılım türü için format bulunamadı: $normalizedReadingType"
+                    readingError = context.getString(R.string.err_format_not_found, normalizedReadingType)
                     return@launch
                 }
                 
@@ -602,17 +603,29 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 val tarotCards = revealedCards.mapNotNull { it.card }
                 
                 if (tarotCards.isEmpty()) {
-                    readingError = "Geçerli kart bulunamadı."
+                    readingError = context.getString(R.string.err_no_valid_card)
                     return@launch
                 }
                 
+                if (!groqService.isAvailable()) {
+                    readingError = context.getString(R.string.err_api_key_missing)
+                    interpretationReadyAt = null
+                    return@launch
+                }
+
                 // Groq'dan yorum oluştur
                 val reading = groqService.generateTarotReading(
                     readingType = readingType,
                     drawnCards = tarotCards,
                     readingFormat = format
                 )
-                
+
+                if (reading.isNullOrBlank()) {
+                    readingError = context.getString(R.string.err_interpretation_api_failed)
+                    interpretationReadyAt = null
+                    return@launch
+                }
+
                 generatedReading = reading
                 Log.d("GeneralReadingViewModel", "Yorum başarıyla oluşturuldu")
                 
@@ -621,41 +634,9 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 
             } catch (e: Exception) {
                 Log.e("GeneralReadingViewModel", "Yorum oluşturulurken hata", e)
-                readingError = "Yorum oluşturulurken bir hata oluştu: ${e.message}"
+                readingError = context.getString(R.string.err_interpretation_failed, e.message ?: "")
             } finally {
                 isGeneratingReading = false
-            }
-        }
-    }
-    
-    /**
-     * Bekleme sırasında reklam izlendiğinde kalan süreyi kısaltır (10 dk -> 5 dk).
-     */
-    fun speedUpInterpretation(readingType: String) {
-        val current = interpretationReadyAt ?: return
-        val newReadyAt = maxOf(System.currentTimeMillis(), current - com.denizcan.astrosea.ads.AdConfig.SPEED_UP_MILLIS)
-        interpretationReadyAt = newReadyAt
-        Log.d("GeneralReadingViewModel", "Yorum süresi kısaltıldı: $current -> $newReadyAt")
-        
-        // Firestore'daki kaydı da güncelle
-        viewModelScope.launch {
-            try {
-                if (userId == null) return@launch
-                if (readingType.trim() == "GÜNLÜK AÇILIM") {
-                    firestore.collection("users").document(userId!!)
-                        .set(mapOf("daily_interpretation_ready_at" to newReadyAt), SetOptions.merge())
-                        .await()
-                } else {
-                    val key = firestoreReadingKey(readingType)
-                    val userDoc = firestore.collection("users").document(userId!!).get().await()
-                    val readingData = (userDoc.get(key) as? Map<String, Any>)?.toMutableMap() ?: return@launch
-                    readingData["interpretationReadyAt"] = newReadyAt
-                    firestore.collection("users").document(userId!!)
-                        .set(mapOf(key to readingData), SetOptions.merge())
-                        .await()
-                }
-            } catch (e: Exception) {
-                Log.e("GeneralReadingViewModel", "Süre kısaltma kaydedilemedi", e)
             }
         }
     }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import androidx.compose.foundation.clickable
@@ -70,7 +71,7 @@ fun TarotMeaningsScreen(
         ) {
             // Üst Bar
             AstroTopBar(
-                title = "Tüm Anlamlar",
+                title = stringResource(R.string.title_all_meanings),
                 onBackClick = onNavigateBack
             )
 
@@ -85,7 +86,7 @@ fun TarotMeaningsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Tarot",
+                        text = stringResource(R.string.tab_tarot),
                         fontSize = 26.sp,
                         color = if (selectedType == "tarot") Color.White else Color.White.copy(alpha = 0.6f),
                         modifier = Modifier.clickable { selectedType = "tarot" },
@@ -108,7 +109,7 @@ fun TarotMeaningsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Rün",
+                        text = stringResource(R.string.tab_rune),
                         fontSize = 26.sp,
                         color = if (selectedType == "rune") Color.White else Color.White.copy(alpha = 0.6f),
                         modifier = Modifier.clickable { selectedType = "rune" },
@@ -154,7 +155,7 @@ fun TarotMeaningsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Hepsi",
+                                text = stringResource(R.string.filter_all),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = if (selectedSuit == "all") selectedContent else unselectedContent,
@@ -180,7 +181,7 @@ fun TarotMeaningsScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_crown),
-                                contentDescription = "Major",
+                                contentDescription = stringResource(R.string.suit_major),
                                 tint = if (selectedSuit == "major") selectedContent else unselectedContent,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -199,7 +200,7 @@ fun TarotMeaningsScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_cup),
-                                contentDescription = "Kupalar",
+                                contentDescription = stringResource(R.string.suit_cups),
                                 tint = if (selectedSuit == "cups") selectedContent else unselectedContent,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -218,7 +219,7 @@ fun TarotMeaningsScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_sword),
-                                contentDescription = "Kılıçlar",
+                                contentDescription = stringResource(R.string.suit_swords),
                                 tint = if (selectedSuit == "swords") selectedContent else unselectedContent,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -237,7 +238,7 @@ fun TarotMeaningsScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_pentacle),
-                                contentDescription = "Tılsımlar",
+                                contentDescription = stringResource(R.string.suit_pentacles),
                                 tint = if (selectedSuit == "pentacles") selectedContent else unselectedContent,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -256,7 +257,7 @@ fun TarotMeaningsScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_wand),
-                                contentDescription = "Değnekler",
+                                contentDescription = stringResource(R.string.suit_wands),
                                 tint = if (selectedSuit == "wands") selectedContent else unselectedContent,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -272,7 +273,7 @@ fun TarotMeaningsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Rünler, eski İskandinav ve Germen kültürlerinde kullanılan, sembolik anlamlar taşıyan kadim harflerdir. Fal ve spiritüel rehberlikte de kullanılır.",
+                        text = stringResource(R.string.rune_description),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             color = Color.White,
@@ -282,7 +283,7 @@ fun TarotMeaningsScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "Çok yakında rün anlamları burada olacak!",
+                        text = stringResource(R.string.rune_coming_soon),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                             color = Color.White,

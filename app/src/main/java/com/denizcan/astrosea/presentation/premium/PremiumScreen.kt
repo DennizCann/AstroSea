@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -102,7 +103,7 @@ fun PremiumScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "🔧 TEST MODU",
+                                text = stringResource(R.string.prem_test_mode),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 11.sp
@@ -130,7 +131,7 @@ fun PremiumScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Kapat",
+                            contentDescription = stringResource(R.string.btn_close),
                             tint = Color.White,
                             modifier = Modifier.size(26.dp)
                         )
@@ -151,7 +152,7 @@ fun PremiumScreen(
                 // Logo
                 Icon(
                     painter = painterResource(id = R.drawable.astrosea_logo),
-                    contentDescription = "AstroSea Logo",
+                    contentDescription = stringResource(R.string.cd_logo),
                     modifier = Modifier.size(80.dp),
                     tint = Color(0xFFD4AF37)
                 )
@@ -160,7 +161,7 @@ fun PremiumScreen(
                 
                 // Başlık
                 Text(
-                    text = "Premium'a Yükseltin",
+                    text = stringResource(R.string.prem_upgrade_title),
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                         fontSize = 32.sp,
@@ -175,7 +176,7 @@ fun PremiumScreen(
                 
                 // Alt başlık
                 Text(
-                    text = "Sınırsız Tarot Açılımları ve Özel İçeriklere Erişin",
+                    text = stringResource(R.string.prem_upgrade_subtitle),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 16.sp,
@@ -194,7 +195,7 @@ fun PremiumScreen(
                 
                 // Fiyatlandırma Başlığı
                 Text(
-                    text = "Planınızı Seçin",
+                    text = stringResource(R.string.prem_choose_plan),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                         fontSize = 22.sp,
@@ -275,7 +276,7 @@ fun PremiumScreen(
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
-                                    text = "İşleniyor...",
+                                    text = stringResource(R.string.prem_processing),
                                     style = MaterialTheme.typography.titleLarge.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                         fontSize = 18.sp,
@@ -286,7 +287,7 @@ fun PremiumScreen(
                             }
                         } else {
                             Text(
-                                text = "Ödemeye Geç",
+                                text = stringResource(R.string.prem_go_to_payment),
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                     fontSize = 18.sp,
@@ -302,7 +303,7 @@ fun PremiumScreen(
                 
                 // Bilgi yazısı
                 Text(
-                    text = "İstediğiniz zaman iptal edebilirsiniz",
+                    text = stringResource(R.string.prem_cancel_anytime),
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         fontSize = 13.sp
@@ -319,7 +320,7 @@ fun PremiumScreen(
                     enabled = !uiState.isLoading && !uiState.isPurchasing
                 ) {
                     Text(
-                        text = "Satın Almaları Geri Yükle",
+                        text = stringResource(R.string.prem_restore),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             fontSize = 14.sp
@@ -397,7 +398,7 @@ private fun PurchaseConfirmDialog(
             ) {
                 if (isTestMode) {
                     Text(
-                        text = "🔧 TEST MODU",
+                        text = stringResource(R.string.prem_test_mode),
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
@@ -406,7 +407,7 @@ private fun PurchaseConfirmDialog(
                     )
                 }
                 Text(
-                    text = "Satın Almayı Onayla",
+                    text = stringResource(R.string.prem_confirm_title),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                         fontWeight = FontWeight.Bold
@@ -421,7 +422,7 @@ private fun PurchaseConfirmDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = product?.name ?: "Premium",
+                    text = product?.name ?: stringResource(R.string.prem_fallback_name),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                         fontWeight = FontWeight.Bold
@@ -443,14 +444,14 @@ private fun PurchaseConfirmDialog(
                 
                 if (isTestMode) {
                     Text(
-                        text = "⚠️ Bu bir test satın almasıdır.\nGerçek ödeme alınmayacaktır.",
+                        text = stringResource(R.string.prem_test_warning),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color(0xFFFF6B6B),
                         textAlign = TextAlign.Center
                     )
                 } else {
                     Text(
-                        text = "Aboneliğiniz otomatik olarak yenilenecektir.\nİstediğiniz zaman iptal edebilirsiniz.",
+                        text = stringResource(R.string.prem_auto_renew),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                         ),
@@ -469,7 +470,7 @@ private fun PurchaseConfirmDialog(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = if (isTestMode) "Test Et" else "Satın Al",
+                    text = stringResource(if (isTestMode) R.string.prem_test_it else R.string.prem_buy),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold))
                     ),
@@ -480,7 +481,7 @@ private fun PurchaseConfirmDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = "İptal",
+                    text = stringResource(R.string.btn_cancel),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold))
                     ),
@@ -494,12 +495,12 @@ private fun PurchaseConfirmDialog(
 @Composable
 private fun PremiumFeaturesList() {
     val features = listOf(
-        "Sınırsız Tarot Açılımları",
-        "Tüm Burç Yorumlarına Erişim",
-        "Kişiselleştirilmiş Doğum Haritası",
-        "Rün Falı ve Özel İçerikler",
-        "Reklamsız Deneyim",
-        "Günlük Bildirimler ve Hatırlatmalar"
+        stringResource(R.string.prem_feature_1),
+        stringResource(R.string.prem_feature_2),
+        stringResource(R.string.prem_feature_3),
+        stringResource(R.string.prem_feature_4),
+        stringResource(R.string.prem_feature_5),
+        stringResource(R.string.prem_feature_6)
     )
     
     Column(
@@ -614,7 +615,7 @@ private fun PricingCard(
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = "Popüler",
+                                    text = stringResource(R.string.prem_popular),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                         fontSize = 10.sp
@@ -682,7 +683,7 @@ private fun PricingCard(
                     if (isSelected) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Seçili",
+                            contentDescription = stringResource(R.string.cd_selected),
                             tint = Color(0xFF1A0F2E),
                             modifier = Modifier.size(18.dp)
                         )

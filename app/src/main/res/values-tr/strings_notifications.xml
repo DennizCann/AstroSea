@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bildirimler ekranı -->
+    <string name="notif_screen_title">Bildirimler</string>
+    <string name="notif_last_7_days">Son 7 Gün</string>
+    <string name="notif_unread">Okunmamış</string>
+    <string name="notif_empty_icon_cd">Bildirim Yok</string>
+    <string name="notif_empty_title">Henüz bildiriminiz yok</string>
+    <string name="notif_empty_message">Günlük açılım kartlarınız yenilendiğinde burada bildirim göreceksiniz</string>
+    <string name="notif_ok">Tamam</string>
+
+    <!-- Bildirim tür etiketleri -->
+    <string name="notif_type_daily_tarot">Günlük Tarot</string>
+    <string name="notif_type_premium_reminder">Premium Hatırlatma</string>
+    <string name="notif_type_welcome">Hoş Geldin</string>
+    <string name="notif_type_general">Genel Bildirim</string>
+
+    <!-- Göreli zaman -->
+    <string name="notif_time_just_now">Az önce</string>
+    <string name="notif_time_minutes_ago">%1$d dakika önce</string>
+    <string name="notif_time_hours_ago">%1$d saat önce</string>
+    <string name="notif_time_days_ago">%1$d gün önce</string>
+
+    <!-- Günlük tarot bildirim kanalı -->
+    <string name="notif_channel_daily_name">Günlük Tarot Açılımları</string>
+    <string name="notif_channel_daily_desc">Günlük tarot kartı açılımları ve hatırlatmalar</string>
+
+    <!-- Günlük tarot bildirim mesajları -->
+    <string name="notif_daily_title_1">✨ Günlük Kartlarınız Hazır!</string>
+    <string name="notif_daily_body_1">Bugün için 3 kart çekildi. Günlük yorumunuzu keşfedin.</string>
+    <string name="notif_daily_title_2">🌟 Yeni Bir Gün, Yeni Bir Açılım!</string>
+    <string name="notif_daily_body_2">Bugünün enerjisini öğrenmek için kartlarınızı açın.</string>
+    <string name="notif_daily_title_3">🔮 Günlük Tarot Zamanı!</string>
+    <string name="notif_daily_body_3">Kartlarınız sizi bekliyor. Bugün size ne söylüyorlar?</string>
+    <string name="notif_daily_title_4">⭐ Günlük Açılımınız Hazır!</string>
+    <string name="notif_daily_body_4">Bugünün mesajlarını almak için uygulamayı açın.</string>
+    <string name="notif_daily_title_5">🌙 Bugün Neler Olacak?</string>
+    <string name="notif_daily_body_5">Günlük tarot kartlarınız çekildi. Hemen keşfedin!</string>
+
+    <!-- Premium hatırlatma bildirim kanalı -->
+    <string name="notif_channel_premium_name">Premium Hatırlatmaları</string>
+    <string name="notif_channel_premium_desc">Premium üyelik hatırlatma bildirimleri</string>
+
+    <!-- Premium hatırlatma mesajları -->
+    <string name="notif_premium_instant_title">Premium ile Daha Fazlasını Keşfet! ✨</string>
+    <string name="notif_premium_instant_message">Tüm tarot yorumlarının kilidini aç ve geleceğine tam bir bakış at!</string>
+    <string name="notif_premium_24hour_title">Sınırsız Tarot Deneyimi Seni Bekliyor! 🔮</string>
+    <string name="notif_premium_24hour_message">Premium üyelikle günlük açılımlarının tam yorumunu oku, sınırsız açılım yap!</string>
+    <string name="notif_premium_5day_title">Premium Fırsatını Kaçırma! 💫</string>
+    <string name="notif_premium_5day_message">Detaylı AI yorumları, sınırsız açılımlar ve daha fazlası premium üyelikte!</string>
+    <string name="notif_premium_weekly_title">AstroSea Premium\'a Geç! ⭐</string>
+    <string name="notif_premium_weekly_message">Tarot deneyimini tamamla! Premium ile tüm özelliklere eriş.</string>
+    <string name="notif_premium_default_title">Premium Üyelik Fırsatı! ✨</string>
+    <string name="notif_premium_default_message">AstroSea\'nin tüm özelliklerini keşfet!</string>
+
+    <!-- Günlük kartlar hazır (uygulama içi bildirim) -->
+    <string name="notif_daily_ready_title">Günlük Kartlarınız Hazır! 🔮</string>
+    <string name="notif_daily_ready_message">Bugün için yeni kartlarınız çekildi. Kartlarınızı açarak günlük yorumunuzu keşfedin.</string>
+</resources>

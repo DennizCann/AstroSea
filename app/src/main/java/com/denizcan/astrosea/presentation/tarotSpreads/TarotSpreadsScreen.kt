@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 
@@ -33,7 +34,7 @@ fun TarotSpreadsScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Tarot Açılımları",
+                    title = stringResource(R.string.title_tarot_spreads),
                     onBackClick = onNavigateBack
                 )
             }
@@ -47,7 +48,7 @@ fun TarotSpreadsScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Çok Yakında!",
+                    text = stringResource(R.string.coming_soon_exclaim),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = Color.White
@@ -56,7 +57,7 @@ fun TarotSpreadsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Farklı konular için hazırlanmış tarot açılımlarını yakında burada bulabileceksiniz.",
+                    text = stringResource(R.string.spreads_coming_body),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                     ),

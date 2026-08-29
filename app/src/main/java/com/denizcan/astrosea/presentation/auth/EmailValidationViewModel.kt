@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.denizcan.astrosea.util.LanguageManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -67,8 +68,14 @@ class EmailValidationViewModel : ViewModel() {
                 
             } catch (e: Exception) {
                 errorMessage = when {
-                    e.message?.contains("email") == true -> "Bu e-posta adresi zaten kullanımda"
-                    else -> "Doğrulama emaili gönderilemedi: ${e.message}"
+                    e.message?.contains("email") == true -> {
+                        if (LanguageManager.isAppTurkish()) "Bu e-posta adresi zaten kullanımda"
+                        else "This email address is already in use"
+                    }
+                    else -> {
+                        if (LanguageManager.isAppTurkish()) "Doğrulama emaili gönderilemedi: ${e.message}"
+                        else "Could not send verification email: ${e.message}"
+                    }
                 }
                 Log.e("EmailValidation", "Error sending verification email", e)
             } finally {
@@ -134,7 +141,11 @@ class EmailValidationViewModel : ViewModel() {
                     Log.d("EmailValidation", "Email not verified yet")
                 }
             } catch (e: Exception) {
-                errorMessage = "Doğrulama kontrolü başarısız: ${e.message}"
+                errorMessage = if (LanguageManager.isAppTurkish()) {
+                    "Doğrulama kontrolü başarısız: ${e.message}"
+                } else {
+                    "Verification check failed: ${e.message}"
+                }
                 Log.e("EmailValidation", "Error checking email verification", e)
             }
         }
@@ -155,7 +166,11 @@ class EmailValidationViewModel : ViewModel() {
                 Log.d("EmailValidation", "Verification email resent for: $tempEmail")
                 
             } catch (e: Exception) {
-                errorMessage = "Doğrulama emaili yeniden gönderilemedi: ${e.message}"
+                errorMessage = if (LanguageManager.isAppTurkish()) {
+                    "Doğrulama emaili yeniden gönderilemedi: ${e.message}"
+                } else {
+                    "Could not resend verification email: ${e.message}"
+                }
                 Log.e("EmailValidation", "Error resending verification email", e)
             } finally {
                 isLoading = false
@@ -188,7 +203,11 @@ class EmailValidationViewModel : ViewModel() {
                 checkEmailVerification(onVerified)
                 
             } catch (e: Exception) {
-                errorMessage = "Manuel doğrulama başarısız: ${e.message}"
+                errorMessage = if (LanguageManager.isAppTurkish()) {
+                    "Manuel doğrulama başarısız: ${e.message}"
+                } else {
+                    "Manual verification failed: ${e.message}"
+                }
                 Log.e("EmailValidation", "Error manually verifying email", e)
             }
         }

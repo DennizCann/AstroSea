@@ -64,7 +64,7 @@ fun TarotCard(
             if (imageResId != 0) {
                 Image(
                     painter = painterResource(id = imageResId),
-                    contentDescription = card.name,
+                    contentDescription = card.displayName(),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds
                 )
@@ -78,7 +78,7 @@ fun TarotCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = card.name,
+                        text = card.displayName(),
                         color = Color.White,
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center

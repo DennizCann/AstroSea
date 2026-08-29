@@ -42,6 +42,8 @@ import com.denizcan.astrosea.util.responsiveSize
 import com.denizcan.astrosea.util.responsivePadding
 import com.denizcan.astrosea.presentation.components.KvkkDialog
 import com.denizcan.astrosea.util.KvkkTexts
+import com.denizcan.astrosea.util.LanguageManager
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,7 +128,7 @@ fun ProfileScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Profil",
+                    title = stringResource(R.string.profile_title),
                     onBackClick = onNavigateBack
                 )
             },
@@ -152,10 +154,10 @@ fun ProfileScreen(
                         ),
                         shape = RoundedCornerShape(50)
                     ) {
-                        Icon(Icons.Default.Done, contentDescription = "Kaydet", tint = Color.White)
+                        Icon(Icons.Default.Done, contentDescription = stringResource(R.string.btn_save), tint = Color.White)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            "Kaydet",
+                            stringResource(R.string.btn_save),
                             color = Color.White,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
@@ -203,28 +205,28 @@ fun ProfileScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         ProfileField(
-                            label = "Ad",
+                            label = stringResource(R.string.field_name),
                             value = state.profileData.name,
                             icon = Icons.Default.Person,
                             enabled = true,
                             onValueChange = { viewModel.onNameChange(it) }
                         )
                         ProfileField(
-                            label = "Soyad",
+                            label = stringResource(R.string.field_surname),
                             value = state.profileData.surname,
                             icon = Icons.Default.Person,
                             enabled = true,
                             onValueChange = { viewModel.onSurnameChange(it) }
                         )
                         ProfileDateField(
-                            label = "Doğum Tarihi",
+                            label = stringResource(R.string.field_birth_date),
                             value = state.profileData.birthDate,
                             icon = Icons.Default.DateRange,
                             enabled = true,
                             onClick = { showDatePicker = true }
                         )
                         ProfileDateField(
-                            label = "Doğum Saati",
+                            label = stringResource(R.string.field_birth_time),
                             value = state.profileData.birthTime,
                             icon = Icons.Default.Info,
                             enabled = true,
@@ -243,7 +245,7 @@ fun ProfileScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Ülke", color = Color.White)
+                                        Text(stringResource(R.string.field_country), color = Color.White)
                                     }
                                 },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = countryExpanded) },
@@ -291,7 +293,7 @@ fun ProfileScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Şehir", color = Color.White)
+                                        Text(stringResource(R.string.field_city), color = Color.White)
                                     }
                                 },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cityExpanded) },
@@ -328,6 +330,10 @@ fun ProfileScreen(
                         }
                     }
                 }
+                // Dil Seçimi
+                Spacer(modifier = Modifier.height(16.dp))
+                LanguageSelectionCard()
+
                 // Premium Üyelik Bilgileri
                 Spacer(modifier = Modifier.height(16.dp))
                 PremiumStatusCard(
@@ -436,6 +442,93 @@ fun ProfileScreen(
 }
 
 @Composable
+fun LanguageSelectionCard() {
+    val context = LocalContext.current
+    val currentLanguage = LanguageManager.getLanguage(context)
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.language_label),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                        color = Color.White
+                    )
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                LanguageOptionChip(
+                    label = stringResource(R.string.language_turkish),
+                    selected = currentLanguage == LanguageManager.TURKISH,
+                    onClick = {
+                        if (currentLanguage != LanguageManager.TURKISH) {
+                            LanguageManager.setLanguage(context, LanguageManager.TURKISH)
+                            (context as? android.app.Activity)?.recreate()
+                        }
+                    }
+                )
+                LanguageOptionChip(
+                    label = stringResource(R.string.language_english),
+                    selected = currentLanguage == LanguageManager.ENGLISH,
+                    onClick = {
+                        if (currentLanguage != LanguageManager.ENGLISH) {
+                            LanguageManager.setLanguage(context, LanguageManager.ENGLISH)
+                            (context as? android.app.Activity)?.recreate()
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LanguageOptionChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(8.dp),
+        color = if (selected) Color(0xFFD4AF37).copy(alpha = 0.9f) else Color.Transparent,
+        border = BorderStroke(
+            1.dp,
+            if (selected) Color(0xFFD4AF37) else Color.White.copy(alpha = 0.4f)
+        )
+    ) {
+        Text(
+            text = label,
+            color = if (selected) Color.Black else Color.White,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+            ),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        )
+    }
+}
+
+@Composable
 fun ProfileField(
     label: String,
     value: String,
@@ -531,12 +624,11 @@ fun PremiumStatusCard(
         }
     }
 
-    // Plan adını Türkçe'ye çevir
     val planName = when (premiumProductId) {
-        "astrosea_weekly" -> "Haftalık Plan"
-        "astrosea_monthly" -> "Aylık Plan"
-        "astrosea_yearly" -> "Yıllık Plan"
-        else -> "Bilinmiyor"
+        "astrosea_weekly" -> stringResource(R.string.plan_weekly)
+        "astrosea_monthly" -> stringResource(R.string.plan_monthly)
+        "astrosea_yearly" -> stringResource(R.string.plan_yearly)
+        else -> stringResource(R.string.plan_unknown)
     }
     
     Card(
@@ -554,7 +646,7 @@ fun PremiumStatusCard(
         ) {
             // Başlık
             Text(
-                text = "Üyelik Durumu",
+                text = stringResource(R.string.membership_status),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                     color = Color.White
@@ -578,7 +670,7 @@ fun PremiumStatusCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Durum",
+                        text = stringResource(R.string.status_label),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             color = Color.White
@@ -586,7 +678,7 @@ fun PremiumStatusCard(
                     )
                 }
                 Text(
-                    text = if (isPremium) "Premium Üye ✨" else "Standart Üye",
+                    text = if (isPremium) stringResource(R.string.premium_member) else stringResource(R.string.standard_member),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         color = if (isPremium) Color(0xFFFFD700) else Color.White.copy(alpha = 0.7f)
@@ -611,7 +703,7 @@ fun PremiumStatusCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Plan",
+                            text = stringResource(R.string.plan_label),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                 color = Color.White
@@ -643,7 +735,7 @@ fun PremiumStatusCard(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Bitiş Tarihi",
+                                text = stringResource(R.string.end_date_label),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                     color = Color.White
@@ -686,7 +778,7 @@ fun PremiumStatusCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (isTestMode) "Üyeliği İptal Et (Demo)" else "Aboneliği Yönet",
+                        text = if (isTestMode) stringResource(R.string.btn_cancel_demo) else stringResource(R.string.btn_manage_subscription),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                         )
@@ -695,7 +787,7 @@ fun PremiumStatusCard(
 
                 if (!isTestMode) {
                     Text(
-                        text = "Aboneliğinizi Google Play üzerinden iptal edebilirsiniz. İptal etseniz bile dönem sonuna kadar premium erişiminiz devam eder.",
+                        text = stringResource(R.string.manage_sub_hint),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             color = Color.White.copy(alpha = 0.6f)
@@ -713,7 +805,7 @@ fun PremiumStatusCard(
             containerColor = Color(0xFF1A1A2E),
             title = {
                 Text(
-                    text = "Üyeliği İptal Et",
+                    text = stringResource(R.string.cancel_dialog_title),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         color = Color.White
@@ -722,7 +814,7 @@ fun PremiumStatusCard(
             },
             text = {
                 Text(
-                    text = "Premium üyeliğinizi iptal etmek istediğinizden emin misiniz?\n\nBu işlem sonrasında premium özelliklere erişiminiz sona erecektir.",
+                    text = stringResource(R.string.cancel_dialog_text),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                         color = Color.White.copy(alpha = 0.8f)
@@ -740,7 +832,7 @@ fun PremiumStatusCard(
                     )
                 ) {
                     Text(
-                        text = "İptal Et",
+                        text = stringResource(R.string.btn_cancel_confirm),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                         )
@@ -753,7 +845,7 @@ fun PremiumStatusCard(
                     border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                 ) {
                     Text(
-                        text = "Vazgeç",
+                        text = stringResource(R.string.btn_dismiss),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                             color = Color.White

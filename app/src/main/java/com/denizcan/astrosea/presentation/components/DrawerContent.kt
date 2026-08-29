@@ -8,8 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.denizcan.astrosea.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ExitToApp
@@ -34,7 +36,7 @@ fun DrawerContent(
         ) {
             // Profil Butonu
             DrawerButton(
-                text = "Profil",
+                text = stringResource(R.string.profile_title),
                 icon = Icons.Default.Person,
                 onClick = onProfileClick
             )
@@ -43,7 +45,7 @@ fun DrawerContent(
 
             // Çıkış Yap Butonu
             DrawerButton(
-                text = "Çıkış Yap",
+                text = stringResource(R.string.cd_logout),
                 icon = Icons.Default.ExitToApp,
                 onClick = onSignOutClick,
                 colors = ButtonDefaults.buttonColors(

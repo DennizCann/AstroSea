@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <string name="btn_close">Close</string>
+    <string name="btn_accept">Accept</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_back">Back</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_logo">AstroSea Logo</string>
+    <string name="cd_frame">Frame</string>
+    <string name="cd_tarot_card">Tarot card</string>
+    <string name="cd_card_not_found">Card not found</string>
+    <string name="cd_closed_card">Face-down card</string>
+    <string name="cd_selected">Selected</string>
+    <string name="please_wait">Please wait</string>
+
+    <!-- KVKK dialog extras -->
+    <string name="kvkk_scroll_hint">Scroll to the end to accept</string>
+
+    <!-- Date picker -->
+    <string name="date_picker_title">Select Birth Date</string>
+    <string name="date_picker_day">Day</string>
+    <string name="date_picker_month">Month</string>
+    <string name="date_picker_year">Year</string>
+    <string-array name="month_names">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <!-- Premium screen -->
+    <string name="prem_test_mode">🔧 TEST MODE</string>
+    <string name="prem_upgrade_title">Upgrade to Premium</string>
+    <string name="prem_upgrade_subtitle">Get unlimited tarot spreads and exclusive content</string>
+    <string name="prem_choose_plan">Choose Your Plan</string>
+    <string name="prem_processing">Processing…</string>
+    <string name="prem_go_to_payment">Continue to Payment</string>
+    <string name="prem_cancel_anytime">You can cancel anytime</string>
+    <string name="prem_restore">Restore Purchases</string>
+    <string name="prem_confirm_title">Confirm Purchase</string>
+    <string name="prem_fallback_name">Premium</string>
+    <string name="prem_test_warning">⚠️ This is a test purchase.\nNo real payment will be charged.</string>
+    <string name="prem_auto_renew">Your subscription will renew automatically.\nYou can cancel anytime.</string>
+    <string name="prem_test_it">Test It</string>
+    <string name="prem_buy">Buy</string>
+    <string name="prem_popular">Popular</string>
+    <string name="prem_feature_1">Unlimited Tarot Spreads</string>
+    <string name="prem_feature_2">Access to All Horoscopes</string>
+    <string name="prem_feature_3">Personalized Birth Chart</string>
+    <string name="prem_feature_4">Rune Readings and Exclusive Content</string>
+    <string name="prem_feature_5">Ad-free Experience</string>
+    <string name="prem_feature_6">Daily Notifications and Reminders</string>
+    <string name="prem_select_plan">Please select a plan</string>
+    <string name="prem_no_session">User session not found</string>
+    <string name="prem_save_failed">Could not save premium status: %1$s</string>
+    <string name="prem_restore_failed">Could not save restore</string>
+    <string name="prem_nothing_to_restore">No purchases found to restore</string>
+    <string name="prem_products_load_failed">Could not load products</string>
+    <string name="prem_product_not_found">Product not found: %1$s</string>
+    <string name="prem_purchase_cancelled">Purchase cancelled</string>
+    <string name="prem_purchase_pending">Purchase is pending</string>
+    <string name="prem_purchase_error">Purchase error: %1$s</string>
+    <string name="prem_plan_weekly_short">Weekly</string>
+    <string name="prem_plan_monthly_short">Monthly</string>
+    <string name="prem_plan_yearly_short">Yearly</string>
+    <string name="prem_price_monthly_fallback">₺50 / month</string>
+    <string name="prem_duration_week">/week</string>
+    <string name="prem_duration_month">/month</string>
+    <string name="prem_duration_year">/year</string>
+
+    <!-- Coming soon / more -->
+    <string name="coming_soon_exclaim">Coming Soon!</string>
+    <string name="title_horoscope">Horoscopes</string>
+    <string name="title_motivation">Motivation</string>
+    <string name="title_birth_chart">Birth Chart</string>
+    <string name="title_tarot_spreads">Tarot Spreads</string>
+    <string name="title_more">More</string>
+    <string name="horoscope_coming_body">Your daily, weekly and monthly horoscopes will be here soon.</string>
+    <string name="motivation_coming_body">Daily motivation messages and personal advice will be here soon.</string>
+    <string name="birth_chart_coming_body">Your detailed birth chart analysis will be here soon.</string>
+    <string name="spreads_coming_body">Tarot spreads prepared for different topics will be here soon.</string>
+    <string name="more_coming_heading">COMING SOON</string>
+    <string name="more_coming_list">• Horoscopes\n• Birth Chart\n• Astrology Lessons\n• Daily Motivation\n• And more…</string>
+
+    <!-- Tarot meanings -->
+    <string name="title_all_meanings">All Meanings</string>
+    <string name="tab_tarot">Tarot</string>
+    <string name="tab_rune">Rune</string>
+    <string name="filter_all">All</string>
+    <string name="suit_major">Major</string>
+    <string name="suit_cups">Cups</string>
+    <string name="suit_swords">Swords</string>
+    <string name="suit_pentacles">Pentacles</string>
+    <string name="suit_wands">Wands</string>
+    <string name="rune_description">Runes are ancient letters used in old Norse and Germanic cultures, carrying symbolic meanings. They are also used in divination and spiritual guidance.</string>
+    <string name="rune_coming_soon">Rune meanings will be here very soon!</string>
+    <string name="card_news_heading">What This Card Brings:</string>
+    <string name="card_zodiac_label">Zodiac signs: %1$s</string>
+    <string name="card_not_found_error">Card not found</string>
+
+    <!-- Auth VM errors -->
+    <string name="auth_error_email_in_use">This email address is already in use</string>
+    <string name="auth_error_verification_send_failed">Could not send verification email: %1$s</string>
+    <string name="auth_error_verification_check_failed">Verification check failed: %1$s</string>
+    <string name="auth_error_resend_failed">Could not resend verification email: %1$s</string>
+    <string name="auth_error_manual_verify_failed">Manual verification failed: %1$s</string>
+    <string name="auth_email_verified_redirect">Email verified! Redirecting to the home page…</string>
+
+    <!-- Reading errors / fallback interpretation -->
+    <string name="err_draw_cards_first">You need to draw the cards first.</string>
+    <string name="err_reveal_one_card">You need to reveal at least one card.</string>
+    <string name="err_format_not_found">No format found for this spread type: %1$s</string>
+    <string name="err_no_valid_card">No valid card found.</string>
+    <string name="err_interpretation_failed">An error occurred while creating the interpretation: %1$s</string>
+    <string name="err_interpretation_api_failed">Could not reach the AI service. Please check your internet connection and try again.</string>
+    <string name="err_api_key_missing">AI service is not configured. Please contact support.</string>
+    <string name="fallback_interp_title">%1$s Interpretation</string>
+    <string name="fallback_card_n">Card %1$d</string>
+    <string name="fallback_unknown_card">Unknown card</string>
+    <string name="fallback_card_uninterpreted">This card has not been interpreted yet.</string>
+    <string name="fallback_card_archetype">Reflect on the upright meaning of %1$s in this position within the spread.</string>
+    <string name="fallback_overall_heading">Overall Interpretation:</string>
+    <string name="fallback_overall_body">This spread is designed to guide you in this area of your life. Consider the meanings of the cards you have drawn carefully and listen to your inner voice. Each card carries a message meant for you.</string>
+    <string name="fallback_no_cards">No cards have been drawn yet. Please draw your cards first.</string>
+    <string name="fallback_showing_default">Showing the default interpretation:\n\n</string>
+    <string name="fallback_error_prefix">Error: %1$s</string>
+
+    <!-- Slot names -->
+    <string-array name="slots_gunluk">
+        <item>Thought</item>
+        <item>Feeling</item>
+        <item>Action</item>
+    </string-array>
+    <string-array name="slots_tek_kart">
+        <item>Card of the Day</item>
+    </string-array>
+    <string-array name="slots_evet_hayir">
+        <item>Answer</item>
+    </string-array>
+    <string-array name="slots_gecmis_simdi_gelecek">
+        <item>Past</item>
+        <item>Present</item>
+        <item>Future</item>
+    </string-array>
+    <string-array name="slots_durum_aksiyon_sonuc">
+        <item>Situation</item>
+        <item>Action</item>
+        <item>Outcome</item>
+    </string-array>
+    <string-array name="slots_iliski">
+        <item>You</item>
+        <item>Them</item>
+        <item>Your Relationship</item>
+    </string-array>
+    <string-array name="slots_uyumluluk">
+        <item>Your emotional compatibility</item>
+        <item>Your desires</item>
+        <item>Your partner\'s desires</item>
+        <item>Your physical compatibility</item>
+        <item>Differences</item>
+        <item>Similarities</item>
+        <item>Your mental compatibility</item>
+    </string-array>
+    <string-array name="slots_detayli_iliski">
+        <item>Past Thoughts</item>
+        <item>Present Thoughts</item>
+        <item>Future Thoughts</item>
+        <item>Past Feelings</item>
+        <item>Present Feelings</item>
+        <item>Future Feelings</item>
+        <item>Past Actions</item>
+        <item>Present Actions</item>
+        <item>Future Actions / Outcome</item>
+    </string-array>
+    <string-array name="slots_mucadeleler">
+        <item>External influences</item>
+        <item>Your role in the problem</item>
+        <item>Your partner\'s role in the problem</item>
+        <item>Can this relationship be saved?</item>
+        <item>Advice for you</item>
+        <item>Advice for your partner</item>
+        <item>Is this relationship worth saving?</item>
+    </string-array>
+    <string-array name="slots_tamam_mi">
+        <item>Current State of the Relationship</item>
+        <item>Potential of Staying</item>
+        <item>Potential of Ending</item>
+        <item>How you would feel if it continues</item>
+        <item>General advice</item>
+        <item>How you would feel if it ends</item>
+    </string-array>
+    <string-array name="slots_gelecege_giden_yol">
+        <item>Your dream career</item>
+        <item>Potential paths</item>
+        <item>Helpful resources</item>
+        <item>Your talents</item>
+        <item>Things to watch out for</item>
+    </string-array>
+    <string-array name="slots_is_problemleri">
+        <item>What Your Job Gives You</item>
+        <item>What Holds You Back at Work</item>
+        <item>Your Goal</item>
+        <item>The Obstacle at Work</item>
+        <item>What Moves You Forward at Work</item>
+        <item>Hidden Causes</item>
+    </string-array>
+    <string-array name="slots_finansal">
+        <item>Root Cause</item>
+        <item>Opposing Forces</item>
+        <item>Action Plan</item>
+        <item>Supporting Forces</item>
+        <item>Sources of Help</item>
+        <item>Possible Outcome</item>
+    </string-array>
+    <string-array name="slots_default">
+        <item>Card</item>
+    </string-array>
+</resources>

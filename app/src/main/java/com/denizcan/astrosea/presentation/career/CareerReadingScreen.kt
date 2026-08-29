@@ -11,6 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.denizcan.astrosea.util.ReadingTexts
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -45,7 +47,7 @@ fun CareerReadingScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Kariyer Açılımları",
+                    title = stringResource(R.string.title_career_readings),
                     onBackClick = onNavigateToHome
                 )
             },
@@ -94,7 +96,7 @@ fun CareerReadingScreen(
                                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(18.dp)
                                                 .height(27.dp),
@@ -105,7 +107,7 @@ fun CareerReadingScreen(
                                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(18.dp)
                                                 .height(27.dp),
@@ -117,7 +119,7 @@ fun CareerReadingScreen(
                                         repeat(3) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier
                                                     .width(18.dp)
                                                     .height(27.dp),
@@ -134,7 +136,7 @@ fun CareerReadingScreen(
                                     .padding(start = 4.dp)
                             ) {
                                 Text(
-                                    text = "GELECEĞİNE GİDEN YOL",
+                                    text = ReadingTexts.displayName("GELECEĞİNE GİDEN YOL"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -143,7 +145,7 @@ fun CareerReadingScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "İstediğin geleceği biliyorsun, peki oraya nasıl ulaşacaksınız? Size yol haritası çizen açılım.",
+                                    text = ReadingTexts.description("GELECEĞİNE GİDEN YOL"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -182,7 +184,7 @@ fun CareerReadingScreen(
                                     Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(16.dp)
                                                 .height(24.dp),
@@ -194,7 +196,7 @@ fun CareerReadingScreen(
                                         repeat(4) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier
                                                     .width(16.dp)
                                                     .height(24.dp),
@@ -206,7 +208,7 @@ fun CareerReadingScreen(
                                     Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(16.dp)
                                                 .height(24.dp),
@@ -222,7 +224,7 @@ fun CareerReadingScreen(
                                     .padding(start = 4.dp)
                             ) {
                                 Text(
-                                    text = "İŞ YERİNDEKİ PROBLEMLER",
+                                    text = ReadingTexts.displayName("İŞ YERİNDEKİ PROBLEMLER"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -231,7 +233,7 @@ fun CareerReadingScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "İş yerinde karşılaştığınız problemlerin sebebini inceleyen açılım.",
+                                    text = ReadingTexts.description("İŞ YERİNDEKİ PROBLEMLER"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -271,7 +273,7 @@ fun CareerReadingScreen(
                                     Row(horizontalArrangement = Arrangement.Center) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                            contentDescription = "Kart Arkası",
+                                            contentDescription = stringResource(R.string.cd_card_back),
                                             modifier = Modifier
                                                 .width(14.dp)
                                                 .height(21.dp),
@@ -284,7 +286,7 @@ fun CareerReadingScreen(
                                         repeat(3) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier
                                                     .width(14.dp)
                                                     .height(21.dp),
@@ -298,7 +300,7 @@ fun CareerReadingScreen(
                                         repeat(2) {
                                             Image(
                                                 painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
-                                                contentDescription = "Kart Arkası",
+                                                contentDescription = stringResource(R.string.cd_card_back),
                                                 modifier = Modifier
                                                     .width(14.dp)
                                                     .height(21.dp),
@@ -315,7 +317,7 @@ fun CareerReadingScreen(
                                     .padding(start = 4.dp)
                             ) {
                                 Text(
-                                    text = "FİNANSAL DURUM",
+                                    text = ReadingTexts.displayName("FİNANSAL DURUM"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 18.sp
@@ -324,7 +326,7 @@ fun CareerReadingScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Finansal durumunuzu gösteren ve neye ihtiyacınız olduğunu söyleyen açılım.",
+                                    text = ReadingTexts.description("FİNANSAL DURUM"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 14.sp
@@ -360,7 +362,7 @@ fun CareerReadingScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "GENEL AÇILIMLAR",
+                                text = stringResource(R.string.tab_general_readings),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 16.sp
@@ -387,7 +389,7 @@ fun CareerReadingScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "İLİŞKİ AÇILIMLARI",
+                                text = stringResource(R.string.tab_relationship_readings),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                     fontSize = 16.sp

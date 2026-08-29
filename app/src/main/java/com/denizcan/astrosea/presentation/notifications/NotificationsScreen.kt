@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -144,7 +145,7 @@ fun NotificationsScreen(
         Scaffold(
             topBar = {
                 AstroTopBar(
-                    title = "Bildirimler",
+                    title = stringResource(R.string.notif_screen_title),
                     onBackClick = onNavigateBack
                 )
             },
@@ -185,7 +186,7 @@ fun NotificationsScreen(
                         ) {
                             Column {
                                 Text(
-                                    text = "Son 7 Gün",
+                                    text = stringResource(R.string.notif_last_7_days),
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 16.sp
@@ -204,7 +205,7 @@ fun NotificationsScreen(
                             
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = "Okunmamış",
+                                    text = stringResource(R.string.notif_unread),
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 16.sp
@@ -237,12 +238,12 @@ fun NotificationsScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Bildirim Yok",
+                                    contentDescription = stringResource(R.string.notif_empty_icon_cd),
                                     modifier = Modifier.size(64.dp),
                                     tint = Color.White.copy(alpha = 0.5f)
                                 )
                                 Text(
-                                    text = "Henüz bildiriminiz yok",
+                                    text = stringResource(R.string.notif_empty_title),
                                     style = MaterialTheme.typography.headlineSmall.copy(
                                         fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                                         fontSize = 24.sp
@@ -251,7 +252,7 @@ fun NotificationsScreen(
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
-                                    text = "Günlük açılım kartlarınız yenilendiğinde burada bildirim göreceksiniz",
+                                    text = stringResource(R.string.notif_empty_message),
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 18.sp
@@ -523,7 +524,7 @@ private fun NotificationDetailDialog(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = "Tamam",
+                        text = stringResource(R.string.notif_ok),
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = FontFamily(Font(R.font.cinzel_regular)),
                             fontSize = 16.sp
@@ -536,12 +537,13 @@ private fun NotificationDetailDialog(
     }
 }
 
+@Composable
 private fun getNotificationTypeLabel(type: NotificationType): String {
     return when (type) {
-        NotificationType.DAILY_TAROT -> "Günlük Tarot"
-        NotificationType.PREMIUM_REMINDER -> "Premium Hatırlatma"
-        NotificationType.WELCOME -> "Hoş Geldin"
-        NotificationType.GENERAL -> "Genel Bildirim"
+        NotificationType.DAILY_TAROT -> stringResource(R.string.notif_type_daily_tarot)
+        NotificationType.PREMIUM_REMINDER -> stringResource(R.string.notif_type_premium_reminder)
+        NotificationType.WELCOME -> stringResource(R.string.notif_type_welcome)
+        NotificationType.GENERAL -> stringResource(R.string.notif_type_general)
     }
 }
 
@@ -565,15 +567,16 @@ private fun getNotificationTypeColor(type: NotificationType): Color {
     }
 }
 
+@Composable
 private fun formatTimestamp(timestamp: Long): String {
     val now = System.currentTimeMillis()
     val diff = now - timestamp
     
     return when {
-        diff < 60000 -> "Az önce" // 1 dakikadan az
-        diff < 3600000 -> "${diff / 60000} dakika önce" // 1 saatten az
-        diff < 86400000 -> "${diff / 3600000} saat önce" // 1 günden az
-        diff < 604800000 -> "${diff / 86400000} gün önce" // 1 haftadan az
+        diff < 60000 -> stringResource(R.string.notif_time_just_now) // 1 dakikadan az
+        diff < 3600000 -> stringResource(R.string.notif_time_minutes_ago, diff / 60000) // 1 saatten az
+        diff < 86400000 -> stringResource(R.string.notif_time_hours_ago, diff / 3600000) // 1 günden az
+        diff < 604800000 -> stringResource(R.string.notif_time_days_ago, diff / 86400000) // 1 haftadan az
         else -> {
             val date = Date(timestamp)
             val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())

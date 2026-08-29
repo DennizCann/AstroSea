@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +32,7 @@ fun BirthChartScreen(
             containerColor = Color.Transparent,
             topBar = {
                 AstroTopBar(
-                    title = "Doğum Haritası",
+                    title = stringResource(R.string.title_birth_chart),
                     onBackClick = onNavigateBack
                 )
             }
@@ -45,7 +46,7 @@ fun BirthChartScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Çok Yakında!",
+                    text = stringResource(R.string.coming_soon_exclaim),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = Color.White
@@ -54,7 +55,7 @@ fun BirthChartScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Detaylı doğum haritası analiziniz çok yakında burada olacak.",
+                    text = stringResource(R.string.birth_chart_coming_body),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = Color.White.copy(alpha = 0.8f)

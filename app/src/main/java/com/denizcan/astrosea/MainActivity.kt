@@ -40,6 +40,7 @@ import androidx.core.view.WindowCompat
 import com.denizcan.astrosea.presentation.birthChart.BirthChartScreen
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsViewModel
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsViewModelFactory
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.util.JsonLoader
 import android.content.Context
@@ -73,6 +74,10 @@ import com.denizcan.astrosea.presentation.components.KvkkDialog
 
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.denizcan.astrosea.util.LanguageManager.wrap(newBase))
+    }
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
@@ -404,7 +409,7 @@ class MainActivity : ComponentActivity() {
                     // Geçiş Ekranı
                     composable(Screen.TransitionToAuth.route) {
                         TransitionScreen(
-                            message = "Mail adresinizi kontrol edin.\nGiriş sayfasına yönlendiriliyorsunuz...",
+                            message = stringResource(R.string.auth_check_email_redirect),
                             onTransitionComplete = {
                                 navController.navigate(Screen.Auth.route) {
                                     popUpTo(0) { inclusive = true }
@@ -644,12 +649,12 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
-                                            "Kart bulunamadi",
+                                            stringResource(R.string.card_not_found_error),
                                             color = androidx.compose.ui.graphics.Color.White
                                         )
                                         Spacer(modifier = Modifier.height(16.dp))
                                         Button(onClick = { appNavigator.popBack() }) {
-                                            Text("Geri")
+                                            Text(stringResource(R.string.btn_back))
                                         }
                                     }
                                 }
