@@ -41,25 +41,28 @@
     <!-- Premium screen -->
     <string name="prem_test_mode">🔧 TEST MODU</string>
     <string name="prem_upgrade_title">Premium\'a Yükseltin</string>
-    <string name="prem_upgrade_subtitle">Sınırsız Tarot Açılımları ve Özel İçeriklere Erişin</string>
+    <string name="prem_upgrade_subtitle">Yapay zekâ destekli kişiselleştirilmiş tarot yorumlarına ve reklamsız deneyime erişin</string>
     <string name="prem_choose_plan">Planınızı Seçin</string>
     <string name="prem_processing">İşleniyor…</string>
     <string name="prem_go_to_payment">Ödemeye Geç</string>
-    <string name="prem_cancel_anytime">İstediğiniz zaman iptal edebilirsiniz</string>
+    <string name="prem_cancel_anytime">Google Play abonelik ayarlarınızdan istediğiniz zaman iptal edebilirsiniz</string>
     <string name="prem_restore">Satın Almaları Geri Yükle</string>
     <string name="prem_confirm_title">Satın Almayı Onayla</string>
     <string name="prem_fallback_name">Premium</string>
     <string name="prem_test_warning">⚠️ Bu bir test satın almasıdır.\nGerçek ödeme alınmayacaktır.</string>
     <string name="prem_auto_renew">Aboneliğiniz otomatik olarak yenilenecektir.\nİstediğiniz zaman iptal edebilirsiniz.</string>
+    <string name="prem_subscription_disclosure">Google Play, %1$s%2$s için ücretlendirme yapar. Aboneliğiniz, Google Play abonelik ayarlarından iptal etmediğiniz sürece aynı dönem için otomatik yenilenir.</string>
+    <string name="prem_subscription_terms">Abonelik Koşulları</string>
+    <string name="prem_privacy_policy">Gizlilik Politikası</string>
     <string name="prem_test_it">Test Et</string>
     <string name="prem_buy">Satın Al</string>
     <string name="prem_popular">Popüler</string>
-    <string name="prem_feature_1">Sınırsız Tarot Açılımları</string>
-    <string name="prem_feature_2">Tüm Burç Yorumlarına Erişim</string>
-    <string name="prem_feature_3">Kişiselleştirilmiş Doğum Haritası</string>
-    <string name="prem_feature_4">Rün Falı ve Özel İçerikler</string>
-    <string name="prem_feature_5">Reklamsız Deneyim</string>
-    <string name="prem_feature_6">Günlük Bildirimler ve Hatırlatmalar</string>
+    <string name="prem_feature_1">Yapay zekâ destekli kişiselleştirilmiş tarot yorumları</string>
+    <string name="prem_feature_2">Sınırsız tarot açılımı</string>
+    <string name="prem_feature_3">Premium tarot yorumlarına tam erişim</string>
+    <string name="prem_feature_4">Reklamsız deneyim</string>
+    <string name="prem_feature_5">Yeni Premium özelliklere öncelikli erişim</string>
+    <string name="prem_feature_6">Aboneliğinizi Google Play üzerinden güvenle yönetme</string>
     <string name="prem_select_plan">Lütfen bir plan seçin</string>
     <string name="prem_no_session">Kullanıcı oturumu bulunamadı</string>
     <string name="prem_save_failed">Premium durumu kaydedilemedi: %1$s</string>
@@ -70,10 +73,12 @@
     <string name="prem_purchase_cancelled">Satın alma iptal edildi</string>
     <string name="prem_purchase_pending">Satın alma işlemi beklemede</string>
     <string name="prem_purchase_error">Satın alma hatası: %1$s</string>
+    <string name="prem_access_not_granted">Ödeme tamamlandı ancak Premium erişimi doğrulanamadı. Satın almaları geri yükleyin veya destekle iletişime geçin.</string>
     <string name="prem_plan_weekly_short">Haftalık</string>
     <string name="prem_plan_monthly_short">Aylık</string>
     <string name="prem_plan_yearly_short">Yıllık</string>
     <string name="prem_price_monthly_fallback">Aylık ₺50</string>
+    <string name="prem_monthly_equivalent">Aylık karşılığı %1$s</string>
     <string name="prem_duration_week">/hafta</string>
     <string name="prem_duration_month">/ay</string>
     <string name="prem_duration_year">/yıl</string>
@@ -225,4 +230,13 @@
     <string-array name="slots_default">
         <item>Kart</item>
     </string-array>
+    <string name="account_deletion_request">Hesabı sil</string>
+    <string name="account_deletion_dialog_title">Hesabın silinsin mi?</string>
+    <string name="account_deletion_dialog_text">Bu işlem profilini, kayıtlı yorumlarını, bildirimlerini ve ilişkili kişisel verilerini kalıcı olarak siler. Aktif Google Play aboneliğini iptal etmez; aboneliği Google Play üzerinden ayrıca iptal etmelisin.</string>
+    <string name="account_deletion_continue">Devam et</string>
+    <string name="account_deletion_final_title">Hesabın kalıcı olarak silinsin mi?</string>
+    <string name="account_deletion_final_text">Bu işlem geri alınamaz. Hesabın ve ilişkili verilerin şimdi silinecek.</string>
+    <string name="account_deletion_confirm">Kalıcı olarak sil</string>
+    <string name="account_deletion_success">Hesabın ve ilişkili verilerin silindi.</string>
+    <string name="account_deletion_failure">Hesabın silinemedi. Lütfen tekrar dene.</string>
 </resources>

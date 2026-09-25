@@ -31,8 +31,7 @@ import com.denizcan.astrosea.R
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import java.text.SimpleDateFormat
 import android.app.TimePickerDialog
-import android.content.Intent
-import android.net.Uri
+import android.widget.Toast
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import com.denizcan.astrosea.billing.BillingConfig
@@ -44,6 +43,10 @@ import com.denizcan.astrosea.presentation.components.KvkkDialog
 import com.denizcan.astrosea.util.KvkkTexts
 import com.denizcan.astrosea.util.LanguageManager
 import androidx.compose.ui.res.stringResource
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.functions.FirebaseFunctions
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +60,10 @@ fun ProfileScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showKvkkDialog by remember { mutableStateOf(false) }
+    var showAccountDeletionDialog by remember { mutableStateOf(false) }
+    var showFinalAccountDeletionDialog by remember { mutableStateOf(false) }
+    var isDeletingAccount by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     var initialProfileData by remember { mutableStateOf(state.profileData.copy()) }
     LaunchedEffect(Unit) {
         initialProfileData = state.profileData.copy()
@@ -381,6 +388,35 @@ fun ProfileScreen(
                     }
                 }
 
+                // Hesap silme talebi uygulamanın içinden de başlatılabilmelidir.
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.4f)),
+                    border = BorderStroke(1.dp, Color(0xFFFF8A80).copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    TextButton(
+                        onClick = { showAccountDeletionDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color(0xFFFF8A80),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.account_deletion_request),
+                            color = Color(0xFFFFB4AB),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
                 if (state.isLoading) {
                     Spacer(modifier = Modifier.height(16.dp))
                     CircularProgressIndicator(color = Color.White)
@@ -436,6 +472,102 @@ fun ProfileScreen(
                 onDismiss = { showKvkkDialog = false },
                 onAccept = null, // Profil ekranında sadece okuma modu
                 showAcceptButton = false
+            )
+        }
+
+        if (showAccountDeletionDialog) {
+            AlertDialog(
+                onDismissRequest = { showAccountDeletionDialog = false },
+                containerColor = Color(0xFF1A1A2E),
+                title = {
+                    Text(
+                        text = stringResource(R.string.account_deletion_dialog_title),
+                        color = Color.White
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.account_deletion_dialog_text),
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showFinalAccountDeletionDialog = true
+                            showAccountDeletionDialog = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.account_deletion_continue))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showAccountDeletionDialog = false }) {
+                        Text(stringResource(R.string.btn_dismiss))
+                    }
+                }
+            )
+        }
+
+        if (showFinalAccountDeletionDialog) {
+            AlertDialog(
+                onDismissRequest = { showFinalAccountDeletionDialog = false },
+                containerColor = Color(0xFF1A1A2E),
+                title = {
+                    Text(
+                        text = stringResource(R.string.account_deletion_final_title),
+                        color = Color.White
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.account_deletion_final_text),
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        enabled = !isDeletingAccount,
+                        onClick = {
+                            showFinalAccountDeletionDialog = false
+                            isDeletingAccount = true
+                            coroutineScope.launch {
+                                try {
+                                    FirebaseFunctions
+                                        .getInstance("europe-west1")
+                                        .getHttpsCallable("deleteAccount")
+                                        .call()
+                                        .await()
+                                    FirebaseAuth.getInstance().signOut()
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.account_deletion_success),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } catch (error: Exception) {
+                                    android.util.Log.e("ProfileScreen", "Account deletion failed", error)
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.account_deletion_failure),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } finally {
+                                    isDeletingAccount = false
+                                }
+                            }
+                        }
+                    ) {
+                        Text(stringResource(R.string.account_deletion_confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        enabled = !isDeletingAccount,
+                        onClick = { showFinalAccountDeletionDialog = false }
+                    ) {
+                        Text(stringResource(R.string.btn_dismiss))
+                    }
+                }
             )
         }
     }
@@ -855,4 +987,4 @@ fun PremiumStatusCard(
             }
         )
     }
-} 
+}

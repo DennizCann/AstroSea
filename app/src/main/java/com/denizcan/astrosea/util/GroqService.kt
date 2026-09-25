@@ -2,27 +2,15 @@ package com.denizcan.astrosea.util
 
 import android.content.Context
 import android.util.Log
-import com.denizcan.astrosea.BuildConfig
 import com.denizcan.astrosea.model.ReadingFormat
 import com.denizcan.astrosea.model.TarotCard
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
-import java.util.concurrent.TimeUnit
+import com.google.firebase.functions.FirebaseFunctions
+import kotlinx.coroutines.tasks.await
 
 class GroqService(private val context: Context) {
 
     companion object {
         private const val TAG = "GroqService"
-        private val API_KEY = BuildConfig.GROQ_API_KEY
-        private const val API_URL = "https://api.groq.com/openai/v1/chat/completions"
-        private const val MODEL = "llama-3.3-70b-versatile"
-
         private val ENGLISH_BASE_PROMPT = """
             Role:
             You are a tarot guide who speaks the language of symbols and archetypes. You hold up a mirror to the querent, reflecting the energy and potential of the cards honestly, directly, and with quiet confidence. Your purpose is not to predict the future, but to read the present, create awareness, and help the querent reclaim their own power.
@@ -43,104 +31,32 @@ class GroqService(private val context: Context) {
         """.trimIndent()
     }
 
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(60, TimeUnit.SECONDS)
-        .build()
+    private val functions = FirebaseFunctions.getInstance("europe-west1")
 
     suspend fun generateTarotReading(
         readingType: String,
         drawnCards: List<TarotCard>,
         readingFormat: ReadingFormat
-    ): String? = withContext(Dispatchers.IO) {
-        if (API_KEY.isBlank()) {
-            Log.e(TAG, "GROQ_API_KEY boş — local.properties dosyasını kontrol edin")
-            return@withContext null
-        }
+    ): String? {
         try {
             val prompt = buildTarotPrompt(readingType, drawnCards, readingFormat)
-            Log.d(TAG, "Groq API'ye istek gönderiliyor...")
-            val response = callGroqAPI(prompt, LanguageManager.isTurkish(context))
+            Log.d(TAG, "Sunucu üzerinden tarot yorumu isteniyor...")
+            val result = functions
+                .getHttpsCallable("generateTarotReading")
+                .call(mapOf("prompt" to prompt, "isTurkish" to LanguageManager.isTurkish(context)))
+                .await()
+            @Suppress("UNCHECKED_CAST")
+            val response = (result.data as? Map<String, Any?>)?.get("reading") as? String ?: ""
             if (response.isNotBlank()) {
-                Log.d(TAG, "Groq'dan başarılı yanıt alındı (${response.length} karakter)")
+                Log.d(TAG, "Yorum başarıyla alındı (${response.length} karakter)")
                 response
             } else {
-                Log.w(TAG, "Groq'dan boş yanıt alındı")
+                Log.w(TAG, "Sunucu boş yorum döndürdü")
                 null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Groq API çağrısında hata", e)
+            Log.e(TAG, "Tarot yorum isteği başarısız", e)
             null
-        }
-    }
-
-    private fun callGroqAPI(prompt: String, isTurkish: Boolean): String {
-        try {
-            val systemMessage = if (isTurkish) {
-                """
-                Sen profesyonel bir Türk tarot yorumcususun.
-                MUTLAKA ve SADECE Türkçe yanıt ver.
-                Hiçbir koşulda İngilizce veya başka bir dilde kelime kullanma.
-                Tüm kart isimlerini Türkçe karşılıklarıyla yaz.
-                Akıcı, anlaşılır ve etkileyici bir Türkçe kullan.
-                """.trimIndent()
-            } else {
-                """
-                You are a professional English tarot reader.
-                Respond ONLY in natural, fluent English.
-                Do not use Turkish words, Turkish headings, or translated stock phrases.
-                Use standard English tarot card names (e.g. The Fool, The Tower).
-                Write as if composing an original reading for this specific spread—not a generic template.
-                """.trimIndent()
-            }
-
-            val jsonBody = JSONObject().apply {
-                put("model", MODEL)
-                put("messages", JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("role", "system")
-                        put("content", systemMessage)
-                    })
-                    put(JSONObject().apply {
-                        put("role", "user")
-                        put("content", prompt)
-                    })
-                })
-                put("temperature", if (isTurkish) 0.65 else 0.72)
-                put("max_tokens", 2048)
-                put("top_p", 0.9)
-                put("stream", false)
-            }
-
-            val requestBody = jsonBody.toString()
-                .toRequestBody("application/json".toMediaType())
-
-            val request = Request.Builder()
-                .url(API_URL)
-                .addHeader("Authorization", "Bearer $API_KEY")
-                .addHeader("Content-Type", "application/json")
-                .post(requestBody)
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                val responseBody = response.body?.string() ?: ""
-                if (!response.isSuccessful) {
-                    Log.e(TAG, "Groq API hatası: ${response.code} - ${response.message} — $responseBody")
-                    return ""
-                }
-
-                val jsonResponse = JSONObject(responseBody)
-
-                return jsonResponse
-                    .getJSONArray("choices")
-                    .getJSONObject(0)
-                    .getJSONObject("message")
-                    .getString("content")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Groq API çağrısında detaylı hata", e)
-            return ""
         }
     }
 
@@ -227,5 +143,5 @@ class GroqService(private val context: Context) {
         """.trimIndent()
     }
 
-    fun isAvailable(): Boolean = API_KEY.isNotBlank()
+    fun isAvailable(): Boolean = true
 }

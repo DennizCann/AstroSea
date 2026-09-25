@@ -41,25 +41,28 @@
     <!-- Premium screen -->
     <string name="prem_test_mode">🔧 TEST MODE</string>
     <string name="prem_upgrade_title">Upgrade to Premium</string>
-    <string name="prem_upgrade_subtitle">Get unlimited tarot spreads and exclusive content</string>
+    <string name="prem_upgrade_subtitle">Unlock AI-powered personalized tarot interpretations and an ad-free experience</string>
     <string name="prem_choose_plan">Choose Your Plan</string>
     <string name="prem_processing">Processing…</string>
     <string name="prem_go_to_payment">Continue to Payment</string>
-    <string name="prem_cancel_anytime">You can cancel anytime</string>
+    <string name="prem_cancel_anytime">Cancel anytime in your Google Play subscription settings</string>
     <string name="prem_restore">Restore Purchases</string>
     <string name="prem_confirm_title">Confirm Purchase</string>
     <string name="prem_fallback_name">Premium</string>
     <string name="prem_test_warning">⚠️ This is a test purchase.\nNo real payment will be charged.</string>
     <string name="prem_auto_renew">Your subscription will renew automatically.\nYou can cancel anytime.</string>
+    <string name="prem_subscription_disclosure">Google Play will charge %1$s%2$s. Your subscription renews automatically for the same period unless you cancel it in Google Play subscription settings.</string>
+    <string name="prem_subscription_terms">Subscription Terms</string>
+    <string name="prem_privacy_policy">Privacy Policy</string>
     <string name="prem_test_it">Test It</string>
     <string name="prem_buy">Buy</string>
     <string name="prem_popular">Popular</string>
-    <string name="prem_feature_1">Unlimited Tarot Spreads</string>
-    <string name="prem_feature_2">Access to All Horoscopes</string>
-    <string name="prem_feature_3">Personalized Birth Chart</string>
-    <string name="prem_feature_4">Rune Readings and Exclusive Content</string>
-    <string name="prem_feature_5">Ad-free Experience</string>
-    <string name="prem_feature_6">Daily Notifications and Reminders</string>
+    <string name="prem_feature_1">AI-powered personalized tarot interpretations</string>
+    <string name="prem_feature_2">Unlimited tarot spreads</string>
+    <string name="prem_feature_3">Full access to premium tarot interpretations</string>
+    <string name="prem_feature_4">Ad-free experience</string>
+    <string name="prem_feature_5">Priority access to new Premium features</string>
+    <string name="prem_feature_6">Manage your subscription securely with Google Play</string>
     <string name="prem_select_plan">Please select a plan</string>
     <string name="prem_no_session">User session not found</string>
     <string name="prem_save_failed">Could not save premium status: %1$s</string>
@@ -70,10 +73,12 @@
     <string name="prem_purchase_cancelled">Purchase cancelled</string>
     <string name="prem_purchase_pending">Purchase is pending</string>
     <string name="prem_purchase_error">Purchase error: %1$s</string>
+    <string name="prem_access_not_granted">Your payment was completed, but Premium access could not be verified. Please restore purchases or contact support.</string>
     <string name="prem_plan_weekly_short">Weekly</string>
     <string name="prem_plan_monthly_short">Monthly</string>
     <string name="prem_plan_yearly_short">Yearly</string>
     <string name="prem_price_monthly_fallback">₺50 / month</string>
+    <string name="prem_monthly_equivalent">Equivalent to %1$s / month</string>
     <string name="prem_duration_week">/week</string>
     <string name="prem_duration_month">/month</string>
     <string name="prem_duration_year">/year</string>
@@ -225,4 +230,13 @@
     <string-array name="slots_default">
         <item>Card</item>
     </string-array>
+    <string name="account_deletion_request">Delete account</string>
+    <string name="account_deletion_dialog_title">Delete your account?</string>
+    <string name="account_deletion_dialog_text">This permanently deletes your profile, saved readings, notifications, and other associated personal data. It does not cancel an active Google Play subscription; cancel that separately in Google Play.</string>
+    <string name="account_deletion_continue">Continue</string>
+    <string name="account_deletion_final_title">Permanently delete your account?</string>
+    <string name="account_deletion_final_text">This cannot be undone. Your account and associated data will be removed now.</string>
+    <string name="account_deletion_confirm">Delete permanently</string>
+    <string name="account_deletion_success">Your account and associated data have been deleted.</string>
+    <string name="account_deletion_failure">We could not delete your account. Please try again.</string>
 </resources>

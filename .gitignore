@@ -16,3 +16,9 @@ local.properties
 app/release/
 *.aab
 /private-signing/
+
+# Local Firebase/Gradle tooling output
+functions/node_modules/
+.gradle-user-home/
+.android-user-home/
+.kotlin/
