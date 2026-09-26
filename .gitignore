@@ -19,6 +19,7 @@ app/release/
 
 # Local Firebase/Gradle tooling output
 functions/node_modules/
+.firebase/
 .gradle-user-home/
 .android-user-home/
 .kotlin/
