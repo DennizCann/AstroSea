@@ -617,7 +617,12 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Profile.route) {
                         ProfileScreen(
                             viewModel = sharedProfileViewModel,
-                            onNavigateBack = { appNavigator.popBack() }
+                            onNavigateBack = { appNavigator.popBack() },
+                            onAccountDeleted = {
+                                navController.navigate(Screen.Auth.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
                         )
                     }
                     composable(route = Screen.TarotMeanings.route) {

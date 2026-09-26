@@ -54,6 +54,7 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
+    onAccountDeleted: () -> Unit = onNavigateBack,
     viewModel: ProfileViewModel = viewModel()
 ) {
     val state = viewModel.profileState
@@ -546,6 +547,7 @@ fun ProfileScreen(
                                         context.getString(R.string.account_deletion_success),
                                         Toast.LENGTH_LONG
                                     ).show()
+                                    onAccountDeleted()
                                 } catch (error: Exception) {
                                     android.util.Log.e("ProfileScreen", "Account deletion failed", error)
                                     Toast.makeText(
