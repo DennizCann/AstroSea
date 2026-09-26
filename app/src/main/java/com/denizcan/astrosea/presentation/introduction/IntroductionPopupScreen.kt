@@ -213,7 +213,7 @@ fun IntroductionPopupScreen(
                             introPage = pages[page],
                             pageIndex = page,
                             onPrimaryClick = {
-                                // Ücretsiz Denemeyi Başlat - hep premium'a gider
+                                // Premium plan seçim ekranına gider.
                                 onNavigateToPremium()
                             }
                         )
@@ -365,7 +365,25 @@ private fun IntroPageContent(
                             contentScale = ContentScale.Fit
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color(0xFFD4AF37).copy(alpha = 0.18f),
+                            border = BorderStroke(1.dp, Color(0xFFD4AF37).copy(alpha = 0.7f))
+                        ) {
+                            Text(
+                                text = stringResource(R.string.onb_intro_coming_soon),
+                                color = Color(0xFFFFD700),
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                    letterSpacing = 1.sp
+                                ),
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         // Başlık
                         Text(
@@ -401,7 +419,7 @@ private fun IntroPageContent(
 
         Spacer(modifier = Modifier.height(if (isShort) 12.dp else 24.dp))
 
-        // Primary Action Button (Ücretsiz Denemeyi Başlat)
+        // Primary Action Button (Premium planlarına gider)
         val buttonHeight = responsiveSize(compact = 46.dp, medium = 52.dp, expanded = 56.dp)
         Button(
             onClick = onPrimaryClick,
