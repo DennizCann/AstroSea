@@ -147,7 +147,7 @@ fun ProfileScreen(
                     Modifier
                         .fillMaxWidth()
                         .background(Color.Transparent)
-                        .padding(bottom = 8.dp)
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
                     Button(
                         onClick = {
@@ -155,24 +155,51 @@ fun ProfileScreen(
                                 onNavigateBack()
                             }
                         },
-                        enabled = isChanged,
+                        enabled = isChanged && !state.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                            .height(56.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isChanged) Color.Black.copy(alpha = 0.6f) else Color.Black.copy(alpha = 0.3f)
+                            containerColor = Color(0xFF6A1B9A),
+                            disabledContainerColor = Color(0xFF1A1A2E).copy(alpha = 0.78f),
+                            disabledContentColor = Color.White.copy(alpha = 0.45f)
                         ),
-                        shape = RoundedCornerShape(50)
+                        border = BorderStroke(
+                            1.dp,
+                            if (isChanged) Color(0xFFFFD700) else Color.White.copy(alpha = 0.2f)
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = if (isChanged) 8.dp else 0.dp
+                        ),
+                        shape = RoundedCornerShape(18.dp)
                     ) {
-                        Icon(Icons.Default.Done, contentDescription = stringResource(R.string.btn_save), tint = Color.White)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            stringResource(R.string.btn_save),
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                        if (state.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(22.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
                             )
-                        )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                stringResource(R.string.profile_saving),
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                                )
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Done,
+                                contentDescription = stringResource(R.string.btn_save),
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                stringResource(R.string.btn_save),
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                                )
+                            )
+                        }
                     }
                 }
             }
