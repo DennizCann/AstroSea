@@ -93,6 +93,8 @@
     <string name="field_city">City</string>
     <string name="btn_save">Save Changes</string>
     <string name="profile_saving">Saving…</string>
+    <string name="profile_saved">Your profile has been saved.</string>
+    <string name="profile_save_failed">Your profile could not be saved. Please try again.</string>
 
     <!-- Language -->
     <string name="language_label">Language</string>

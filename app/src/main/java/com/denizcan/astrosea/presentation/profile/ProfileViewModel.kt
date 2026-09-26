@@ -127,7 +127,10 @@ class ProfileViewModel : ViewModel() {
         profileState = profileState.copy(isEditing = !profileState.isEditing)
     }
 
-    fun saveProfile(onSuccess: () -> Unit) {
+    fun saveProfile(
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit = {}
+    ) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         profileState = profileState.copy(isLoading = true)
 
@@ -158,6 +161,7 @@ class ProfileViewModel : ViewModel() {
                     isLoading = false
                 )
                 Log.e("ProfileViewModel", "Error saving profile", e)
+                onError(e.localizedMessage ?: "Unknown error")
             }
         }
     }
@@ -348,4 +352,4 @@ data class ProfileState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isEditing: Boolean = false
-) 
+)

@@ -71,7 +71,14 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         initialProfileData = state.profileData.copy()
     }
-    val isChanged = state.profileData != initialProfileData
+    val hasProfileChanges = state.profileData.let { current ->
+        current.name != initialProfileData.name ||
+            current.surname != initialProfileData.surname ||
+            current.birthDate != initialProfileData.birthDate ||
+            current.birthTime != initialProfileData.birthTime ||
+            current.country != initialProfileData.country ||
+            current.city != initialProfileData.city
+    }
     
     // Mevcut tarihi parse et
     val (initialYear, initialMonth, initialDay) = remember(state.profileData.birthDate) {
@@ -151,11 +158,25 @@ fun ProfileScreen(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.saveProfile {
-                                onNavigateBack()
-                            }
+                            viewModel.saveProfile(
+                                onSuccess = {
+                                    initialProfileData = state.profileData.copy()
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.profile_saved),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                onError = {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.profile_save_failed),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
                         },
-                        enabled = isChanged && !state.isLoading,
+                        enabled = hasProfileChanges && !state.isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
@@ -166,10 +187,10 @@ fun ProfileScreen(
                         ),
                         border = BorderStroke(
                             1.dp,
-                            if (isChanged) Color(0xFFFFD700) else Color.White.copy(alpha = 0.2f)
+                            if (hasProfileChanges) Color(0xFFFFD700) else Color.White.copy(alpha = 0.2f)
                         ),
                         elevation = ButtonDefaults.buttonElevation(
-                            defaultElevation = if (isChanged) 8.dp else 0.dp
+                            defaultElevation = if (hasProfileChanges) 8.dp else 0.dp
                         ),
                         shape = RoundedCornerShape(18.dp)
                     ) {

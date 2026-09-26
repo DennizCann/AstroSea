@@ -93,6 +93,8 @@
     <string name="field_city">Şehir</string>
     <string name="btn_save">Değişiklikleri Kaydet</string>
     <string name="profile_saving">Kaydediliyor…</string>
+    <string name="profile_saved">Profiliniz kaydedildi.</string>
+    <string name="profile_save_failed">Profiliniz kaydedilemedi. Lütfen tekrar deneyin.</string>
 
     <!-- Language -->
     <string name="language_label">Dil</string>
