@@ -78,9 +78,13 @@ class PremiumViewModel(
                         Log.d(TAG, "Billing bağlantısı kuruldu")
                     }
                     is BillingState.ProductsLoaded -> {
+                        val monthlyPlanIndex = state.products.indexOfFirst {
+                            it.durationDays == BillingConfig.DURATION_MONTHLY
+                        }.takeIf { it >= 0 } ?: 0
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            products = state.products
+                            products = state.products,
+                            selectedProductIndex = monthlyPlanIndex
                         )
                     }
                     is BillingState.PurchaseSuccess -> {

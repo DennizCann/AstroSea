@@ -71,12 +71,14 @@
     <string name="ad_dialog_text">Watch a short ad to unlock the AI interpretation of this spread for free.\n\nRemaining today: %1$d/%2$d</string>
     <string name="btn_watch_ad">Watch Ad</string>
     <string name="btn_premium_instead">Ad-free: Go Premium</string>
+    <string name="ad_not_available">The ad is not ready yet. Please try again in a moment.</string>
+    <string name="ad_interpretation_failed">Your interpretation could not be prepared. Your daily ad credit was not used; please try again.</string>
 
     <!-- Premium dialog -->
     <string name="premium_dialog_title">🌟 Premium Feature</string>
     <string name="premium_limit_title">You Are Out of Ad Credits for Today</string>
     <string name="premium_ai_title">AI-Powered Tarot Interpretation</string>
-    <string name="premium_limit_text">You can unlock up to %1$d interpretations per day by watching ads, and you have used today\'s credits.\n\nGo Premium to access all spread interpretations without ads.</string>
+    <string name="premium_limit_text">You can unlock up to %1$d interpretations per day by watching ads, and you have used today\'s credits.\n\nGo Premium for up to 25 AI interpretations per day without ads.</string>
     <string name="premium_ai_text">You can access personalized AI tarot interpretations with a Premium membership or by watching an ad.</string>
     <string name="btn_go_premium">Go Premium</string>
     <string name="btn_later">Later</string>

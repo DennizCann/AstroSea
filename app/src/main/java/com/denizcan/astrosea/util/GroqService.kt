@@ -46,17 +46,17 @@ class GroqService(private val context: Context) {
                 .call(mapOf("prompt" to prompt, "isTurkish" to LanguageManager.isTurkish(context)))
                 .await()
             @Suppress("UNCHECKED_CAST")
-            val response = (result.data as? Map<String, Any?>)?.get("reading") as? String ?: ""
+            val response = (result.getData() as? Map<String, Any?>)?.get("reading") as? String ?: ""
             if (response.isNotBlank()) {
                 Log.d(TAG, "Yorum başarıyla alındı (${response.length} karakter)")
-                response
+                return response
             } else {
                 Log.w(TAG, "Sunucu boş yorum döndürdü")
-                null
+                return null
             }
         } catch (e: Exception) {
             Log.e(TAG, "Tarot yorum isteği başarısız", e)
-            null
+            return null
         }
     }
 

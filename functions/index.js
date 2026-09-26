@@ -51,6 +51,19 @@ async function reserveReadingQuota(uid) {
   });
 }
 
+async function releaseReadingQuota(uid) {
+  const quotaRef = db.collection("users").doc(uid).collection("private").doc("ai_quota");
+  const today = startOfTodayUtc();
+  await db.runTransaction(async (transaction) => {
+    const quotaSnapshot = await transaction.get(quotaRef);
+    const isSameDay = quotaSnapshot.exists && quotaSnapshot.get("date") === today;
+    const used = isSameDay ? Number(quotaSnapshot.get("count") || 0) : 0;
+    if (used > 0) {
+      transaction.update(quotaRef, { count: used - 1, updatedAt: new Date() });
+    }
+  });
+}
+
 /**
  * Generates a tarot interpretation without ever sending the Groq credential to Android.
  * The client may submit only an authenticated, size-limited prompt. A per-user server-side
@@ -75,15 +88,16 @@ exports.generateTarotReading = onCall(
       throw new HttpsError("invalid-argument", "Invalid interpretation request.");
     }
 
-    await reserveReadingQuota(uid);
+    let quotaReserved = false;
+    try {
+      await reserveReadingQuota(uid);
+      quotaReserved = true;
 
     const systemMessage = isTurkish
       ? "Sen profesyonel bir Türk tarot yorumcususun. MUTLAKA ve SADECE Türkçe yanıt ver. Kart isimlerini Türkçe karşılıklarıyla yaz; akıcı, anlaşılır ve etkileyici Türkçe kullan."
       : "You are a professional English tarot reader. Respond ONLY in natural, fluent English. Use standard English tarot card names and write an original reading for this specific spread.";
 
-    let groqResponse;
-    try {
-      groqResponse = await fetch(GROQ_URL, {
+      const groqResponse = await fetch(GROQ_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${groqApiKey.value()}`,
@@ -101,27 +115,32 @@ exports.generateTarotReading = onCall(
           stream: false,
         }),
       });
+      if (!groqResponse.ok) {
+        logger.error("Groq request failed", { status: groqResponse.status });
+        if (groqResponse.status === 429) {
+          throw new HttpsError("resource-exhausted", "Interpretation service is busy. Please try again shortly.");
+        }
+        throw new HttpsError("internal", "Interpretation could not be generated.");
+      }
+
+      const payload = await groqResponse.json();
+      const reading = payload?.choices?.[0]?.message?.content;
+      if (typeof reading !== "string" || reading.trim().length === 0) {
+        logger.error("Groq returned an empty interpretation");
+        throw new HttpsError("internal", "Interpretation could not be generated.");
+      }
+
+      return { reading: reading.trim() };
     } catch (error) {
+      if (quotaReserved) {
+        await releaseReadingQuota(uid).catch((releaseError) => {
+          logger.error("Failed to release interpretation quota", { code: releaseError?.code ?? "unknown" });
+        });
+      }
+      if (error instanceof HttpsError) throw error;
       logger.error("Groq network request failed", { code: error?.code ?? "unknown" });
       throw new HttpsError("unavailable", "Interpretation service is temporarily unavailable.");
     }
-
-    if (!groqResponse.ok) {
-      logger.error("Groq request failed", { status: groqResponse.status });
-      if (groqResponse.status === 429) {
-        throw new HttpsError("resource-exhausted", "Interpretation service is busy. Please try again shortly.");
-      }
-      throw new HttpsError("internal", "Interpretation could not be generated.");
-    }
-
-    const payload = await groqResponse.json();
-    const reading = payload?.choices?.[0]?.message?.content;
-    if (typeof reading !== "string" || reading.trim().length === 0) {
-      logger.error("Groq returned an empty interpretation");
-      throw new HttpsError("internal", "Interpretation could not be generated.");
-    }
-
-    return { reading: reading.trim() };
   }
 );
 

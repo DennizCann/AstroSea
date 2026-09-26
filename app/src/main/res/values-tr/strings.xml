@@ -71,12 +71,14 @@
     <string name="ad_dialog_text">Kısa bir reklam izleyerek bu açılımın yapay zeka yorumunu ücretsiz açabilirsiniz.\n\nBugün kalan hakkınız: %1$d/%2$d</string>
     <string name="btn_watch_ad">Reklam İzle</string>
     <string name="btn_premium_instead">Reklamsız: Premium\'a Geç</string>
+    <string name="ad_not_available">Reklam henüz hazır değil. Lütfen biraz sonra tekrar deneyin.</string>
+    <string name="ad_interpretation_failed">Yorum hazırlanamadı. Günlük reklam hakkınız kullanılmadı; lütfen tekrar deneyin.</string>
 
     <!-- Premium dialog -->
     <string name="premium_dialog_title">🌟 Premium Özellik</string>
     <string name="premium_limit_title">Bugünlük Reklam Hakkınız Bitti</string>
     <string name="premium_ai_title">AI Destekli Tarot Yorumu</string>
-    <string name="premium_limit_text">Reklam izleyerek günde en fazla %1$d yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üye olarak reklamsız şekilde tüm açılımların yorumlarına erişebilirsiniz.</string>
+    <string name="premium_limit_text">Reklam izleyerek günde en fazla %1$d yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üyelikle günde 25 AI yorumuna reklamsız erişebilirsiniz.</string>
     <string name="premium_ai_text">Yapay zeka destekli kişiselleştirilmiş tarot yorumlarına Premium üyelikle ya da reklam izleyerek erişebilirsiniz.</string>
     <string name="btn_go_premium">Premium\'a Geç</string>
     <string name="btn_later">Daha Sonra</string>

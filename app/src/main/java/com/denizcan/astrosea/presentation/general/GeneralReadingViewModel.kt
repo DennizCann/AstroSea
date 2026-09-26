@@ -554,17 +554,23 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             .trim()
     }
     
-    fun generateReading(readingType: String, delayMillis: Long = 0L) {
+    fun generateReading(
+        readingType: String,
+        delayMillis: Long = 0L,
+        onCompleted: (Boolean) -> Unit = {}
+    ) {
         // Kartların çekilip çekilmediğini kontrol et
         val hasCards = drawnCards.isNotEmpty() && drawnCards.any { it.card != null }
         if (!hasCards) {
             readingError = context.getString(R.string.err_draw_cards_first)
+            onCompleted(false)
             return
         }
         
         val revealedCards = drawnCards.filter { it.isRevealed && it.card != null }
         if (revealedCards.isEmpty()) {
             readingError = context.getString(R.string.err_reveal_one_card)
+            onCompleted(false)
             return
         }
         
@@ -576,6 +582,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 // Bellekte yorum varsa tekrar üretme
                 if (generatedReading != null) {
                     Log.d("GeneralReadingViewModel", "Yorum bellekte mevcut, tekrar üretilmiyor")
+                    onCompleted(true)
                     return@launch
                 }
                 
@@ -584,6 +591,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 if (savedInterpretation != null) {
                     generatedReading = savedInterpretation
                     Log.d("GeneralReadingViewModel", "Kayıtlı yorum Firestore'dan yüklendi, tekrar üretilmiyor")
+                    onCompleted(true)
                     return@launch
                 }
                 
@@ -596,6 +604,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 val format = readingFormats?.readingFormats?.get(normalizedReadingType)
                 if (format == null) {
                     readingError = context.getString(R.string.err_format_not_found, normalizedReadingType)
+                    onCompleted(false)
                     return@launch
                 }
                 
@@ -604,12 +613,14 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 
                 if (tarotCards.isEmpty()) {
                     readingError = context.getString(R.string.err_no_valid_card)
+                    onCompleted(false)
                     return@launch
                 }
                 
                 if (!groqService.isAvailable()) {
                     readingError = context.getString(R.string.err_api_key_missing)
                     interpretationReadyAt = null
+                    onCompleted(false)
                     return@launch
                 }
 
@@ -623,6 +634,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 if (reading.isNullOrBlank()) {
                     readingError = context.getString(R.string.err_interpretation_api_failed)
                     interpretationReadyAt = null
+                    onCompleted(false)
                     return@launch
                 }
 
@@ -631,10 +643,12 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 
                 // Yorumu Firestore'a kaydet - açılım sıfırlanana kadar tekrar üretilmesin
                 saveInterpretation(readingType, reading, readyAt)
+                onCompleted(true)
                 
             } catch (e: Exception) {
                 Log.e("GeneralReadingViewModel", "Yorum oluşturulurken hata", e)
                 readingError = context.getString(R.string.err_interpretation_failed, e.message ?: "")
+                onCompleted(false)
             } finally {
                 isGeneratingReading = false
             }
@@ -720,4 +734,4 @@ data class ReadingCardState(
     val index: Int,
     val card: TarotCard?,
     val isRevealed: Boolean
-) 
+)

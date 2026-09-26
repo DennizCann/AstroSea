@@ -63,6 +63,7 @@ import com.denizcan.astrosea.presentation.notifications.NotificationsScreen
 import com.denizcan.astrosea.notifications.DailyNotificationScheduler
 import com.denizcan.astrosea.notifications.PremiumReminderScheduler
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen1
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen2
 import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionScreen3
@@ -71,6 +72,9 @@ import com.denizcan.astrosea.presentation.profileCompletion.ProfileCompletionSta
 import com.denizcan.astrosea.presentation.auth.TransitionScreen
 import com.denizcan.astrosea.presentation.introduction.IntroductionPopupScreen
 import com.denizcan.astrosea.presentation.components.KvkkDialog
+import com.denizcan.astrosea.billing.BillingConfig
+import com.denizcan.astrosea.billing.BillingManager
+import com.adapty.Adapty
 
 
 class MainActivity : ComponentActivity() {
@@ -806,6 +810,38 @@ class MainActivity : ComponentActivity() {
      * Premium durumunu kontrol eder ve hatırlatmaları zamanlar
      */
     private fun checkPremiumAndScheduleReminders(userId: String) {
+        if (!BillingConfig.TEST_MODE) {
+            Adapty.identify(userId) { error ->
+                if (error != null) {
+                    Log.e("MainActivity", "Adapty kullanıcı tanımlama hatası", error)
+                    checkPremiumAndScheduleRemindersFromCache(userId)
+                    return@identify
+                }
+
+                BillingManager.getInstance(this).checkPremiumAccess { hasAccess ->
+                    FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(userId)
+                        .set(mapOf("isPremium" to hasAccess), SetOptions.merge())
+                        .addOnFailureListener { e ->
+                            Log.e("MainActivity", "Premium erişimi Firestore'a eşitlenemedi", e)
+                        }
+
+                    if (hasAccess) {
+                        PremiumReminderScheduler.cancelAllReminders(this)
+                        Log.d("MainActivity", "Adapty premium erişimi etkin")
+                    } else {
+                        Log.d("MainActivity", "Adapty premium erişimi etkin değil")
+                    }
+                }
+            }
+            return
+        }
+
+        checkPremiumAndScheduleRemindersFromCache(userId)
+    }
+
+    private fun checkPremiumAndScheduleRemindersFromCache(userId: String) {
         FirebaseFirestore.getInstance()
             .collection("users")
             .document(userId)
@@ -848,4 +884,3 @@ class MainActivity : ComponentActivity() {
             }
     }
 }
-

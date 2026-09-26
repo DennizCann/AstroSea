@@ -30,6 +30,8 @@ import com.denizcan.astrosea.R
 import com.denizcan.astrosea.ads.AdConfig
 import com.denizcan.astrosea.ads.AdRightsManager
 import com.denizcan.astrosea.ads.RewardedAdManager
+import com.denizcan.astrosea.billing.BillingConfig
+import com.denizcan.astrosea.billing.BillingManager
 import com.denizcan.astrosea.presentation.components.AstroTopBar
 import com.denizcan.astrosea.presentation.home.DailyTarotViewModel
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
@@ -117,6 +119,7 @@ fun GeneralReadingDetailScreen(
     var showAdDialog by remember { mutableStateOf(false) }
     var remainingAdUnlocks by remember { mutableStateOf(0) }
     var isAdShowing by remember { mutableStateOf(false) }
+    var adErrorMessage by remember { mutableStateOf<String?>(null) }
     
     // Reklam yöneticileri
     val rewardedAdManager = remember { RewardedAdManager(context) }
@@ -331,16 +334,37 @@ fun GeneralReadingDetailScreen(
                                                 val isPremium = document.getBoolean("isPremium") ?: false
                                                 Log.d("GeneralReadingDetailScreen", "Firestore'dan okunan isPremium: $isPremium")
                                                 
-                                                if (isPremium) {
+                                                if (BillingConfig.TEST_MODE && isPremium) {
                                                     Log.d("GeneralReadingDetailScreen", "Premium kullanıcı - yorum oluşturuluyor")
                                                     viewModel.generateReading(readingType, AdConfig.PREMIUM_INTERPRETATION_DELAY_MILLIS)
                                                     currentScreen = "interpretation"
+                                                } else if (!BillingConfig.TEST_MODE) {
+                                                    BillingManager.getInstance(context).checkPremiumAccess { hasAccess ->
+                                                        if (hasAccess) {
+                                                            Log.d("GeneralReadingDetailScreen", "Adapty premium erişimi doğrulandı")
+                                                            viewModel.generateReading(readingType, AdConfig.PREMIUM_INTERPRETATION_DELAY_MILLIS)
+                                                            currentScreen = "interpretation"
+                                                        } else {
+                                                            scope.launch {
+                                                                val remaining = adRightsManager.getRemainingUnlocks()
+                                                if (remaining > 0) {
+                                                    remainingAdUnlocks = remaining
+                                                    adErrorMessage = null
+                                                    showAdDialog = true
+                                                                } else {
+                                                                    adLimitReached = true
+                                                                    showPremiumDialog = true
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 } else {
                                                     // Ücretsiz kullanıcı - reklam hakkı kontrolü
                                                     val remaining = adRightsManager.getRemainingUnlocks()
                                                     Log.d("GeneralReadingDetailScreen", "Kalan reklam hakkı: $remaining")
                                                     if (remaining > 0) {
                                                         remainingAdUnlocks = remaining
+                                                        adErrorMessage = null
                                                         showAdDialog = true
                                                     } else {
                                                         adLimitReached = true
@@ -411,6 +435,16 @@ fun GeneralReadingDetailScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         CircularProgressIndicator(color = Color(0xFFD4AF37), modifier = Modifier.size(28.dp))
                     }
+                    adErrorMessage?.let { message ->
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = message,
+                            color = Color(0xFFFFB4AB),
+                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             },
             confirmButton = {
@@ -418,25 +452,38 @@ fun GeneralReadingDetailScreen(
                     onClick = {
                         val activity = context as? android.app.Activity ?: return@Button
                         isAdShowing = true
+                        adErrorMessage = null
                         rewardedAdManager.show(
                             activity = activity,
                             onRewarded = {
                                 scope.launch {
-                                    val consumed = adRightsManager.consumeUnlock()
-                                    isAdShowing = false
-                                    showAdDialog = false
-                                    if (consumed) {
-                                        viewModel.generateReading(readingType, AdConfig.AD_INTERPRETATION_DELAY_MILLIS)
-                                        currentScreen = "interpretation"
-                                    } else {
-                                        adLimitReached = true
-                                        showPremiumDialog = true
+                                    viewModel.generateReading(
+                                        readingType,
+                                        AdConfig.AD_INTERPRETATION_DELAY_MILLIS
+                                    ) { success ->
+                                        scope.launch {
+                                            isAdShowing = false
+                                            if (success) {
+                                                val consumed = adRightsManager.consumeUnlock()
+                                                showAdDialog = false
+                                                if (!consumed) {
+                                                    Log.w(
+                                                        "GeneralReadingDetailScreen",
+                                                        "Reklam hakkı kaydedilemedi; hazırlanmış yorum yine de kullanıcıya gösteriliyor"
+                                                    )
+                                                }
+                                                currentScreen = "interpretation"
+                                            } else {
+                                                adErrorMessage = context.getString(R.string.ad_interpretation_failed)
+                                            }
+                                        }
                                     }
                                 }
                             },
                             onFailed = {
                                 isAdShowing = false
                                 Log.w("GeneralReadingDetailScreen", "Reklam gösterilemedi")
+                                adErrorMessage = context.getString(R.string.ad_not_available)
                             }
                         )
                     },
@@ -1661,4 +1708,4 @@ private fun MeaningCardPreview() {
             )
         }
     }
-} 
+}

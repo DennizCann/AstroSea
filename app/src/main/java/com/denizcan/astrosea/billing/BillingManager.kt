@@ -14,6 +14,9 @@ import com.denizcan.astrosea.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.text.NumberFormat
+import java.util.Currency
+import java.util.Locale
 
 object BillingConfig {
     val TEST_MODE: Boolean = BuildConfig.BILLING_TEST_MODE
@@ -192,7 +195,11 @@ class BillingManager(private val context: Context) {
                             val profile = purchaseResult.profile
                             val hasAccess = profile.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
                             Log.d(TAG, "Satın alma başarılı! Premium erişim: $hasAccess")
-                            _billingState.value = BillingState.PurchaseSuccess(productId)
+                            _billingState.value = if (hasAccess) {
+                                BillingState.PurchaseSuccess(productId)
+                            } else {
+                                BillingState.Error(context.getString(R.string.prem_access_not_granted))
+                            }
                         }
                         is AdaptyPurchaseResult.UserCanceled -> {
                             Log.d(TAG, "Kullanıcı satın almayı iptal etti")
@@ -267,8 +274,12 @@ class BillingManager(private val context: Context) {
     }
 
     private fun calculateMonthlyPrice(product: AdaptyPaywallProduct): String? {
-        val priceAmount = product.price.amount
-        val monthly = priceAmount.toDouble() / 12
-        return "Aylık ₺${String.format("%.0f", monthly)}"
+        return runCatching {
+            val monthly = product.price.amount.toDouble() / 12
+            val formatter = NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
+                currency = Currency.getInstance(product.price.currencyCode)
+            }
+            context.getString(R.string.prem_monthly_equivalent, formatter.format(monthly))
+        }.getOrNull()
     }
 }

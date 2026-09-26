@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -36,6 +37,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.billing.BillingConfig
 import com.denizcan.astrosea.billing.SubscriptionProduct
+import com.denizcan.astrosea.presentation.components.KvkkDialog
+import com.denizcan.astrosea.util.LanguageManager
 
 @Composable
 fun PremiumScreen(
@@ -47,6 +50,8 @@ fun PremiumScreen(
         factory = PremiumViewModel.Factory(context)
     )
     val uiState by viewModel.uiState.collectAsState()
+    var showPrivacyPolicy by remember { mutableStateOf(false) }
+    var showSubscriptionTerms by remember { mutableStateOf(false) }
     
     // Satın alma başarılı olduğunda
     LaunchedEffect(uiState.purchaseSuccess) {
@@ -328,6 +333,35 @@ fun PremiumScreen(
                         color = Color(0xFFD4AF37).copy(alpha = 0.8f)
                     )
                 }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(onClick = { showSubscriptionTerms = true }) {
+                        Text(
+                            text = stringResource(R.string.prem_subscription_terms),
+                            color = Color.White.copy(alpha = 0.75f),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                    Text(
+                        text = "•",
+                        color = Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                    TextButton(onClick = { showPrivacyPolicy = true }) {
+                        Text(
+                            text = stringResource(R.string.prem_privacy_policy),
+                            color = Color.White.copy(alpha = 0.75f),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                }
                 
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -346,6 +380,17 @@ fun PremiumScreen(
                 },
                 onDismiss = { viewModel.dismissConfirmDialog() }
             )
+        }
+
+        if (showPrivacyPolicy) {
+            KvkkDialog(
+                onDismiss = { showPrivacyPolicy = false },
+                showAcceptButton = false
+            )
+        }
+
+        if (showSubscriptionTerms) {
+            SubscriptionTermsDialog(onDismiss = { showSubscriptionTerms = false })
         }
         
         // Hata Snackbar
@@ -451,7 +496,11 @@ private fun PurchaseConfirmDialog(
                     )
                 } else {
                     Text(
-                        text = stringResource(R.string.prem_auto_renew),
+                        text = stringResource(
+                            R.string.prem_subscription_disclosure,
+                            product?.price ?: "",
+                            product?.duration ?: ""
+                        ),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
                         ),
@@ -488,6 +537,34 @@ private fun PurchaseConfirmDialog(
                     color = Color.White.copy(alpha = 0.7f)
                 )
             }
+        }
+    )
+}
+
+@Composable
+private fun SubscriptionTermsDialog(onDismiss: () -> Unit) {
+    val isTurkish = LanguageManager.isAppTurkish()
+    val title = if (isTurkish) "ABONELİK KOŞULLARI" else "SUBSCRIPTION TERMS"
+    val body = if (isTurkish) {
+        "AstroSea Premium, seçtiğiniz haftalık, aylık veya yıllık dönem boyunca yapay zekâ destekli kişiselleştirilmiş tarot yorumlarına ve reklamsız deneyime erişim sağlar.\n\nÖdeme Google Play tarafından işlenir. Seçtiğiniz plan, siz Google Play abonelik ayarlarınızdan iptal etmediğiniz sürece aynı dönem için otomatik olarak yenilenir. Ücret ve faturalama dönemi, satın alma onay ekranında gösterilir.\n\nAboneliğinizi Google Play > Ödemeler ve abonelikler > Abonelikler bölümünden yönetebilir veya iptal edebilirsiniz. İptal etseniz bile mevcut ödeme döneminizin sonuna kadar Premium erişiminiz sürer.\n\nSatın alma ile ilgili destek için: astrosea777@gmail.com"
+    } else {
+        "AstroSea Premium provides access to AI-powered personalized tarot interpretations and an ad-free experience for the weekly, monthly, or annual period you select.\n\nPayment is processed by Google Play. Your selected plan renews automatically for the same period unless you cancel it in your Google Play subscription settings. The price and billing period are shown on the purchase confirmation screen.\n\nYou can manage or cancel your subscription in Google Play > Payments & subscriptions > Subscriptions. If you cancel, Premium access continues until the end of the current billing period.\n\nFor purchase support: astrosea777@gmail.com"
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1A1F3A),
+        title = { Text(title, color = Color(0xFFD4AF37), textAlign = TextAlign.Center) },
+        text = {
+            Text(
+                text = body,
+                color = Color.White.copy(alpha = 0.9f),
+                modifier = Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.btn_close)) }
         }
     )
 }

@@ -17,8 +17,8 @@ object AdConfig {
     const val DAILY_AD_UNLOCK_LIMIT = 3
 
     /** Premium kullanıcı için yorumun hazırlanma süresi (ekranda gösterilmez) */
-    const val PREMIUM_INTERPRETATION_DELAY_MILLIS: Long = 15_000L
+    const val PREMIUM_INTERPRETATION_DELAY_MILLIS: Long = 5_000L
 
     /** Ücretsiz / reklam izleyen kullanıcı için yorumun hazırlanma süresi (ekranda gösterilmez) */
-    const val AD_INTERPRETATION_DELAY_MILLIS: Long = 30_000L
+    const val AD_INTERPRETATION_DELAY_MILLIS: Long = 8_000L
 }
