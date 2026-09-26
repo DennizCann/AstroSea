@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Request permanent deletion of your AstroSea account and associated data.">
+  <title>Delete your AstroSea account</title>
+  <style>
+    :root { color-scheme: dark; font-family: Georgia, "Times New Roman", serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: #f8f2ff; background: radial-gradient(circle at 50% -20%, #50337d, #111126 55%, #070711); }
+    main { width: min(100% - 32px, 560px); margin: 0 auto; padding: 48px 0; }
+    .brand { color: #f5ce62; font-size: .8rem; letter-spacing: .22em; text-align: center; }
+    h1 { margin: 14px 0 10px; font-size: clamp(2rem, 7vw, 3rem); text-align: center; }
+    .lead, .muted { color: #dbd2e8; line-height: 1.55; text-align: center; }
+    .card { margin-top: 28px; padding: 26px; border: 1px solid rgba(245, 206, 98, .55); border-radius: 20px; background: rgba(20, 17, 45, .88); box-shadow: 0 24px 70px rgba(0,0,0,.35); }
+    h2 { margin-top: 0; color: #f5ce62; font-size: 1.35rem; }
+    label { display: block; margin: 16px 0 7px; color: #eee6f7; font-size: .95rem; }
+    input { width: 100%; padding: 13px 14px; border: 1px solid #716086; border-radius: 11px; color: #fff; background: #17142d; font: inherit; }
+    button { width: 100%; margin-top: 14px; min-height: 48px; border: 0; border-radius: 12px; color: #171027; background: linear-gradient(135deg, #f5ce62, #dba942); font: 700 1rem Georgia, serif; cursor: pointer; }
+    button.secondary { color: #fff; background: #423064; }
+    button.danger { color: #fff; background: linear-gradient(135deg, #a62c53, #751c3a); }
+    button:disabled { cursor: not-allowed; opacity: .5; }
+    .divider { display: flex; align-items: center; gap: 10px; margin: 20px 0 4px; color: #bcb0ca; font-size: .85rem; }
+    .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid #55456b; }
+    .notice { margin-top: 18px; padding: 14px; border-radius: 12px; line-height: 1.45; background: rgba(245, 206, 98, .1); color: #f7e8b0; }
+    .error { color: #ffb4ab; } .success { color: #b6f2bf; }
+    .hidden { display: none; }
+    .check { display: flex; gap: 10px; align-items: flex-start; margin-top: 18px; color: #dbd2e8; line-height: 1.4; }
+    .check input { width: auto; margin-top: 4px; }
+    .language { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+    .language button { width: auto; min-height: auto; margin: 0; padding: 8px 12px; color: #e9dcff; background: transparent; border: 1px solid #66517e; font-size: .85rem; }
+    .language button.active { border-color: #f5ce62; color: #f5ce62; }
+    footer { margin-top: 24px; color: #bcb0ca; font-size: .83rem; line-height: 1.45; text-align: center; }
+    a { color: #f5ce62; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">ASTROSEA</div>
+    <h1 data-i18n="title">Delete your account</h1>
+    <p class="lead" data-i18n="lead">Sign in to permanently delete your AstroSea account and associated data.</p>
+
+    <section id="sign-in-card" class="card">
+      <h2 data-i18n="signIn">Sign in to continue</h2>
+      <label for="email" data-i18n="email">Email address</label>
+      <input id="email" type="email" autocomplete="email" required>
+      <label for="password" data-i18n="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button id="email-sign-in" type="button" data-i18n="emailSignIn">Sign in</button>
+      <div class="divider" data-i18n="or">or</div>
+      <button id="google-sign-in" class="secondary" type="button" data-i18n="googleSignIn">Continue with Google</button>
+      <p id="sign-in-message" class="muted" role="status"></p>
+    </section>
+
+    <section id="delete-card" class="card hidden">
+      <h2 data-i18n="ready">Account deletion</h2>
+      <p class="muted" data-i18n="signedInAs">You are signed in as <strong id="user-email"></strong>.</p>
+      <div class="notice" data-i18n="deletionNotice">This permanently removes your AstroSea profile, saved readings, notifications, and associated account data. This cannot be undone.</div>
+      <label class="check"><input id="deletion-confirmation" type="checkbox"><span data-i18n="confirmation">I understand that this action permanently deletes my AstroSea account and associated data.</span></label>
+      <button id="delete-account" class="danger" type="button" disabled data-i18n="delete">Permanently delete my account</button>
+      <button id="sign-out" class="secondary" type="button" data-i18n="signOut">Sign out</button>
+      <p id="delete-message" class="muted" role="status"></p>
+    </section>
+
+    <p class="notice" data-i18n="subscription">Deleting your AstroSea account does not cancel an active Google Play subscription. Cancel any subscription separately in Google Play.</p>
+    <div class="language"><button id="lang-en" class="active" type="button">English</button><button id="lang-tr" type="button">Türkçe</button></div>
+    <footer><span data-i18n="footer">Need help with your request?</span> <a href="mailto:astrosea777@gmail.com">astrosea777@gmail.com</a></footer>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCijEN289ljQKG0SZUEh6p8uuBOTHM0U6U",
+      authDomain: "astrosea-3de22.firebaseapp.com",
+      projectId: "astrosea-3de22",
+      storageBucket: "astrosea-3de22.firebasestorage.app",
+      messagingSenderId: "14279256363",
+      appId: "1:14279256363:web:b09d2d708ea2479eeabd6e"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const deleteAccount = httpsCallable(getFunctions(app, "europe-west1"), "deleteAccount");
+    const text = {
+      en: { title:"Delete your account", lead:"Sign in to permanently delete your AstroSea account and associated data.", signIn:"Sign in to continue", email:"Email address", password:"Password", emailSignIn:"Sign in", or:"or", googleSignIn:"Continue with Google", ready:"Account deletion", signedInAs:"You are signed in as <strong id=\"user-email\"></strong>.", deletionNotice:"This permanently removes your AstroSea profile, saved readings, notifications, and associated account data. This cannot be undone.", confirmation:"I understand that this action permanently deletes my AstroSea account and associated data.", delete:"Permanently delete my account", signOut:"Sign out", subscription:"Deleting your AstroSea account does not cancel an active Google Play subscription. Cancel any subscription separately in Google Play.", footer:"Need help with your request?", signInError:"We could not sign you in. Check your details and try again.", deleteError:"We could not delete your account. Please try again.", deleting:"Deleting your account…", success:"Your AstroSea account and associated data have been deleted." },
+      tr: { title:"Hesabını sil", lead:"AstroSea hesabınızı ve ilişkili verilerinizi kalıcı olarak silmek için giriş yapın.", signIn:"Devam etmek için giriş yapın", email:"E-posta adresi", password:"Şifre", emailSignIn:"Giriş yap", or:"veya", googleSignIn:"Google ile devam et", ready:"Hesap silme", signedInAs:"Şu hesapla giriş yaptınız: <strong id=\"user-email\"></strong>.", deletionNotice:"Bu işlem AstroSea profilinizi, kayıtlı yorumlarınızı, bildirimlerinizi ve ilişkili hesap verilerinizi kalıcı olarak siler. Geri alınamaz.", confirmation:"Bu işlemin AstroSea hesabımı ve ilişkili verilerimi kalıcı olarak sileceğini anlıyorum.", delete:"Hesabımı kalıcı olarak sil", signOut:"Çıkış yap", subscription:"AstroSea hesabını silmek aktif Google Play aboneliğini iptal etmez. Aboneliğinizi Google Play üzerinden ayrıca iptal edin.", footer:"Talebiniz için yardıma mı ihtiyacınız var?", signInError:"Giriş yapılamadı. Bilgilerinizi kontrol edip tekrar deneyin.", deleteError:"Hesabınız silinemedi. Lütfen tekrar deneyin.", deleting:"Hesabınız siliniyor…", success:"AstroSea hesabınız ve ilişkili verileriniz silindi." }
+    };
+    let language = navigator.language.toLowerCase().startsWith("tr") ? "tr" : "en";
+    const $ = (id) => document.getElementById(id);
+    const message = (id, value, type = "") => { const node = $(id); node.textContent = value; node.className = `muted ${type}`; };
+    function renderLanguage() {
+      document.documentElement.lang = language;
+      document.title = `AstroSea — ${text[language].title}`;
+      document.querySelectorAll("[data-i18n]").forEach((node) => { node.innerHTML = text[language][node.dataset.i18n]; });
+      $("lang-en").classList.toggle("active", language === "en");
+      $("lang-tr").classList.toggle("active", language === "tr");
+      const user = auth.currentUser;
+      if (user) $("user-email").textContent = user.email || "";
+    }
+    function setBusy(button, busy, label) { button.disabled = busy; if (busy) button.textContent = label; else renderLanguage(); }
+    onAuthStateChanged(auth, (user) => {
+      $("sign-in-card").classList.toggle("hidden", !!user);
+      $("delete-card").classList.toggle("hidden", !user);
+      if (user) $("user-email").textContent = user.email || "";
+    });
+    $("email-sign-in").addEventListener("click", async () => {
+      const button = $("email-sign-in"); setBusy(button, true, "…");
+      try { await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value); }
+      catch { message("sign-in-message", text[language].signInError, "error"); }
+      finally { setBusy(button, false); }
+    });
+    $("google-sign-in").addEventListener("click", async () => {
+      const button = $("google-sign-in"); setBusy(button, true, "…");
+      try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+      catch { message("sign-in-message", text[language].signInError, "error"); }
+      finally { setBusy(button, false); }
+    });
+    $("deletion-confirmation").addEventListener("change", (event) => { $("delete-account").disabled = !event.target.checked; });
+    $("delete-account").addEventListener("click", async () => {
+      const button = $("delete-account"); setBusy(button, true, text[language].deleting);
+      try { await deleteAccount(); message("delete-message", text[language].success, "success"); await signOut(auth); }
+      catch { message("delete-message", text[language].deleteError, "error"); setBusy(button, false); }
+    });
+    $("sign-out").addEventListener("click", () => signOut(auth));
+    $("lang-en").addEventListener("click", () => { language = "en"; renderLanguage(); });
+    $("lang-tr").addEventListener("click", () => { language = "tr"; renderLanguage(); });
+    renderLanguage();
+  </script>
+</body>
+</html>
