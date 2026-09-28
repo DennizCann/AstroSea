@@ -95,6 +95,13 @@
     <string name="profile_saving">Saving…</string>
     <string name="profile_saved">Your profile has been saved.</string>
     <string name="profile_save_failed">Your profile could not be saved. Please try again.</string>
+    <string name="profile_save_confirmation_title">Save changes?</string>
+    <string name="profile_save_confirmation_message">Would you like to save your profile details and language preference?</string>
+    <string name="profile_save_confirmation_confirm">Save</string>
+    <string name="notification_settings_title">Notifications</string>
+    <string name="notification_settings_enabled">Notifications are on</string>
+    <string name="notification_settings_disabled">Turn on notifications so you don’t miss your daily reading.</string>
+    <string name="notification_settings_enable">Turn On</string>
 
     <!-- Language -->
     <string name="language_label">Language</string>

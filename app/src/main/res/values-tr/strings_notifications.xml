@@ -36,6 +36,11 @@
     <string name="notif_daily_body_4">Bugünün mesajlarını almak için uygulamayı açın.</string>
     <string name="notif_daily_title_5">🌙 Bugün Neler Olacak?</string>
     <string name="notif_daily_body_5">Günlük tarot kartlarınız çekildi. Hemen keşfedin!</string>
+    <string name="notif_daily_reminder_title">AstroSea</string>
+    <string name="notif_daily_reminder_body_1">Bugün seni nelerin beklediğini merak etmiyor musun? 👀</string>
+    <string name="notif_daily_reminder_body_2">Kaderin bugün için bir ipucu bırakmış olabilir. 🔮</string>
+    <string name="notif_daily_reminder_body_3">Günlük açılımın hâlâ seni bekliyor. Bakmak ister misin? ✨</string>
+    <string name="notif_daily_reminder_body_4">Evrenin bugünkü mesajını kaçırmadan kartlarını aç. 🌙</string>
 
     <!-- Premium hatırlatma bildirim kanalı -->
     <string name="notif_channel_premium_name">Premium Hatırlatmaları</string>

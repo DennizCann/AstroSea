@@ -8,80 +8,96 @@ import android.util.Log
 import java.util.Calendar
 
 /**
- * Günlük bildirimleri AlarmManager ile zamanlar.
+ * Günlük açılım bildirimlerini AlarmManager ile zamanlar.
  * Uygulama kapalıyken bile çalışır.
  */
 object DailyNotificationScheduler {
     
     private const val TAG = "DailyNotificationScheduler"
-    private const val ALARM_REQUEST_CODE = 1001
-    
-    // Bildirim saati: 10:00
-    private const val NOTIFICATION_HOUR = 10
-    private const val NOTIFICATION_MINUTE = 0
+    /**
+     * Günün ilk bildirimi mevcut sabah bildirimi olarak kalır. Diğer dört
+     * zaman, kullanıcı henüz günlük açılımını yapmadıysa gönderilir.
+     */
+    private val reminderTimes = listOf(
+        10 to 0,
+        13 to 0,
+        16 to 0,
+        19 to 0,
+        22 to 0
+    )
     
     /**
-     * Günlük 10:00 bildirimini zamanlar
+     * Günlük beş bildirimi zamanlar.
      */
     fun scheduleDailyNotification(context: Context) {
+        reminderTimes.indices.forEach { reminderIndex ->
+            scheduleReminder(context, reminderIndex)
+        }
+        saveAlarmState(context, true)
+    }
+
+    /** Bir bildirim gönderildikten sonra aynı zaman dilimini ertesi gün için kurar. */
+    fun scheduleNextOccurrence(context: Context, reminderIndex: Int) {
+        scheduleReminder(context, reminderIndex, forceTomorrow = true)
+        saveAlarmState(context, true)
+    }
+
+    private fun scheduleReminder(
+        context: Context,
+        reminderIndex: Int,
+        forceTomorrow: Boolean = false
+    ) {
+        val (hour, minute) = reminderTimes[reminderIndex]
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        
         val intent = Intent(context, DailyNotificationReceiver::class.java).apply {
             action = "com.denizcan.astrosea.DAILY_NOTIFICATION"
+            putExtra(DailyNotificationReceiver.EXTRA_REMINDER_INDEX, reminderIndex)
         }
-        
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            ALARM_REQUEST_CODE,
+            reminderIndex,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
-        // Bir sonraki 10:00'ı hesapla
         val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, NOTIFICATION_HOUR)
-            set(Calendar.MINUTE, NOTIFICATION_MINUTE)
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-            
-            // Eğer şu anki saat 10:00'dan sonraysa, yarın 10:00'a ayarla
-            if (timeInMillis <= System.currentTimeMillis()) {
+            if (forceTomorrow || timeInMillis <= System.currentTimeMillis()) {
                 add(Calendar.DAY_OF_YEAR, 1)
             }
         }
-        
-        // Exact alarm izinleri olmadan da calisacak inexact zamanlama kullan.
+
+        // Exact alarm izni istemeden, cihaz boşta olsa da mümkün olan en yakın zamanda çalışır.
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             calendar.timeInMillis,
             pendingIntent
         )
-        Log.d(TAG, "Günlük bildirim zamanlandı (inexact): ${calendar.time}")
-        
-        // SharedPreferences'a kaydet (boot receiver için)
-        saveAlarmState(context, true)
+        Log.d(TAG, "Günlük bildirim $reminderIndex zamanlandı: ${calendar.time}")
     }
     
     /**
-     * Günlük bildirimi iptal eder
+     * Günlük açılım bildirimlerini iptal eder.
      */
     fun cancelDailyNotification(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        
-        val intent = Intent(context, DailyNotificationReceiver::class.java).apply {
-            action = "com.denizcan.astrosea.DAILY_NOTIFICATION"
+        reminderTimes.indices.forEach { reminderIndex ->
+            val intent = Intent(context, DailyNotificationReceiver::class.java).apply {
+                action = "com.denizcan.astrosea.DAILY_NOTIFICATION"
+                putExtra(DailyNotificationReceiver.EXTRA_REMINDER_INDEX, reminderIndex)
+            }
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                reminderIndex,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            alarmManager.cancel(pendingIntent)
         }
-        
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            ALARM_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        alarmManager.cancel(pendingIntent)
         saveAlarmState(context, false)
-        Log.d(TAG, "Günlük bildirim iptal edildi")
+        Log.d(TAG, "Günlük açılım bildirimleri iptal edildi")
     }
     
     /**

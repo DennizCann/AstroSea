@@ -1,8 +1,11 @@
 package com.denizcan.astrosea.presentation.notifications
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
@@ -18,6 +21,8 @@ class NotificationManager(private val context: Context) {
     companion object {
         private const val TAG = "NotificationManager"
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 100
+        private const val NOTIFICATION_PREFS = "notification_prefs"
+        private const val NOTIFICATION_PERMISSION_REQUESTED = "notification_permission_requested"
         private const val DISPLAY_WINDOW_DAYS = 7L
         private const val RETENTION_DAYS = 30L
         private const val MAX_NOTIFICATIONS = 50L
@@ -220,12 +225,10 @@ class NotificationManager(private val context: Context) {
      * Bildirim izinlerini kontrol eder
      */
     fun checkNotificationPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == 
-                android.content.pm.PackageManager.PERMISSION_GRANTED
-        } else {
-            true // Android 13'ten önceki sürümlerde otomatik olarak izin verilir
-        }
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
     }
     
     /**
@@ -235,11 +238,28 @@ class NotificationManager(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != 
                 android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                context.getSharedPreferences(NOTIFICATION_PREFS, Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(NOTIFICATION_PERMISSION_REQUESTED, true)
+                    .apply()
                 activity.requestPermissions(
                     arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
                     NOTIFICATION_PERMISSION_REQUEST_CODE
                 )
             }
         }
+    }
+
+    fun wasNotificationPermissionRequested(): Boolean =
+        context.getSharedPreferences(NOTIFICATION_PREFS, Context.MODE_PRIVATE)
+            .getBoolean(NOTIFICATION_PERMISSION_REQUESTED, false)
+
+    /** Android artık tekrar izin penceresi göstermiyorsa kullanıcıyı doğrudan ayarlara götürür. */
+    fun openNotificationSettings() {
+        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
     }
 }

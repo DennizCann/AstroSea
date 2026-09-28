@@ -754,7 +754,9 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Premium.route) {
                         com.denizcan.astrosea.presentation.premium.PremiumScreen(
                             onNavigateBack = { appNavigator.popBack() },
-                            onPurchaseComplete = { appNavigator.popBackToHome() }
+                            // Satın alma, kullanıcıyı ödeme akışını başlattığı ekrana döndürür.
+                            // Böylece yorum talep eden kullanıcı açılım sayfasında kalır.
+                            onPurchaseComplete = { appNavigator.popBack() }
                         )
                     }
                 }

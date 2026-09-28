@@ -36,6 +36,11 @@
     <string name="notif_daily_body_4">Open the app to receive today\'s messages.</string>
     <string name="notif_daily_title_5">🌙 What Does Today Hold?</string>
     <string name="notif_daily_body_5">Your daily tarot cards have been drawn. Discover them now!</string>
+    <string name="notif_daily_reminder_title">AstroSea</string>
+    <string name="notif_daily_reminder_body_1">Are you not curious about what awaits you today? 👀</string>
+    <string name="notif_daily_reminder_body_2">Your fate may have left a clue for today. 🔮</string>
+    <string name="notif_daily_reminder_body_3">Your daily reading is still waiting for you. Want to take a look? ✨</string>
+    <string name="notif_daily_reminder_body_4">Open your cards before you miss today’s message from the universe. 🌙</string>
 
     <!-- Premium reminder notification channel -->
     <string name="notif_channel_premium_name">Premium Reminders</string>

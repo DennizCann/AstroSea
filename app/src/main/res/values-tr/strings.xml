@@ -95,6 +95,13 @@
     <string name="profile_saving">Kaydediliyor…</string>
     <string name="profile_saved">Profiliniz kaydedildi.</string>
     <string name="profile_save_failed">Profiliniz kaydedilemedi. Lütfen tekrar deneyin.</string>
+    <string name="profile_save_confirmation_title">Değişiklikler kaydedilsin mi?</string>
+    <string name="profile_save_confirmation_message">Profil bilgileriniz ve dil tercihiniz kaydedilsin mi?</string>
+    <string name="profile_save_confirmation_confirm">Kaydet</string>
+    <string name="notification_settings_title">Bildirimler</string>
+    <string name="notification_settings_enabled">Bildirimler açık</string>
+    <string name="notification_settings_disabled">Günlük açılımını kaçırmamak için bildirimleri aç.</string>
+    <string name="notification_settings_enable">Aç</string>
 
     <!-- Language -->
     <string name="language_label">Dil</string>

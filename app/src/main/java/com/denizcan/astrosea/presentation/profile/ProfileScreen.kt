@@ -36,12 +36,16 @@ import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.denizcan.astrosea.billing.BillingConfig
 import java.util.Calendar
 import com.denizcan.astrosea.presentation.components.WheelDatePickerDialog
 import com.denizcan.astrosea.util.responsiveSize
 import com.denizcan.astrosea.util.responsivePadding
 import com.denizcan.astrosea.presentation.components.KvkkDialog
+import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import com.denizcan.astrosea.util.KvkkTexts
 import com.denizcan.astrosea.util.LanguageManager
 import androidx.compose.ui.res.stringResource
@@ -59,15 +63,30 @@ fun ProfileScreen(
 ) {
     val state = viewModel.profileState
     val context = LocalContext.current
+    val notificationManager = remember { NotificationManager(context) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var notificationsEnabled by remember { mutableStateOf(notificationManager.checkNotificationPermission()) }
     val calendar = remember { Calendar.getInstance() }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showKvkkDialog by remember { mutableStateOf(false) }
     var showAccountDeletionDialog by remember { mutableStateOf(false) }
     var showFinalAccountDeletionDialog by remember { mutableStateOf(false) }
+    var showSaveConfirmationDialog by remember { mutableStateOf(false) }
     var isDeletingAccount by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     var initialProfileData by remember { mutableStateOf(state.profileData.copy()) }
+    var initialLanguage by rememberSaveable { mutableStateOf(LanguageManager.getLanguage(context)) }
+    var selectedLanguage by rememberSaveable { mutableStateOf(initialLanguage) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                notificationsEnabled = notificationManager.checkNotificationPermission()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
     LaunchedEffect(Unit) {
         initialProfileData = state.profileData.copy()
     }
@@ -79,6 +98,8 @@ fun ProfileScreen(
             current.country != initialProfileData.country ||
             current.city != initialProfileData.city
     }
+    val hasLanguageChange = selectedLanguage != initialLanguage
+    val hasChanges = hasProfileChanges || hasLanguageChange
     
     // Mevcut tarihi parse et
     val (initialYear, initialMonth, initialDay) = remember(state.profileData.birthDate) {
@@ -148,81 +169,6 @@ fun ProfileScreen(
                     title = stringResource(R.string.profile_title),
                     onBackClick = onNavigateBack
                 )
-            },
-            bottomBar = {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent)
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            viewModel.saveProfile(
-                                onSuccess = {
-                                    initialProfileData = state.profileData.copy()
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.profile_saved),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                onError = {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.profile_save_failed),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            )
-                        },
-                        enabled = hasProfileChanges && !state.isLoading,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF6A1B9A),
-                            disabledContainerColor = Color(0xFF1A1A2E).copy(alpha = 0.78f),
-                            disabledContentColor = Color.White.copy(alpha = 0.45f)
-                        ),
-                        border = BorderStroke(
-                            1.dp,
-                            if (hasProfileChanges) Color(0xFFFFD700) else Color.White.copy(alpha = 0.2f)
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(
-                            defaultElevation = if (hasProfileChanges) 8.dp else 0.dp
-                        ),
-                        shape = RoundedCornerShape(18.dp)
-                    ) {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(22.dp),
-                                color = Color.White,
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                stringResource(R.string.profile_saving),
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_bold))
-                                )
-                            )
-                        } else {
-                            Icon(
-                                Icons.Default.Done,
-                                contentDescription = stringResource(R.string.btn_save),
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                stringResource(R.string.btn_save),
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontFamily = FontFamily(Font(R.font.cinzel_bold))
-                                )
-                            )
-                        }
-                    }
-                }
             }
         ) { paddingValues ->
             if (state.isLoading && state.profileData.name.isEmpty()) {
@@ -390,7 +336,78 @@ fun ProfileScreen(
                 }
                 // Dil Seçimi
                 Spacer(modifier = Modifier.height(16.dp))
-                LanguageSelectionCard()
+                LanguageSelectionCard(
+                    selectedLanguage = selectedLanguage,
+                    onLanguageSelected = { selectedLanguage = it }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                NotificationSettingsCard(
+                    notificationsEnabled = notificationsEnabled,
+                    onEnableNotifications = {
+                        val activity = context as? android.app.Activity
+                        if (
+                            activity != null &&
+                            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+                            !notificationManager.wasNotificationPermissionRequested()
+                        ) {
+                            notificationManager.requestNotificationPermission(activity)
+                        } else {
+                            notificationManager.openNotificationSettings()
+                        }
+                    }
+                )
+
+                // Kaydetme işlemi, üyelik durumundan önce profil ayarlarının yanında kalır.
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { showSaveConfirmationDialog = true },
+                    enabled = hasChanges && !state.isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF6A1B9A),
+                        disabledContainerColor = Color(0xFF1A1A2E).copy(alpha = 0.78f),
+                        disabledContentColor = Color.White.copy(alpha = 0.45f)
+                    ),
+                    border = BorderStroke(
+                        1.dp,
+                        if (hasChanges) Color(0xFFFFD700) else Color.White.copy(alpha = 0.2f)
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = if (hasChanges) 8.dp else 0.dp
+                    ),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(22.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            stringResource(R.string.profile_saving),
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                            )
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Done,
+                            contentDescription = stringResource(R.string.btn_save),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            stringResource(R.string.btn_save),
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontFamily = FontFamily(Font(R.font.cinzel_bold))
+                            )
+                        )
+                    }
+                }
 
                 // Premium Üyelik Bilgileri
                 Spacer(modifier = Modifier.height(16.dp))
@@ -526,6 +543,65 @@ fun ProfileScreen(
             )
         }
 
+        if (showSaveConfirmationDialog) {
+            AlertDialog(
+                onDismissRequest = { showSaveConfirmationDialog = false },
+                containerColor = Color(0xFF1A1A2E),
+                title = {
+                    Text(
+                        text = stringResource(R.string.profile_save_confirmation_title),
+                        color = Color.White
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.profile_save_confirmation_message),
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val languageToSave = selectedLanguage
+                            val languageChanged = hasLanguageChange
+                            showSaveConfirmationDialog = false
+                            viewModel.saveProfile(
+                                onSuccess = {
+                                    initialProfileData = state.profileData.copy()
+                                    if (languageChanged) {
+                                        LanguageManager.setLanguage(context, languageToSave)
+                                        initialLanguage = languageToSave
+                                    }
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.profile_saved),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    if (languageChanged) {
+                                        (context as? android.app.Activity)?.recreate()
+                                    }
+                                },
+                                onError = {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.profile_save_failed),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
+                        }
+                    ) {
+                        Text(stringResource(R.string.profile_save_confirmation_confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSaveConfirmationDialog = false }) {
+                        Text(stringResource(R.string.btn_dismiss))
+                    }
+                }
+            )
+        }
+
         if (showAccountDeletionDialog) {
             AlertDialog(
                 onDismissRequest = { showAccountDeletionDialog = false },
@@ -626,9 +702,71 @@ fun ProfileScreen(
 }
 
 @Composable
-fun LanguageSelectionCard() {
-    val context = LocalContext.current
-    val currentLanguage = LanguageManager.getLanguage(context)
+fun NotificationSettingsCard(
+    notificationsEnabled: Boolean,
+    onEnableNotifications: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)),
+        border = BorderStroke(
+            1.dp,
+            if (notificationsEnabled) Color(0xFF81C784).copy(alpha = 0.65f) else Color.White.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null,
+                tint = if (notificationsEnabled) Color(0xFF81C784) else Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.size(24.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.notification_settings_title),
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                    )
+                )
+                Text(
+                    text = stringResource(
+                        if (notificationsEnabled) {
+                            R.string.notification_settings_enabled
+                        } else {
+                            R.string.notification_settings_disabled
+                        }
+                    ),
+                    color = Color.White.copy(alpha = 0.72f),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (!notificationsEnabled) {
+                OutlinedButton(
+                    onClick = onEnableNotifications,
+                    border = BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.75f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700))
+                ) {
+                    Text(stringResource(R.string.notification_settings_enable))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LanguageSelectionCard(
+    selectedLanguage: String,
+    onLanguageSelected: (String) -> Unit
+) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -663,23 +801,13 @@ fun LanguageSelectionCard() {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LanguageOptionChip(
                     label = stringResource(R.string.language_turkish),
-                    selected = currentLanguage == LanguageManager.TURKISH,
-                    onClick = {
-                        if (currentLanguage != LanguageManager.TURKISH) {
-                            LanguageManager.setLanguage(context, LanguageManager.TURKISH)
-                            (context as? android.app.Activity)?.recreate()
-                        }
-                    }
+                    selected = selectedLanguage == LanguageManager.TURKISH,
+                    onClick = { onLanguageSelected(LanguageManager.TURKISH) }
                 )
                 LanguageOptionChip(
                     label = stringResource(R.string.language_english),
-                    selected = currentLanguage == LanguageManager.ENGLISH,
-                    onClick = {
-                        if (currentLanguage != LanguageManager.ENGLISH) {
-                            LanguageManager.setLanguage(context, LanguageManager.ENGLISH)
-                            (context as? android.app.Activity)?.recreate()
-                        }
-                    }
+                    selected = selectedLanguage == LanguageManager.ENGLISH,
+                    onClick = { onLanguageSelected(LanguageManager.ENGLISH) }
                 )
             }
         }
