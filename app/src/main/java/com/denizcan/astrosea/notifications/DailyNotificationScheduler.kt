@@ -14,6 +14,8 @@ import java.util.Calendar
 object DailyNotificationScheduler {
     
     private const val TAG = "DailyNotificationScheduler"
+    private const val NOTIFICATION_PREFS = "notification_prefs"
+    private const val DAILY_NOTIFICATIONS_ENABLED = "daily_notifications_enabled"
     /**
      * Günün ilk bildirimi mevcut sabah bildirimi olarak kalır. Diğer dört
      * zaman, kullanıcı henüz günlük açılımını yapmadıysa gönderilir.
@@ -35,6 +37,22 @@ object DailyNotificationScheduler {
         }
         saveAlarmState(context, true)
     }
+
+    /** Kullanıcının profil tercihinden günlük açılım bildirimlerini açar. */
+    fun enableDailyNotifications(context: Context) {
+        saveUserPreference(context, true)
+        scheduleDailyNotification(context)
+    }
+
+    /** Kullanıcının profil tercihinden günlük açılım bildirimlerini kapatır. */
+    fun disableDailyNotifications(context: Context) {
+        saveUserPreference(context, false)
+        cancelDailyNotification(context)
+    }
+
+    fun areDailyNotificationsEnabled(context: Context): Boolean =
+        context.getSharedPreferences(NOTIFICATION_PREFS, Context.MODE_PRIVATE)
+            .getBoolean(DAILY_NOTIFICATIONS_ENABLED, true)
 
     /** Bir bildirim gönderildikten sonra aynı zaman dilimini ertesi gün için kurar. */
     fun scheduleNextOccurrence(context: Context, reminderIndex: Int) {
@@ -104,9 +122,16 @@ object DailyNotificationScheduler {
      * Alarm durumunu SharedPreferences'a kaydet
      */
     private fun saveAlarmState(context: Context, isEnabled: Boolean) {
-        context.getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences(NOTIFICATION_PREFS, Context.MODE_PRIVATE)
             .edit()
             .putBoolean("daily_alarm_enabled", isEnabled)
+            .apply()
+    }
+
+    private fun saveUserPreference(context: Context, isEnabled: Boolean) {
+        context.getSharedPreferences(NOTIFICATION_PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(DAILY_NOTIFICATIONS_ENABLED, isEnabled)
             .apply()
     }
     
@@ -114,7 +139,7 @@ object DailyNotificationScheduler {
      * Alarm'ın etkin olup olmadığını kontrol et
      */
     fun isAlarmEnabled(context: Context): Boolean {
-        return context.getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
+        return context.getSharedPreferences(NOTIFICATION_PREFS, Context.MODE_PRIVATE)
             .getBoolean("daily_alarm_enabled", false)
     }
 }

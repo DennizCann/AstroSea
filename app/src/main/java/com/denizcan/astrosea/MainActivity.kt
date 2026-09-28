@@ -125,9 +125,13 @@ class MainActivity : ComponentActivity() {
                 // Log işlemi ekleyelim - hata ayıklama için
                 Log.d("Auth", "User logged in: ${user.uid}, email: ${user.email}")
                 
-                // Kullanıcı giriş yaptığında günlük bildirim alarmını kur (saat 10:00)
-                DailyNotificationScheduler.scheduleDailyNotification(this)
-                Log.d("Auth", "Günlük bildirim alarmı kuruldu (10:00)")
+                // Kullanıcının profil tercihine göre günlük bildirim alarmlarını kur.
+                if (DailyNotificationScheduler.areDailyNotificationsEnabled(this)) {
+                    DailyNotificationScheduler.scheduleDailyNotification(this)
+                    Log.d("Auth", "Günlük bildirim alarmları kuruldu")
+                } else {
+                    Log.d("Auth", "Kullanıcı günlük bildirimleri kapatmış")
+                }
                 
                 // Premium durumunu kontrol et ve hatırlatmaları yönet
                 checkPremiumAndScheduleReminders(user.uid)

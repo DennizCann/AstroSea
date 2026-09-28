@@ -55,7 +55,9 @@ class DailyNotificationReceiver : BroadcastReceiver() {
             } catch (e: Exception) {
                 Log.e(TAG, "Günlük açılım durumu kontrol edilemedi", e)
             } finally {
-                DailyNotificationScheduler.scheduleNextOccurrence(context, reminderIndex)
+                if (DailyNotificationScheduler.areDailyNotificationsEnabled(context)) {
+                    DailyNotificationScheduler.scheduleNextOccurrence(context, reminderIndex)
+                }
                 pendingResult.finish()
             }
         }

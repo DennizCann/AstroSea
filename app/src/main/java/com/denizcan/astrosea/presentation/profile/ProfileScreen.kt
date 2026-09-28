@@ -46,6 +46,7 @@ import com.denizcan.astrosea.util.responsiveSize
 import com.denizcan.astrosea.util.responsivePadding
 import com.denizcan.astrosea.presentation.components.KvkkDialog
 import com.denizcan.astrosea.presentation.notifications.NotificationManager
+import com.denizcan.astrosea.notifications.DailyNotificationScheduler
 import com.denizcan.astrosea.util.KvkkTexts
 import com.denizcan.astrosea.util.LanguageManager
 import androidx.compose.ui.res.stringResource
@@ -65,7 +66,13 @@ fun ProfileScreen(
     val context = LocalContext.current
     val notificationManager = remember { NotificationManager(context) }
     val lifecycleOwner = LocalLifecycleOwner.current
-    var notificationsEnabled by remember { mutableStateOf(notificationManager.checkNotificationPermission()) }
+    var initialDailyNotificationsEnabled by remember {
+        mutableStateOf(DailyNotificationScheduler.areDailyNotificationsEnabled(context))
+    }
+    var selectedDailyNotificationsEnabled by remember {
+        mutableStateOf(initialDailyNotificationsEnabled)
+    }
+    var systemNotificationsEnabled by remember { mutableStateOf(notificationManager.checkNotificationPermission()) }
     val calendar = remember { Calendar.getInstance() }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -81,7 +88,12 @@ fun ProfileScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                notificationsEnabled = notificationManager.checkNotificationPermission()
+                if (selectedDailyNotificationsEnabled == initialDailyNotificationsEnabled) {
+                    val storedPreference = DailyNotificationScheduler.areDailyNotificationsEnabled(context)
+                    initialDailyNotificationsEnabled = storedPreference
+                    selectedDailyNotificationsEnabled = storedPreference
+                }
+                systemNotificationsEnabled = notificationManager.checkNotificationPermission()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -99,7 +111,8 @@ fun ProfileScreen(
             current.city != initialProfileData.city
     }
     val hasLanguageChange = selectedLanguage != initialLanguage
-    val hasChanges = hasProfileChanges || hasLanguageChange
+    val hasNotificationChange = selectedDailyNotificationsEnabled != initialDailyNotificationsEnabled
+    val hasChanges = hasProfileChanges || hasLanguageChange || hasNotificationChange
     
     // Mevcut tarihi parse et
     val (initialYear, initialMonth, initialDay) = remember(state.profileData.birthDate) {
@@ -343,19 +356,9 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 NotificationSettingsCard(
-                    notificationsEnabled = notificationsEnabled,
-                    onEnableNotifications = {
-                        val activity = context as? android.app.Activity
-                        if (
-                            activity != null &&
-                            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
-                            !notificationManager.wasNotificationPermissionRequested()
-                        ) {
-                            notificationManager.requestNotificationPermission(activity)
-                        } else {
-                            notificationManager.openNotificationSettings()
-                        }
-                    }
+                    notificationsEnabled = selectedDailyNotificationsEnabled,
+                    systemNotificationsEnabled = systemNotificationsEnabled,
+                    onNotificationsChanged = { enabled -> selectedDailyNotificationsEnabled = enabled }
                 )
 
                 // Kaydetme işlemi, üyelik durumundan önce profil ayarlarının yanında kalır.
@@ -564,6 +567,8 @@ fun ProfileScreen(
                         onClick = {
                             val languageToSave = selectedLanguage
                             val languageChanged = hasLanguageChange
+                            val notificationsToSave = selectedDailyNotificationsEnabled
+                            val notificationsChanged = hasNotificationChange
                             showSaveConfirmationDialog = false
                             viewModel.saveProfile(
                                 onSuccess = {
@@ -571,6 +576,27 @@ fun ProfileScreen(
                                     if (languageChanged) {
                                         LanguageManager.setLanguage(context, languageToSave)
                                         initialLanguage = languageToSave
+                                    }
+                                    if (notificationsChanged) {
+                                        if (notificationsToSave) {
+                                            DailyNotificationScheduler.enableDailyNotifications(context)
+                                        } else {
+                                            DailyNotificationScheduler.disableDailyNotifications(context)
+                                        }
+                                        initialDailyNotificationsEnabled = notificationsToSave
+
+                                        if (notificationsToSave && !systemNotificationsEnabled) {
+                                            val activity = context as? android.app.Activity
+                                            if (
+                                                activity != null &&
+                                                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+                                                !notificationManager.wasNotificationPermissionRequested()
+                                            ) {
+                                                notificationManager.requestNotificationPermission(activity)
+                                            } else {
+                                                notificationManager.openNotificationSettings()
+                                            }
+                                        }
                                     }
                                     Toast.makeText(
                                         context,
@@ -596,7 +622,7 @@ fun ProfileScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { showSaveConfirmationDialog = false }) {
-                        Text(stringResource(R.string.btn_dismiss))
+                        Text(stringResource(R.string.profile_save_confirmation_cancel))
                     }
                 }
             )
@@ -704,14 +730,15 @@ fun ProfileScreen(
 @Composable
 fun NotificationSettingsCard(
     notificationsEnabled: Boolean,
-    onEnableNotifications: () -> Unit
+    systemNotificationsEnabled: Boolean,
+    onNotificationsChanged: (Boolean) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)),
         border = BorderStroke(
             1.dp,
-            if (notificationsEnabled) Color(0xFF81C784).copy(alpha = 0.65f) else Color.White.copy(alpha = 0.3f)
+            if (notificationsEnabled && systemNotificationsEnabled) Color(0xFF81C784).copy(alpha = 0.65f) else Color.White.copy(alpha = 0.3f)
         ),
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -726,7 +753,7 @@ fun NotificationSettingsCard(
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = null,
-                tint = if (notificationsEnabled) Color(0xFF81C784) else Color.White.copy(alpha = 0.8f),
+                tint = if (notificationsEnabled && systemNotificationsEnabled) Color(0xFF81C784) else Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.size(24.dp)
             )
             Column(modifier = Modifier.weight(1f)) {
@@ -739,25 +766,26 @@ fun NotificationSettingsCard(
                 )
                 Text(
                     text = stringResource(
-                        if (notificationsEnabled) {
+                        if (notificationsEnabled && systemNotificationsEnabled) {
                             R.string.notification_settings_enabled
-                        } else {
+                        } else if (!notificationsEnabled) {
                             R.string.notification_settings_disabled
+                        } else {
+                            R.string.notification_settings_system_disabled
                         }
                     ),
                     color = Color.White.copy(alpha = 0.72f),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-            if (!notificationsEnabled) {
-                OutlinedButton(
-                    onClick = onEnableNotifications,
-                    border = BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.75f)),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700))
-                ) {
-                    Text(stringResource(R.string.notification_settings_enable))
-                }
-            }
+            Switch(
+                checked = notificationsEnabled,
+                onCheckedChange = onNotificationsChanged,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color(0xFFFFD700),
+                    checkedTrackColor = Color(0xFF6A1B9A)
+                )
+            )
         }
     }
 }
