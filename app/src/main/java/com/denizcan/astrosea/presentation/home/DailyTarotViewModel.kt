@@ -86,11 +86,13 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     }
                     hasDrawnToday = false
                     
-                    // Günlük kartlar yenilendi - Firestore'a bildirim kaydet
-                    if (userId != null) {
+                    // Günlük kartlar yenilendiğinde bildirim listesine yalnızca günde bir kez ekle.
+                    // Bu ekran birden fazla kez oluşturulabildiği için kontrolü transaction ile atomik yapıyoruz.
+                    val currentUserId = userId
+                    if (currentUserId != null && reserveDailyReadyNotification(currentUserId, currentDate)) {
                         try {
                             notificationManager.saveNotificationToFirestore(
-                                userId = userId!!,
+                                userId = currentUserId,
                                 title = context.getString(R.string.notif_daily_ready_title),
                                 message = context.getString(R.string.notif_daily_ready_message)
                             )
@@ -112,6 +114,24 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                 isLoading = false
             }
         }
+    }
+
+    /** Aynı kullanıcı için aynı gün yalnızca bir "günlük kartlar hazır" kaydına izin verir. */
+    private suspend fun reserveDailyReadyNotification(userId: String, currentDate: String): Boolean {
+        val userRef = firestore.collection("users").document(userId)
+        return firestore.runTransaction { transaction ->
+            val userDocument = transaction.get(userRef)
+            if (userDocument.getString("daily_ready_notification_date") == currentDate) {
+                false
+            } else {
+                transaction.set(
+                    userRef,
+                    mapOf("daily_ready_notification_date" to currentDate),
+                    SetOptions.merge()
+                )
+                true
+            }
+        }.await()
     }
     
     // Kart çekme ve açma işlemini birleştiren fonksiyon
