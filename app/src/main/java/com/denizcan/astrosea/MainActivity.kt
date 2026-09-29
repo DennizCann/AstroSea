@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.lifecycleScope
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
 import com.denizcan.astrosea.presentation.horoscope.HoroscopeScreen
 import com.denizcan.astrosea.presentation.tarot.meanings.TarotMeaningsScreen
@@ -821,77 +822,23 @@ class MainActivity : ComponentActivity() {
      * Premium durumunu kontrol eder ve hatırlatmaları zamanlar
      */
     private fun checkPremiumAndScheduleReminders(userId: String) {
-        if (!BillingConfig.TEST_MODE) {
-            Adapty.identify(userId) { error ->
-                if (error != null) {
-                    Log.e("MainActivity", "Adapty kullanıcı tanımlama hatası", error)
-                    checkPremiumAndScheduleRemindersFromCache(userId)
-                    return@identify
+        lifecycleScope.launch {
+            runCatching { com.denizcan.astrosea.billing.MembershipRepository.refresh() }
+                .onSuccess { membership ->
+                    if (FirebaseAuth.getInstance().currentUser?.uid == userId && membership.hasAccess)
+                        PremiumReminderScheduler.cancelAllReminders(this@MainActivity)
                 }
-
-                BillingManager.getInstance(this).checkPremiumAccess { hasAccess ->
-                    FirebaseFirestore.getInstance()
-                        .collection("users")
-                        .document(userId)
-                        .set(mapOf("isPremium" to hasAccess), SetOptions.merge())
-                        .addOnFailureListener { e ->
-                            Log.e("MainActivity", "Premium erişimi Firestore'a eşitlenemedi", e)
-                        }
-
-                    if (hasAccess) {
-                        PremiumReminderScheduler.cancelAllReminders(this)
-                        Log.d("MainActivity", "Adapty premium erişimi etkin")
-                    } else {
-                        Log.d("MainActivity", "Adapty premium erişimi etkin değil")
-                    }
-                }
-            }
-            return
         }
-
-        checkPremiumAndScheduleRemindersFromCache(userId)
     }
 
-    private fun checkPremiumAndScheduleRemindersFromCache(userId: String) {
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                val isPremium = document.getBoolean("isPremium") ?: false
-                
-                if (isPremium) {
-                    // Premium kullanıcı - tüm hatırlatmaları iptal et
-                    PremiumReminderScheduler.cancelAllReminders(this)
-                    Log.d("MainActivity", "Kullanıcı premium, hatırlatmalar iptal edildi")
-                } else {
-                    Log.d("MainActivity", "Kullanıcı premium değil, hatırlatmalar aktif")
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("MainActivity", "Premium kontrol hatası", e)
-            }
-    }
-    
-    /**
-     * İlk kez kullanıcı için anında premium hatırlatma zamanlar (30 dakika sonra)
-     */
     private fun scheduleInstantPremiumReminder(userId: String) {
-        FirebaseFirestore.getInstance()
-            .collection("users")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                val isPremium = document.getBoolean("isPremium") ?: false
-                
-                if (!isPremium) {
-                    // Premium değilse 30 dakika sonra hatırlatma
-                    PremiumReminderScheduler.scheduleInstantReminder(this)
-                    Log.d("MainActivity", "30 dakika sonra premium hatırlatma zamanlandı")
+        lifecycleScope.launch {
+            runCatching { com.denizcan.astrosea.billing.MembershipRepository.refresh() }
+                .onSuccess { membership ->
+                    if (FirebaseAuth.getInstance().currentUser?.uid == userId && !membership.hasAccess)
+                        PremiumReminderScheduler.scheduleInstantReminder(this@MainActivity)
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e("MainActivity", "Premium kontrol hatası", e)
-            }
+        }
     }
+
 }

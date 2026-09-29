@@ -324,44 +324,12 @@ fun GeneralReadingDetailScreen(
                                                     return@launch
                                                 }
                                                 
-                                                // Firestore'dan direkt oku
-                                                val document = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                                                    .collection("users")
-                                                    .document(userId)
-                                                    .get()
-                                                    .await()
-                                                
-                                                val isPremium = document.getBoolean("isPremium") ?: false
-                                                Log.d("GeneralReadingDetailScreen", "Firestore'dan okunan isPremium: $isPremium")
-                                                
-                                                if (BillingConfig.TEST_MODE && isPremium) {
-                                                    Log.d("GeneralReadingDetailScreen", "Premium kullanıcı - yorum oluşturuluyor")
+                                                val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
+                                                if (membership.hasAccess) {
                                                     viewModel.generateReading(readingType, AdConfig.PREMIUM_INTERPRETATION_DELAY_MILLIS)
                                                     currentScreen = "interpretation"
-                                                } else if (!BillingConfig.TEST_MODE) {
-                                                    BillingManager.getInstance(context).checkPremiumAccess { hasAccess ->
-                                                        if (hasAccess) {
-                                                            Log.d("GeneralReadingDetailScreen", "Adapty premium erişimi doğrulandı")
-                                                            viewModel.generateReading(readingType, AdConfig.PREMIUM_INTERPRETATION_DELAY_MILLIS)
-                                                            currentScreen = "interpretation"
-                                                        } else {
-                                                            scope.launch {
-                                                                val remaining = adRightsManager.getRemainingUnlocks()
-                                                if (remaining > 0) {
-                                                    remainingAdUnlocks = remaining
-                                                    adErrorMessage = null
-                                                    showAdDialog = true
-                                                                } else {
-                                                                    adLimitReached = true
-                                                                    showPremiumDialog = true
-                                                                }
-                                                            }
-                                                        }
-                                                    }
                                                 } else {
-                                                    // Ücretsiz kullanıcı - reklam hakkı kontrolü
                                                     val remaining = adRightsManager.getRemainingUnlocks()
-                                                    Log.d("GeneralReadingDetailScreen", "Kalan reklam hakkı: $remaining")
                                                     if (remaining > 0) {
                                                         remainingAdUnlocks = remaining
                                                         adErrorMessage = null
@@ -373,8 +341,7 @@ fun GeneralReadingDetailScreen(
                                                 }
                                             } catch (e: Exception) {
                                                 Log.e("GeneralReadingDetailScreen", "Yorum akışı hatası", e)
-                                                adLimitReached = false
-                                                showPremiumDialog = true
+                                                android.widget.Toast.makeText(context, context.getString(R.string.membership_unavailable), android.widget.Toast.LENGTH_LONG).show()
                                             }
                                         }
                                     },

@@ -25,10 +25,19 @@ class ProfileViewModel : ViewModel() {
     private var profileListener: ListenerRegistration? = null
 
     init {
+        viewModelScope.launch {
+            com.denizcan.astrosea.billing.MembershipRepository.state.collect { membership ->
+                val current = if (membership.uid == auth.currentUser?.uid) membership else com.denizcan.astrosea.billing.MembershipState()
+                profileState = profileState.copy(membership = current,
+                    profileData = profileState.profileData.copy(isPremium = current.hasAccess))
+            }
+        }
         authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user != null) {
                 Log.d("ProfileViewModel", "Auth state changed: User ${user.uid} logged in")
+                profileState = ProfileState()
+                refreshMembership()
                 loadProfile(user.uid)
                 startListeningToProfileChanges(user.uid)
             } else {
@@ -56,10 +65,10 @@ class ProfileViewModel : ViewModel() {
             .document(userId)
             .get()
             .addOnSuccessListener { document ->
-                // Raw data'yı logla (debug için)
+                if (auth.currentUser?.uid != userId) return@addOnSuccessListener
+                // Parse profile details.
                 val rawData = document.data
-                Log.d("ProfileViewModel", "Raw Firestore data: $rawData")
-                Log.d("ProfileViewModel", "Raw isPremium value: ${rawData?.get("isPremium")}")
+
                 
                 // Manuel parse - Timestamp ve String formatlarını destekle
                 val profileData = parseProfileData(rawData)
@@ -67,8 +76,7 @@ class ProfileViewModel : ViewModel() {
                     profileData = profileData,
                     isLoading = false
                 )
-                Log.d("ProfileViewModel", "Profile loaded: $profileData")
-                Log.d("ProfileViewModel", "isPremium after parse: ${profileData.isPremium}")
+
             }
             .addOnFailureListener { e ->
                 profileState = profileState.copy(
@@ -178,11 +186,11 @@ class ProfileViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
+                if (auth.currentUser?.uid != userId) return@addSnapshotListener
                 if (snapshot != null && snapshot.exists()) {
                     // Raw data'yı logla (debug için)
                     val rawData = snapshot.data
-                    Log.d("ProfileViewModel", "Raw Firestore data: $rawData")
-                    Log.d("ProfileViewModel", "Raw isPremium value: ${rawData?.get("isPremium")}")
+
                     
                     // Manuel parse - Timestamp ve String formatlarını destekle
                     val profileData = parseProfileData(rawData)
@@ -190,8 +198,7 @@ class ProfileViewModel : ViewModel() {
                         profileData = profileData,
                         isLoading = false
                     )
-                    Log.d("ProfileViewModel", "Profile updated: $profileData")
-                    Log.d("ProfileViewModel", "isPremium after parse: ${profileData.isPremium}")
+
                 }
             }
     }
@@ -226,7 +233,7 @@ class ProfileViewModel : ViewModel() {
             birthTime = data["birthTime"] as? String ?: "",
             country = data["country"] as? String ?: "",
             city = data["city"] as? String ?: "",
-            isPremium = data["isPremium"] as? Boolean ?: false,
+            isPremium = profileState.membership.hasAccess,
             premiumStartDate = parseDate(data["premiumStartDate"]),
             premiumEndDate = parseDate(data["premiumEndDate"]),
             premiumProductId = data["premiumProductId"] as? String,
@@ -240,116 +247,21 @@ class ProfileViewModel : ViewModel() {
         )
     }
 
-    // ==================== PREMIUM ÜYELİK FONKSİYONLARI ====================
-
-    /**
-     * Kullanıcının premium üye olup olmadığını döndürür (cache'den)
-     */
-    val isPremium: Boolean
-        get() = profileState.profileData.isPremium
-
-    /**
-     * Premium durumunu kontrol eder ve boolean döndürür (cache'den)
-     */
-    fun checkPremiumStatus(): Boolean {
-        return profileState.profileData.isPremium
-    }
-
-    /**
-     * Firestore'dan ANLIK olarak premium durumunu kontrol eder
-     * Her kritik işlemde (buton tıklama, ekran açılma) bu fonksiyon kullanılmalı
-     */
-    suspend fun checkPremiumStatusFromFirestore(): Boolean {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return false
-        
-        return try {
-            val document = FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(userId)
-                .get()
-                .await()
-            
-            val isPremiumValue = document.getBoolean("isPremium") ?: false
-            Log.d("ProfileViewModel", "Firestore'dan anlık premium kontrolü: $isPremiumValue")
-            
-            // Local state'i de güncelle
-            if (isPremiumValue != profileState.profileData.isPremium) {
-                profileState = profileState.copy(
-                    profileData = profileState.profileData.copy(isPremium = isPremiumValue)
-                )
-                Log.d("ProfileViewModel", "Local state güncellendi: isPremium = $isPremiumValue")
-            }
-            
-            isPremiumValue
-        } catch (e: Exception) {
-            Log.e("ProfileViewModel", "Firestore'dan premium kontrolü hatası", e)
-            false
-        }
-    }
-
-    /**
-     * Kullanıcıyı premium üye yapar (ödeme başarılı olduktan sonra çağrılacak)
-     * @param startDate Premium başlangıç tarihi
-     * @param endDate Premium bitiş tarihi (null = süresiz)
-     */
-    fun upgradeToPremium(startDate: String, endDate: String? = null, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        
+    fun refreshMembership() {
         viewModelScope.launch {
-            try {
-                FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(userId)
-                    .update(
-                        mapOf(
-                            "isPremium" to true,
-                            "premiumStartDate" to startDate,
-                            "premiumEndDate" to endDate
-                        )
-                    )
-                    .await()
-                
-                Log.d("ProfileViewModel", "User upgraded to premium: $userId")
-                onSuccess()
-            } catch (e: Exception) {
-                Log.e("ProfileViewModel", "Error upgrading to premium", e)
-                onError(e.message ?: "Premium yükseltme hatası")
-            }
+            runCatching { com.denizcan.astrosea.billing.MembershipRepository.refresh() }
         }
     }
-
-    /**
-     * Kullanıcının premium üyeliğini iptal eder
-     */
-    fun cancelPremium(onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        
-        viewModelScope.launch {
-            try {
-                FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(userId)
-                    .update(
-                        mapOf(
-                            "isPremium" to false,
-                            "premiumEndDate" to java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-                        )
-                    )
-                    .await()
-                
-                Log.d("ProfileViewModel", "User premium cancelled: $userId")
-                onSuccess()
-            } catch (e: Exception) {
-                Log.e("ProfileViewModel", "Error cancelling premium", e)
-                onError(e.message ?: "Premium iptal hatası")
-            }
-        }
-    }
+    val isPremium: Boolean get() = profileState.membership.hasAccess
+    fun checkPremiumStatus(): Boolean = isPremium
+    suspend fun checkPremiumStatusFromFirestore(): Boolean =
+        com.denizcan.astrosea.billing.MembershipRepository.refresh().hasAccess
 }
 
 data class ProfileState(
     val profileData: ProfileData = ProfileData(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isEditing: Boolean = false
+    val isEditing: Boolean = false,
+    val membership: com.denizcan.astrosea.billing.MembershipState = com.denizcan.astrosea.billing.MembershipState()
 )

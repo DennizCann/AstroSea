@@ -1,0 +1,14 @@
+<resources>
+    <string name="membership_pending">Purchase completed; membership verification is pending. Do not pay again. Refresh your profile or restore purchases shortly.</string>
+    <string name="membership_unavailable">Membership could not be verified. Check your connection and try again.</string>
+    <string name="membership_refresh">Refresh</string>
+    <string name="membership_beta">Free beta access</string>
+    <string name="membership_sandbox">Google Play test subscription</string>
+    <string name="membership_granted">Granted premium access</string>
+    <string name="membership_no_expiry">No expiration date</string>
+    <string name="membership_renewal_date">Next renewal:</string>
+    <string name="membership_beta_hint">This access is free. It does not become a paid subscription when it ends; a separate purchase is required.</string>
+    <string name="membership_sandbox_hint">Test subscriptions renew and expire on accelerated schedules. The displayed date is the actual test expiration.</string>
+    <string name="membership_cancelled_hint">Auto-renewal is off. Access continues until the displayed expiration date.</string>
+    <string name="membership_continue">Access active — continue</string>
+</resources>

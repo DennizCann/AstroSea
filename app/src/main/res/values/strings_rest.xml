@@ -39,7 +39,6 @@
     </string-array>
 
     <!-- Premium screen -->
-    <string name="prem_test_mode">🔧 TEST MODE</string>
     <string name="prem_upgrade_title">Upgrade to Premium</string>
     <string name="prem_upgrade_subtitle">Unlock AI-powered personalized tarot interpretations and an ad-free experience</string>
     <string name="prem_choose_plan">Choose Your Plan</string>
@@ -49,12 +48,10 @@
     <string name="prem_restore">Restore Purchases</string>
     <string name="prem_confirm_title">Confirm Purchase</string>
     <string name="prem_fallback_name">Premium</string>
-    <string name="prem_test_warning">⚠️ This is a test purchase.\nNo real payment will be charged.</string>
     <string name="prem_auto_renew">Your subscription will renew automatically.\nYou can cancel anytime.</string>
-    <string name="prem_subscription_disclosure">Google Play will charge %1$s%2$s. Your subscription renews automatically for the same period unless you cancel it in Google Play subscription settings.</string>
+    <string name="prem_subscription_disclosure">Google Play will show the current price and subscription details on the next screen. You can manage or cancel your subscription anytime in Google Play.</string>
     <string name="prem_subscription_terms">Subscription Terms</string>
     <string name="prem_privacy_policy">Privacy Policy</string>
-    <string name="prem_test_it">Test It</string>
     <string name="prem_buy">Buy</string>
     <string name="prem_popular">Popular</string>
     <string name="prem_feature_1">AI-powered personalized tarot interpretations</string>

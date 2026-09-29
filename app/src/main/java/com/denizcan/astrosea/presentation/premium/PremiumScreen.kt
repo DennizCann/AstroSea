@@ -35,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denizcan.astrosea.R
-import com.denizcan.astrosea.billing.BillingConfig
 import com.denizcan.astrosea.billing.SubscriptionProduct
 import com.denizcan.astrosea.presentation.components.KvkkDialog
 import com.denizcan.astrosea.util.LanguageManager
@@ -90,34 +89,12 @@ fun PremiumScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                // Close button ve Test Mode Badge
+                // Close button
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    // Test Mode Badge (sol üst)
-                    if (uiState.isTestMode) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                                .background(
-                                    color = Color(0xFFFF6B6B),
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.prem_test_mode),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp
-                                ),
-                                color = Color.White
-                            )
-                        }
-                    }
-                    
                     // Close button (sağ üst)
                     IconButton(
                         onClick = onNavigateBack,
@@ -292,7 +269,7 @@ fun PremiumScreen(
                             }
                         } else {
                             Text(
-                                text = stringResource(R.string.prem_go_to_payment),
+                                text = stringResource(if (uiState.hasPremiumAccess) R.string.membership_continue else R.string.prem_go_to_payment),
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontFamily = FontFamily(Font(R.font.cinzel_bold)),
                                     fontSize = 18.sp,
@@ -371,7 +348,6 @@ fun PremiumScreen(
         if (uiState.showConfirmDialog) {
             PurchaseConfirmDialog(
                 product = uiState.products.getOrNull(uiState.selectedProductIndex),
-                isTestMode = uiState.isTestMode,
                 onConfirm = {
                     val activity = context as? Activity
                     if (activity != null) {
@@ -428,7 +404,6 @@ fun PremiumScreen(
 @Composable
 private fun PurchaseConfirmDialog(
     product: SubscriptionProduct?,
-    isTestMode: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -441,16 +416,6 @@ private fun PurchaseConfirmDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (isTestMode) {
-                    Text(
-                        text = stringResource(R.string.prem_test_mode),
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color(0xFFFF6B6B),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
                 Text(
                     text = stringResource(R.string.prem_confirm_title),
                     style = MaterialTheme.typography.titleLarge.copy(
@@ -487,27 +452,14 @@ private fun PurchaseConfirmDialog(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                if (isTestMode) {
-                    Text(
-                        text = stringResource(R.string.prem_test_warning),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFFF6B6B),
-                        textAlign = TextAlign.Center
-                    )
-                } else {
-                    Text(
-                        text = stringResource(
-                            R.string.prem_subscription_disclosure,
-                            product?.price ?: "",
-                            product?.duration ?: ""
-                        ),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
-                        ),
-                        color = Color.White.copy(alpha = 0.7f),
-                        textAlign = TextAlign.Center
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.prem_subscription_disclosure),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
+                    ),
+                    color = Color.White.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center
+                )
             }
         },
         confirmButton = {
@@ -519,7 +471,7 @@ private fun PurchaseConfirmDialog(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = stringResource(if (isTestMode) R.string.prem_test_it else R.string.prem_buy),
+                    text = stringResource(R.string.prem_buy),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontFamily = FontFamily(Font(R.font.cinzel_bold))
                     ),
@@ -830,7 +782,6 @@ private fun PurchaseConfirmDialogPreview() {
             durationDays = 30,
             isPopular = true
         ),
-        isTestMode = true,
         onConfirm = {},
         onDismiss = {}
     )
@@ -888,28 +839,6 @@ private fun PremiumScreenContentPreview() {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Test Mode Badge
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .background(
-                        color = Color(0xFFFF6B6B),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = "🔧 TEST MODU",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp
-                    ),
-                    color = Color.White
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
             // Başlık
             Text(
                 text = "Premium'a Yükseltin",

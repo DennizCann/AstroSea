@@ -88,6 +88,7 @@ fun ProfileScreen(
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshMembership()
                 if (selectedDailyNotificationsEnabled == initialDailyNotificationsEnabled) {
                     val storedPreference = DailyNotificationScheduler.areDailyNotificationsEnabled(context)
                     initialDailyNotificationsEnabled = storedPreference
@@ -414,22 +415,8 @@ fun ProfileScreen(
 
                 // Premium Üyelik Bilgileri
                 Spacer(modifier = Modifier.height(16.dp))
-                PremiumStatusCard(
-                    isPremium = state.profileData.isPremium,
-                    premiumProductId = state.profileData.premiumProductId,
-                    premiumEndDate = state.profileData.premiumEndDate,
-                    onCancelPremium = {
-                        viewModel.cancelPremium(
-                            onSuccess = {
-                                // Başarılı iptal
-                            },
-                            onError = { error ->
-                                // Hata
-                            }
-                        )
-                    }
-                )
-                
+                PremiumStatusCard(state.membership, onRefresh = { viewModel.refreshMembership() })
+
                 // KVKK / Gizlilik Politikası Linki
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(
@@ -841,7 +828,6 @@ fun LanguageSelectionCard(
         }
     }
 }
-
 @Composable
 private fun LanguageOptionChip(
     label: String,
@@ -941,258 +927,71 @@ fun ProfileDateField(
 
 @Composable
 fun PremiumStatusCard(
-    isPremium: Boolean,
-    premiumProductId: String?,
-    premiumEndDate: String?,
-    onCancelPremium: () -> Unit
+    membership: com.denizcan.astrosea.billing.MembershipState,
+    onRefresh: () -> Unit
 ) {
-    var showCancelDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val isTestMode = BillingConfig.TEST_MODE
-
-    // Gerçek abonelik Google Play üzerinden yönetilir; uygulama içinden iptal edilemez.
-    fun openPlaySubscriptions() {
-        val url = if (premiumProductId != null) {
-            "https://play.google.com/store/account/subscriptions?sku=$premiumProductId&package=${context.packageName}"
-        } else {
-            "https://play.google.com/store/account/subscriptions"
-        }
-        try {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        } catch (e: Exception) {
-            android.util.Log.e("PremiumStatusCard", "Play Store abonelik sayfası açılamadı", e)
-        }
-    }
-
-    val planName = when (premiumProductId) {
-        "astrosea_weekly" -> stringResource(R.string.plan_weekly)
-        "astrosea_monthly" -> stringResource(R.string.plan_monthly)
-        "astrosea_yearly" -> stringResource(R.string.plan_yearly)
-        else -> stringResource(R.string.plan_unknown)
-    }
-    
+    val textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)))
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)),
-        border = BorderStroke(1.dp, if (isPremium) Color(0xFFFFD700).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.3f)),
-        shape = RoundedCornerShape(14.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(14.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Başlık
-            Text(
-                text = stringResource(R.string.membership_status),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                    color = Color.White
-                )
-            )
-            
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(stringResource(R.string.membership_status), color = Color.White, style = textStyle)
             HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
-            
-            // Üyelik Durumu Satırı
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = null,
-                        tint = if (isPremium) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.status_label),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            color = Color.White
-                        )
-                    )
-                }
-                Text(
-                    text = if (isPremium) stringResource(R.string.premium_member) else stringResource(R.string.standard_member),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                        color = if (isPremium) Color(0xFFFFD700) else Color.White.copy(alpha = 0.7f)
-                    )
-                )
+            if (!membership.verified) {
+                Text(stringResource(R.string.membership_unavailable), color = Color.White, style = textStyle)
+                TextButton(onClick = onRefresh) { Text(stringResource(R.string.membership_refresh)) }
+            } else if (!membership.hasAccess) {
+                Text(stringResource(R.string.standard_member), color = Color.White, style = textStyle)
             }
-            
-            // Premium kullanıcılar için ek bilgiler
-            if (isPremium) {
-                // Seçilen Plan Satırı
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.plan_label),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                color = Color.White
-                            )
-                        )
-                    }
-                    Text(
-                        text = planName,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            color = Color.White.copy(alpha = 0.9f)
-                        )
-                    )
+            membership.activeLevels.forEach { level ->
+                val label = when {
+                    level.source == "beta" -> R.string.membership_beta
+                    level.environment == "sandbox" -> R.string.membership_sandbox
+                    level.source == "subscription" && level.environment == "production" -> R.string.premium_member
+                    else -> R.string.membership_granted
                 }
-                
-                // Bitiş Tarihi Satırı (varsa)
-                premiumEndDate?.let { endDate ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Info,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.end_date_label),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    color = Color.White
-                                )
-                            )
-                        }
-                        Text(
-                            text = endDate.take(10), // Sadece tarih kısmını göster
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        )
+                Text(stringResource(label), color = Color(0xFFFFD700), style = textStyle)
+                val productName = when (level.productId) {
+                    "astrosea_weekly" -> R.string.plan_weekly
+                    "astrosea_monthly" -> R.string.plan_monthly
+                    "astrosea_yearly" -> R.string.plan_yearly
+                    else -> null
+                }
+                productName?.let { Text(stringResource(it), color = Color.White, style = textStyle) }
+                val date = level.expiresAt?.let { value ->
+                    com.denizcan.astrosea.billing.membershipTime(value)?.let { time ->
+                        java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.MEDIUM,
+                            java.text.DateFormat.SHORT).format(java.util.Date(time))
                     }
                 }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Abonelik yönetimi: gerçek satın almalar Google Play'den iptal edilir,
-                // test modunda ise Firestore üzerinde demo iptal yapılır.
-                OutlinedButton(
-                    onClick = {
-                        if (isTestMode) {
-                            showCancelDialog = true
-                        } else {
-                            openPlaySubscriptions()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFFF6B6B)
-                    ),
-                    border = BorderStroke(1.dp, Color(0xFFFF6B6B).copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (isTestMode) stringResource(R.string.btn_cancel_demo) else stringResource(R.string.btn_manage_subscription),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
-                        )
-                    )
+                val dateLabel = if (level.source == "subscription" && level.renewalCancelledAt == null)
+                    R.string.membership_renewal_date else R.string.end_date_label
+                Text(
+                    if (date == null) stringResource(R.string.membership_no_expiry)
+                    else stringResource(dateLabel) + " " + date,
+                    color = Color.White, style = textStyle
+                )
+                if (level.source == "beta") {
+                    Text(stringResource(R.string.membership_beta_hint), color = Color.White.copy(alpha = 0.8f), style = textStyle)
+                } else if (level.environment == "sandbox") {
+                    Text(stringResource(R.string.membership_sandbox_hint), color = Color.White.copy(alpha = 0.8f), style = textStyle)
                 }
-
-                if (!isTestMode) {
-                    Text(
-                        text = stringResource(R.string.manage_sub_hint),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            color = Color.White.copy(alpha = 0.6f)
-                        )
-                    )
+                if (level.renewalCancelledAt != null) {
+                    Text(stringResource(R.string.membership_cancelled_hint), color = Color.White.copy(alpha = 0.8f), style = textStyle)
                 }
+            }
+            if (membership.activeLevels.any { it.source == "subscription" || it.environment == "sandbox" }) {
+                OutlinedButton(onClick = {
+                    runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/account/subscriptions")))
+                    }
+                }) { Text(stringResource(R.string.btn_manage_subscription)) }
             }
         }
-    }
-    
-    // İptal Onay Dialogu
-    if (showCancelDialog) {
-        AlertDialog(
-            onDismissRequest = { showCancelDialog = false },
-            containerColor = Color(0xFF1A1A2E),
-            title = {
-                Text(
-                    text = stringResource(R.string.cancel_dialog_title),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                        color = Color.White
-                    )
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(R.string.cancel_dialog_text),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onCancelPremium()
-                        showCancelDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF6B6B)
-                    )
-                ) {
-                    Text(
-                        text = stringResource(R.string.btn_cancel_confirm),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular))
-                        )
-                    )
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = { showCancelDialog = false },
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
-                ) {
-                    Text(
-                        text = stringResource(R.string.btn_dismiss),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                            color = Color.White
-                        )
-                    )
-                }
-            }
-        )
     }
 }

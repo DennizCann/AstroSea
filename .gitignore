@@ -23,3 +23,8 @@ functions/node_modules/
 .gradle-user-home/
 .android-user-home/
 .kotlin/
+
+# Function credentials and emulator-only secret files must never be committed.
+functions/.secret.local
+functions/.env.local
+firestore-debug.log

@@ -1,0 +1,14 @@
+<resources>
+    <string name="membership_pending">Ödemeniz alındı, üyeliğiniz henüz doğrulanamadı. Tekrar ödeme yapmayın; biraz sonra profilinizi yenileyin veya satın almaları geri yükleyin.</string>
+    <string name="membership_unavailable">Üyelik doğrulanamadı. Bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="membership_refresh">Yenile</string>
+    <string name="membership_beta">Ücretsiz test erişimi</string>
+    <string name="membership_sandbox">Google Play test aboneliği</string>
+    <string name="membership_granted">Tanımlanmış premium erişimi</string>
+    <string name="membership_no_expiry">Bitiş tarihi yok</string>
+    <string name="membership_renewal_date">Sonraki yenileme:</string>
+    <string name="membership_beta_hint">Bu erişim ücretsizdir. Bitişinde ücretli aboneliğe dönüşmez; devam etmek için ayrıca satın alma gerekir.</string>
+    <string name="membership_sandbox_hint">Test abonelikleri hızlandırılmış sürelerle yenilenir ve sona erer. Gösterilen tarih gerçek test bitişidir.</string>
+    <string name="membership_cancelled_hint">Otomatik yenileme kapalı. Erişiminiz gösterilen bitiş tarihine kadar devam eder.</string>
+    <string name="membership_continue">Erişiminiz aktif — devam et</string>
+</resources>

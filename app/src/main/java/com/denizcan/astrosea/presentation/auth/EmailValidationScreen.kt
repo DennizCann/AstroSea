@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
+import com.denizcan.astrosea.BuildConfig
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -233,24 +234,25 @@ fun EmailValidationScreen(
                                 )
                             }
                             
-                            // Test amaçlı manuel doğrulama butonu (geliştirme aşamasında)
-                            OutlinedButton(
-                                onClick = { 
-                                    viewModel.manuallyVerifyEmail(onEmailVerified)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color.Yellow
-                                ),
-                                border = BorderStroke(1.dp, Color.Yellow.copy(alpha = 0.5f))
-                            ) {
-                                Text(
-                                    stringResource(R.string.auth_test_manual_verify),
-                                    color = Color.Yellow,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                            if (BuildConfig.DEBUG) {
+                                OutlinedButton(
+                                    onClick = {
+                                        viewModel.manuallyVerifyEmail(onEmailVerified)
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = Color.Yellow
+                                    ),
+                                    border = BorderStroke(1.dp, Color.Yellow.copy(alpha = 0.5f))
+                                ) {
+                                    Text(
+                                        stringResource(R.string.auth_test_manual_verify),
+                                        color = Color.Yellow,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
                             }
                         }
                         

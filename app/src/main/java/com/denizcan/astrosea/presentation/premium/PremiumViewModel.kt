@@ -6,25 +6,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.adapty.Adapty
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.billing.BillingConfig
 import com.denizcan.astrosea.billing.BillingManager
 import com.denizcan.astrosea.billing.BillingState
 import com.denizcan.astrosea.billing.SubscriptionProduct
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.*
 
 data class PremiumUiState(
     val isLoading: Boolean = false,
+    val hasPremiumAccess: Boolean = false,
     val products: List<SubscriptionProduct> = emptyList(),
     val selectedProductIndex: Int = 1, // Varsayılan: Aylık
     val isPurchasing: Boolean = false,
@@ -43,28 +38,20 @@ class PremiumViewModel(
     }
     
     private val billingManager = BillingManager.getInstance(context)
-    private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     
     private val _uiState = MutableStateFlow(PremiumUiState())
     val uiState: StateFlow<PremiumUiState> = _uiState.asStateFlow()
     
     init {
-        identifyUser()
-        observeBillingState()
-        loadProducts()
-    }
-    
-    private fun identifyUser() {
-        if (BillingConfig.TEST_MODE) return
-        val userId = auth.currentUser?.uid ?: return
-        Adapty.identify(userId) { error ->
-            if (error != null) {
-                Log.e(TAG, "Adapty kullanıcı tanımlama hatası: ${error.message}")
-            } else {
-                Log.d(TAG, "Adapty kullanıcı tanımlandı: $userId")
+        viewModelScope.launch {
+            com.denizcan.astrosea.billing.MembershipRepository.state.collect { membership ->
+                _uiState.value = _uiState.value.copy(hasPremiumAccess = membership.uid == auth.currentUser?.uid && membership.hasAccess)
             }
         }
+        viewModelScope.launch { runCatching { com.denizcan.astrosea.billing.MembershipRepository.refresh() } }
+        observeBillingState()
+        loadProducts()
     }
     
     private fun observeBillingState() {
@@ -123,7 +110,18 @@ class PremiumViewModel(
      * Satın alma onay dialogunu göster
      */
     fun showPurchaseConfirmation() {
-        _uiState.value = _uiState.value.copy(showConfirmDialog = true)
+        if (_uiState.value.isPurchasing) return
+        _uiState.value = _uiState.value.copy(isPurchasing = true)
+        viewModelScope.launch {
+            try {
+                val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
+                _uiState.value = _uiState.value.copy(isPurchasing = false,
+                    purchaseSuccess = membership.hasAccess, showConfirmDialog = !membership.hasAccess)
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(isPurchasing = false,
+                    errorMessage = context.getString(R.string.membership_unavailable))
+            }
+        }
     }
     
     /**
@@ -148,7 +146,19 @@ class PremiumViewModel(
             showConfirmDialog = false
         )
         
-        billingManager.launchPurchaseFlow(activity, selectedProduct.productId)
+        viewModelScope.launch {
+            try {
+                val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
+                if (membership.hasAccess) {
+                    _uiState.value = _uiState.value.copy(isPurchasing = false, purchaseSuccess = true)
+                } else {
+                    billingManager.launchPurchaseFlow(activity, selectedProduct.productId)
+                }
+            } catch (error: Exception) {
+                _uiState.value = _uiState.value.copy(isPurchasing = false,
+                    errorMessage = context.getString(R.string.membership_unavailable))
+            }
+        }
     }
     
     /**
@@ -166,35 +176,14 @@ class PremiumViewModel(
                     return@launch
                 }
                 
-                // Premium süresini hesapla
-                val product = _uiState.value.products.find { it.productId == productId }
-                val durationDays = product?.durationDays ?: 30
-                
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
-                
-                val startDate = Date()
-                val calendar = Calendar.getInstance()
-                calendar.time = startDate
-                calendar.add(Calendar.DAY_OF_YEAR, durationDays)
-                val endDate = calendar.time
-                
-                // Tarihleri String olarak kaydet (ProfileData ile uyumlu)
-                val premiumData = mapOf(
-                    "isPremium" to true,
-                    "premiumStartDate" to dateFormat.format(startDate),
-                    "premiumEndDate" to dateFormat.format(endDate),
-                    "premiumProductId" to productId,
-                    "premiumPurchaseDate" to dateFormat.format(Date()),
-                    "isTestPurchase" to BillingConfig.TEST_MODE
-                )
-                
-                firestore.collection("users")
-                    .document(userId)
-                    .set(premiumData, SetOptions.merge())
-                    .await()
-                
-                Log.d(TAG, "Premium durumu Firestore'a kaydedildi")
-                
+                val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
+                if (!membership.hasAccess) {
+                    _uiState.value = _uiState.value.copy(
+                        isPurchasing = false,
+                        errorMessage = context.getString(R.string.membership_pending)
+                    )
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(
                     isPurchasing = false,
                     purchaseSuccess = true
@@ -204,7 +193,7 @@ class PremiumViewModel(
                 Log.e(TAG, "Premium kaydetme hatası", e)
                 _uiState.value = _uiState.value.copy(
                     isPurchasing = false,
-                    errorMessage = context.getString(R.string.prem_save_failed, e.message ?: "")
+                    errorMessage = context.getString(R.string.membership_pending)
                 )
             }
         }
@@ -220,15 +209,12 @@ class PremiumViewModel(
                 viewModelScope.launch {
                     try {
                         val userId = auth.currentUser?.uid ?: return@launch
-                        val premiumData = mapOf(
-                            "isPremium" to true,
-                            "premiumRestoredAt" to SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
-                        )
-                        firestore.collection("users")
-                            .document(userId)
-                            .set(premiumData, SetOptions.merge())
-                            .await()
-                        
+                        val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
+                        if (!membership.hasAccess) {
+                            _uiState.value = _uiState.value.copy(isLoading = false,
+                                errorMessage = context.getString(R.string.membership_pending))
+                            return@launch
+                        }
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             purchaseSuccess = true

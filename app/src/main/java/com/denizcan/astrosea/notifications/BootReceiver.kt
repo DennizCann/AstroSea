@@ -59,16 +59,11 @@ class BootReceiver : BroadcastReceiver() {
     
     private suspend fun checkIsPremium(userId: String): Boolean {
         return try {
-            val userDoc = FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(userId)
-                .get()
-                .await()
-            
-            userDoc.getBoolean("isPremium") ?: false
+            if (com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid != userId) return true
+            com.denizcan.astrosea.billing.MembershipRepository.refresh().hasAccess
         } catch (e: Exception) {
             Log.e(TAG, "Premium kontrol hatası", e)
-            false
+            true
         }
     }
 }

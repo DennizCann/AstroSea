@@ -39,7 +39,6 @@
     </string-array>
 
     <!-- Premium screen -->
-    <string name="prem_test_mode">🔧 TEST MODU</string>
     <string name="prem_upgrade_title">Premium\'a Yükseltin</string>
     <string name="prem_upgrade_subtitle">Yapay zekâ destekli kişiselleştirilmiş tarot yorumlarına ve reklamsız deneyime erişin</string>
     <string name="prem_choose_plan">Planınızı Seçin</string>
@@ -49,12 +48,10 @@
     <string name="prem_restore">Satın Almaları Geri Yükle</string>
     <string name="prem_confirm_title">Satın Almayı Onayla</string>
     <string name="prem_fallback_name">Premium</string>
-    <string name="prem_test_warning">⚠️ Bu bir test satın almasıdır.\nGerçek ödeme alınmayacaktır.</string>
     <string name="prem_auto_renew">Aboneliğiniz otomatik olarak yenilenecektir.\nİstediğiniz zaman iptal edebilirsiniz.</string>
-    <string name="prem_subscription_disclosure">Google Play, %1$s%2$s için ücretlendirme yapar. Aboneliğiniz, Google Play abonelik ayarlarından iptal etmediğiniz sürece aynı dönem için otomatik yenilenir.</string>
+    <string name="prem_subscription_disclosure">Google Play bir sonraki ekranda güncel fiyatı ve abonelik ayrıntılarını gösterir. Aboneliğinizi Google Play üzerinden istediğiniz zaman yönetebilir veya iptal edebilirsiniz.</string>
     <string name="prem_subscription_terms">Abonelik Koşulları</string>
     <string name="prem_privacy_policy">Gizlilik Politikası</string>
-    <string name="prem_test_it">Test Et</string>
     <string name="prem_buy">Satın Al</string>
     <string name="prem_popular">Popüler</string>
     <string name="prem_feature_1">Yapay zekâ destekli kişiselleştirilmiş tarot yorumları</string>

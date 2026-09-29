@@ -1,5 +1,12 @@
 package com.denizcan.astrosea.billing
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import com.adapty.models.AdaptyProfile
 import android.app.Activity
 import android.content.Context
 import android.util.Log
@@ -74,6 +81,7 @@ class BillingManager(private val context: Context) {
         }
     }
 
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val _billingState = MutableStateFlow<BillingState>(BillingState.Idle)
     val billingState: StateFlow<BillingState> = _billingState.asStateFlow()
 
@@ -175,96 +183,55 @@ class BillingManager(private val context: Context) {
     }
 
     fun launchPurchaseFlow(activity: Activity, productId: String) {
-        if (BillingConfig.TEST_MODE) {
-            Log.d(TAG, "TEST MODU: Simüle edilmiş satın alma - $productId")
-            _billingState.value = BillingState.PurchaseSuccess(productId)
-            return
-        }
-
         val product = adaptyProducts.find { it.vendorProductId == productId }
         if (product == null) {
             _billingState.value = BillingState.Error(context.getString(R.string.prem_product_not_found, productId))
             return
         }
-
-        Adapty.makePurchase(activity, product, null) { result ->
-            when (result) {
-                is AdaptyResult.Success -> {
-                    when (val purchaseResult = result.value) {
-                        is AdaptyPurchaseResult.Success -> {
-                            val profile = purchaseResult.profile
-                            val hasAccess = profile.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
-                            Log.d(TAG, "Satın alma başarılı! Premium erişim: $hasAccess")
-                            _billingState.value = if (hasAccess) {
-                                BillingState.PurchaseSuccess(productId)
-                            } else {
-                                BillingState.Error(context.getString(R.string.prem_access_not_granted))
-                            }
-                        }
-                        is AdaptyPurchaseResult.UserCanceled -> {
-                            Log.d(TAG, "Kullanıcı satın almayı iptal etti")
-                            _billingState.value = BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_cancelled))
-                        }
-                        is AdaptyPurchaseResult.Pending -> {
-                            Log.d(TAG, "Satın alma beklemede")
-                            _billingState.value = BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_pending))
-                        }
+        scope.launch {
+            try {
+                val result = MembershipRepository.withBillingIdentity {
+                    suspendCoroutine<AdaptyResult<AdaptyPurchaseResult>> { continuation ->
+                        Adapty.makePurchase(activity, product, null) { continuation.resume(it) }
                     }
                 }
-                is AdaptyResult.Error -> {
-                    Log.e(TAG, "Adapty satın alma hatası: ${result.error.message}")
-                    _billingState.value = BillingState.Error(context.getString(R.string.prem_purchase_error, result.error.message))
+                _billingState.value = when (result) {
+                    is AdaptyResult.Success -> when (result.value) {
+                        is AdaptyPurchaseResult.Success -> BillingState.PurchaseSuccess(productId)
+                        is AdaptyPurchaseResult.UserCanceled -> BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_cancelled))
+                        is AdaptyPurchaseResult.Pending -> BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_pending))
+                    }
+                    is AdaptyResult.Error -> BillingState.Error(context.getString(R.string.prem_restore_failed))
                 }
+            } catch (error: Exception) {
+                _billingState.value = BillingState.Error(context.getString(R.string.membership_unavailable))
             }
         }
     }
 
-    /**
-     * Kullanıcının premium erişimi olup olmadığını Adapty'den kontrol et
-     */
     fun checkPremiumAccess(onResult: (Boolean) -> Unit) {
-        if (BillingConfig.TEST_MODE) {
-            Log.d(TAG, "TEST MODU: Premium erişim kontrolü atlandı")
-            onResult(false)
-            return
-        }
-
-        Adapty.getProfile { result ->
-            when (result) {
-                is AdaptyResult.Success -> {
-                    val hasAccess = result.value.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
-                    Log.d(TAG, "Premium erişim durumu: $hasAccess")
-                    onResult(hasAccess)
-                }
-                is AdaptyResult.Error -> {
-                    Log.e(TAG, "Profil kontrol hatası: ${result.error.message}")
-                    onResult(false)
-                }
-            }
+        scope.launch {
+            val membership = runCatching { MembershipRepository.refresh() }.getOrNull()
+            if (membership != null) onResult(membership.hasAccess)
         }
     }
 
-    /**
-     * Satın almaları geri yükle
-     */
     fun restorePurchases(onResult: (Boolean) -> Unit) {
-        if (BillingConfig.TEST_MODE) {
-            Log.d(TAG, "TEST MODU: Restore atlandı")
-            onResult(false)
-            return
-        }
-
-        Adapty.restorePurchases { result ->
-            when (result) {
-                is AdaptyResult.Success -> {
-                    val hasAccess = result.value.accessLevels[BillingConfig.ACCESS_LEVEL]?.isActive == true
-                    Log.d(TAG, "Restore sonucu: premium=$hasAccess")
-                    onResult(hasAccess)
+        scope.launch {
+            try {
+                val result = MembershipRepository.withBillingIdentity {
+                    suspendCoroutine<AdaptyResult<AdaptyProfile>> { continuation ->
+                        Adapty.restorePurchases { continuation.resume(it) }
+                    }
                 }
-                is AdaptyResult.Error -> {
-                    Log.e(TAG, "Restore hatası: ${result.error.message}")
-                    onResult(false)
+                when (result) {
+                    is AdaptyResult.Success -> onResult(MembershipRepository.refresh().hasAccess)
+                    is AdaptyResult.Error -> {
+                        _billingState.value = BillingState.Error(context.getString(R.string.prem_restore_failed))
+                    }
                 }
+            } catch (error: Exception) {
+                _billingState.value = BillingState.Error(context.getString(R.string.membership_unavailable))
             }
         }
     }
