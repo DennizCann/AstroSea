@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModelProvider
 import com.denizcan.astrosea.R
 import com.denizcan.astrosea.util.JsonLoader
@@ -26,11 +27,17 @@ class TarotMeaningsViewModel(
     var selectedTab by mutableStateOf(0)
         private set
 
-    private val _isLoading = MutableStateFlow(false)
+    private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
 
     init {
-        _cards.value = jsonLoader.loadTarotCards()
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                _cards.value = jsonLoader.loadTarotCards()
+                filterCards()
+            } finally { _isLoading.value = false }
+        }
     }
 
     private fun filterCards() {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Telefon yeniden başlatıldığında alarmları tekrar kurar.
@@ -22,21 +23,24 @@ class BootReceiver : BroadcastReceiver() {
     }
     
     override fun onReceive(context: Context, intent: Intent?) {
-        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+        if (intent?.action in setOf(Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED,
+                Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED)) {
             Log.d(TAG, "Cihaz yeniden başlatıldı, alarmlar kontrol ediliyor...")
             
             // Günlük bildirim alarmını tekrar kur
-            if (DailyNotificationScheduler.isAlarmEnabled(context)) {
+            if (FirebaseAuth.getInstance().currentUser != null &&
+                DailyNotificationScheduler.areDailyNotificationsEnabled(context)) {
                 DailyNotificationScheduler.scheduleDailyNotification(context)
                 Log.d(TAG, "Günlük bildirim alarmı yeniden kuruldu")
             }
             
             // Premium hatırlatmaları kontrol et ve tekrar kur
+            val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val userId = FirebaseAuth.getInstance().currentUser?.uid
                     if (userId != null) {
-                        val isPremium = checkIsPremium(userId)
+                        val isPremium = withTimeoutOrNull(8_000) { checkIsPremium(userId) } ?: return@launch
                         if (!isPremium) {
                             // Premium değilse haftalık hatırlatmayı kur
                             val reminderCount = PremiumReminderScheduler.getReminderCount(context)
@@ -52,6 +56,8 @@ class BootReceiver : BroadcastReceiver() {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Premium kontrol hatası", e)
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }

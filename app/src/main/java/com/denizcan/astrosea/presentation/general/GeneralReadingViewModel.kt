@@ -24,7 +24,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.delay
 
-class GeneralReadingViewModel(private val context: Context) : ViewModel() {
+class GeneralReadingViewModel(context: Context) : ViewModel() {
+    private val context = com.denizcan.astrosea.util.LanguageManager.wrap(context.applicationContext)
 
     var drawnCards by mutableStateOf<List<ReadingCardState>>(emptyList())
         private set
@@ -55,13 +56,9 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     private val groqService = GroqService(context)
     
     // Reading Formats
-    private val readingFormats by lazy {
-        JsonLoader(context).loadReadingFormats()
-    }
+    private suspend fun readingFormats() = JsonLoader(context.applicationContext).loadReadingFormats()
 
-    private val allTarotCards: List<TarotCard> by lazy {
-        JsonLoader(context).loadTarotCards()
-    }
+    private suspend fun allTarotCards(): List<TarotCard> = JsonLoader(context.applicationContext).loadTarotCards()
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -69,6 +66,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     
     // Günlük açılım için DailyTarotViewModel referansı
     private var dailyTarotViewModel: DailyTarotViewModel? = null
+    private var authListener: FirebaseAuth.AuthStateListener? = null
 
     init {
         Log.d("GeneralReadingViewModel", "ViewModel initialized.")
@@ -100,7 +98,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
     
     private fun checkUserChange() {
         // Kullanıcı değiştiğinde verileri temizle
-        auth.addAuthStateListener { firebaseAuth ->
+        authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val currentUser = firebaseAuth.currentUser
             Log.d("GeneralReadingViewModel", "User changed: ${currentUser?.uid}")
             
@@ -111,6 +109,14 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 isLoading = false
             }
         }
+        auth.addAuthStateListener(authListener!!)
+    }
+
+    override fun onCleared() {
+        authListener?.let(auth::removeAuthStateListener)
+        dailyTarotViewModel?.setOnCardsLoadedCallback(null)
+        dailyTarotViewModel = null
+        super.onCleared()
     }
 
     private fun getCardCountForReading(readingType: String): Int {
@@ -124,8 +130,8 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         }
         if (drawnCards.any { it.index == position } || isLoading) return
 
+        isLoading = true
         viewModelScope.launch {
-            isLoading = true
             try {
                 // Diğer açılımlar için Firebase kullan
                 drawOtherReadingCardForPosition(readingType, position)
@@ -148,7 +154,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             val readingData = userDoc.get("reading_$normalizedReadingType") as? Map<String, Any>
             
             val usedCardIds = drawnCards.map { it.card?.id }
-            val availableCards = allTarotCards.filter { it.id !in usedCardIds }
+            val availableCards = allTarotCards().filter { it.id !in usedCardIds }
 
             if (availableCards.isEmpty()) {
                 Log.w("GeneralReadingVM", "No more unique cards to draw.")
@@ -281,7 +287,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             
             Log.d("GeneralReadingVM", "Firebase data for index $i: cardId=$cardId, isRevealed=$isRevealed")
 
-            val card = allTarotCards.find { it.id == cardId }
+            val card = allTarotCards().find { it.id == cardId }
             if (cardId.isNotEmpty() && card != null) {
                 // Kart çekilmiş, açık veya kapalı olarak göster
                 loadedCards.add(
@@ -420,7 +426,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                         val cardId = cardData["cardId"] as? String ?: ""
                         val isRevealed = cardData["isRevealed"] as? Boolean ?: false
                         
-                        val card = allTarotCards.find { it.id == cardId }
+                        val card = allTarotCards().find { it.id == cardId }
                         if (card != null) {
                             loadedCards.add(
                                 ReadingCardState(
@@ -559,6 +565,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
         delayMillis: Long = 0L,
         onCompleted: (Boolean) -> Unit = {}
     ) {
+        if (isGeneratingReading) return
         // Kartların çekilip çekilmediğini kontrol et
         val hasCards = drawnCards.isNotEmpty() && drawnCards.any { it.card != null }
         if (!hasCards) {
@@ -574,9 +581,9 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
             return
         }
         
+        isGeneratingReading = true
         viewModelScope.launch {
             try {
-                isGeneratingReading = true
                 readingError = null
                 
                 // Bellekte yorum varsa tekrar üretme
@@ -601,7 +608,7 @@ class GeneralReadingViewModel(private val context: Context) : ViewModel() {
                 
                 // Reading format'ını al - readingType'ı JSON key formatına çevir
                 val normalizedReadingType = normalizeReadingType(readingType)
-                val format = readingFormats?.readingFormats?.get(normalizedReadingType)
+                val format = readingFormats()?.readingFormats?.get(normalizedReadingType)
                 if (format == null) {
                     readingError = context.getString(R.string.err_format_not_found, normalizedReadingType)
                     onCompleted(false)

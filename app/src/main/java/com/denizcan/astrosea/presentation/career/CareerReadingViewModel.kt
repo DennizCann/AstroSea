@@ -23,9 +23,7 @@ class CareerReadingViewModel(private val context: Context) : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
     
-    private val allTarotCards: List<TarotCard> by lazy {
-        JsonLoader(context).loadTarotCards()
-    }
+    private suspend fun allTarotCards(): List<TarotCard> = JsonLoader(context.applicationContext).loadTarotCards()
     
     fun drawCards(readingType: String) {
         if (isCardsDrawn) return
@@ -43,7 +41,7 @@ class CareerReadingViewModel(private val context: Context) : ViewModel() {
                 }
                 
                 // Rastgele kartları çek (hiçbiri aynı olmasın)
-                val randomCards = allTarotCards.shuffled().take(cardCount)
+                val randomCards = allTarotCards().shuffled().take(cardCount)
                 
                 // Kart durumlarını oluştur (hepsi kapalı başlar)
                 drawnCards = randomCards.mapIndexed { index, card ->

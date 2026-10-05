@@ -24,6 +24,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withTimeoutOrNull
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.lifecycleScope
@@ -150,6 +153,8 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val navController = rememberNavController()
             var startDestination by remember { mutableStateOf<String?>(null) }
+            var startupAttempt by remember { mutableIntStateOf(0) }
+            var startupFailed by remember { mutableStateOf(false) }
             val scope = rememberCoroutineScope()
             var fallbackTried by remember { mutableStateOf(false) }
             
@@ -249,7 +254,10 @@ class MainActivity : ComponentActivity() {
             )
 
             // Onboarding ve oturum kontrolü
-            LaunchedEffect(Unit) {
+            LaunchedEffect(startupAttempt) {
+                startupFailed = false
+                try {
+                val destination = withTimeoutOrNull(12_000) {
                 val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 val hasSeenOnboarding = prefs.getBoolean("has_seen_onboarding", false)
                 val user = FirebaseAuth.getInstance().currentUser
@@ -263,13 +271,15 @@ class MainActivity : ComponentActivity() {
                             .get()
                             .await()
                         userDoc.getBoolean("hasSeenIntroduction") ?: false
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (e: Exception) {
                         android.util.Log.e("MainActivity", "Error checking hasSeenIntroduction", e)
                         false
                     }
                 } ?: false
 
-                startDestination = when {
+                when {
                     !hasSeenOnboarding -> Screen.Onboarding.route
                     user == null -> Screen.Auth.route
                     user != null && !user.isEmailVerified -> Screen.Auth.route
@@ -299,10 +309,29 @@ class MainActivity : ComponentActivity() {
                     }
                     else -> Screen.Auth.route
                 }
+                }
+                startDestination = destination
+                startupFailed = destination == null
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Startup failed", e)
+                    startupFailed = true
+                }
             }
 
             if (startDestination == null) {
-                Box(Modifier.fillMaxSize()) { /* Splash veya boş ekran */ }
+                Box(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color(0xFF1A0A2E)),
+                    contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (startupFailed) {
+                            Text(stringResource(R.string.startup_retry_message), color = androidx.compose.ui.graphics.Color.White)
+                            Button(onClick = { startupAttempt++ }) { Text(stringResource(R.string.startup_retry_button)) }
+                        } else {
+                            CircularProgressIndicator(color = androidx.compose.ui.graphics.Color(0xFFFFD700))
+                        }
+                    }
+                }
             } else {
                 val context = LocalContext.current
                 val activity = context as ComponentActivity
@@ -649,7 +678,12 @@ class MainActivity : ComponentActivity() {
                                 factory = TarotMeaningsViewModelFactory(JsonLoader(context))
                             )
                             val card = viewModel.cards.find { it.id == cardId }
-                            if (card != null) {
+                            val cardsLoading by viewModel.isLoading.collectAsState()
+                            if (cardsLoading) {
+                                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    CircularProgressIndicator()
+                                }
+                            } else if (card != null) {
                                 TarotDetailScreen(
                                     onNavigateBack = { appNavigator.popBack() },
                                     card = card

@@ -159,6 +159,8 @@ class ProfileCompletionViewModel : ViewModel() {
             }
             
             ProfileCompletionStatus.COMPLETE
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: Exception) {
             ProfileCompletionStatus.ERROR
         }

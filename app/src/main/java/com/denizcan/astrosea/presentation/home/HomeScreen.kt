@@ -39,7 +39,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.util.rememberResourcePainter as painterResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
@@ -102,10 +102,12 @@ fun HomeScreen(
     
     // Çıkış yapma işleyicisi
     val handleSignOut: () -> Unit = {
-        showLogoutAnimation = true
-        scope.launch {
-            delay(1000) // 1 saniye animasyon
-            onSignOut()
+        if (!showLogoutAnimation) {
+            showLogoutAnimation = true
+            scope.launch {
+                delay(1000)
+                onSignOut()
+            }
         }
     }
     
@@ -585,7 +587,8 @@ private fun ServiceCard(
                             "Evet / Hayır" -> R.drawable.tarot
                             "Doğum Haritası" -> R.drawable.birthchart
                             else -> R.drawable.birthchart
-                        }
+                        },
+                        maxDimension = 512
                     ),
                     contentDescription = title,
                     modifier = Modifier

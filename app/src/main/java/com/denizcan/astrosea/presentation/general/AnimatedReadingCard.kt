@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.util.rememberResourcePainter as painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -106,7 +106,7 @@ fun AnimatedReadingCard(
                 )
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli, maxDimension = 512),
                     contentDescription = stringResource(R.string.cd_tarot_card),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
@@ -145,7 +145,7 @@ fun AnimatedReadingCard(
                         
                         if (imageResId != 0) {
                             Image(
-                                painter = painterResource(id = imageResId),
+                                painter = painterResource(id = imageResId, maxDimension = 512),
                                 contentDescription = cardState.card.name,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Fit
@@ -153,7 +153,7 @@ fun AnimatedReadingCard(
                         } else {
                             // Resim bulunamadıysa varsayılan
                             Image(
-                                painter = painterResource(id = R.drawable.placeholder_card),
+                                painter = painterResource(id = R.drawable.placeholder_card, maxDimension = 512),
                                 contentDescription = stringResource(R.string.cd_card_not_found),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Fit
@@ -162,7 +162,7 @@ fun AnimatedReadingCard(
                     } else {
                         // Kart henüz çekilmemişse arka yüzü göster
                         Image(
-                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli, maxDimension = 512),
                             contentDescription = stringResource(R.string.cd_closed_card),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit

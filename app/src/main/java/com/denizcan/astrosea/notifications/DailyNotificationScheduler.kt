@@ -20,13 +20,7 @@ object DailyNotificationScheduler {
      * Günün ilk bildirimi mevcut sabah bildirimi olarak kalır. Diğer dört
      * zaman, kullanıcı henüz günlük açılımını yapmadıysa gönderilir.
      */
-    private val reminderTimes = listOf(
-        10 to 0,
-        13 to 0,
-        16 to 0,
-        19 to 0,
-        22 to 0
-    )
+    private val reminderTimes = DailyReminderPolicy.hours.map { it to 0 }
     
     /**
      * Günlük beş bildirimi zamanlar.
@@ -100,6 +94,7 @@ object DailyNotificationScheduler {
      * Günlük açılım bildirimlerini iptal eder.
      */
     fun cancelDailyNotification(context: Context) {
+        androidx.work.WorkManager.getInstance(context).cancelAllWorkByTag(DailyNotificationWorker.TAG)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         reminderTimes.indices.forEach { reminderIndex ->
             val intent = Intent(context, DailyNotificationReceiver::class.java).apply {

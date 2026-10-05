@@ -5,9 +5,25 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.denizcan.astrosea.model.TarotCard
 import com.denizcan.astrosea.model.ReadingFormats
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class JsonLoader(private val context: Context) {
-    fun loadTarotCards(): List<TarotCard> {
+    companion object {
+        private val lock = Mutex()
+        private var cachedCards: List<TarotCard>? = null
+        private var cachedFormats: ReadingFormats? = null
+    }
+
+    suspend fun loadTarotCards(): List<TarotCard> = withContext(Dispatchers.IO) {
+        lock.withLock {
+            cachedCards ?: readTarotCards().also { if (it.isNotEmpty()) cachedCards = it }
+        }
+    }
+
+    private fun readTarotCards(): List<TarotCard> {
         return try {
             val jsonString = context.assets.open("tarot_cards.json").bufferedReader().use { it.readText() }
             val type = object : TypeToken<TarotCardsResponse>() {}.type
@@ -46,7 +62,11 @@ class JsonLoader(private val context: Context) {
         }
     }
     
-    fun loadReadingFormats(): ReadingFormats? {
+    suspend fun loadReadingFormats(): ReadingFormats? = withContext(Dispatchers.IO) {
+        lock.withLock { cachedFormats ?: readReadingFormats().also { cachedFormats = it } }
+    }
+
+    private fun readReadingFormats(): ReadingFormats? {
         return try {
             val jsonString = context.assets.open("reading_formats.json").bufferedReader().use { it.readText() }
             Gson().fromJson(jsonString, ReadingFormats::class.java)

@@ -15,12 +15,17 @@ import com.denizcan.astrosea.presentation.notifications.NotificationManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DailyTarotViewModel(private val context: Context) : ViewModel() {
+class DailyTarotViewModel(context: Context) : ViewModel() {
+    private val context = com.denizcan.astrosea.util.LanguageManager.wrap(context.applicationContext)
     
     var dailyCards by mutableStateOf<List<DailyCardState>>(emptyList())
         private set
@@ -35,18 +40,17 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     private var onCardsLoaded: (() -> Unit)? = null
     
     // Callback'i set etmek için fonksiyon
-    fun setOnCardsLoadedCallback(callback: () -> Unit) {
+    fun setOnCardsLoadedCallback(callback: (() -> Unit)?) {
         onCardsLoaded = callback
     }
     
-    private val allTarotCards: List<TarotCard> by lazy {
-        JsonLoader(context).loadTarotCards()
-    }
+    private suspend fun allTarotCards(): List<TarotCard> = JsonLoader(context.applicationContext).loadTarotCards()
     
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val userId: String? get() = auth.currentUser?.uid
     private val notificationManager = NotificationManager(context)
+    private var refreshJob: Job? = null
     
     init {
         if (userId != null) {
@@ -66,52 +70,49 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     
     private fun checkTodayDrawStatus() {
         viewModelScope.launch {
+            val uid = userId ?: return@launch
+            val date = getCurrentDateString()
+            var newDay = false
             try {
-                isLoading = true
-                val currentDate = getCurrentDateString()
-                val userDoc = userId?.let {
-                    firestore.collection("users").document(it).get().await()
-                }
-                
-                val lastDrawDate = userDoc?.getString("last_draw_date") ?: ""
-                
-                if (lastDrawDate != currentDate) {
-                    // Yeni günlük kartlar henüz çekilmemiş, arka yüzlerini göster
-                    dailyCards = List(3) { index ->
-                        DailyCardState(
-                            index = index,
-                            card = null,
-                            isRevealed = false
-                        )
+                withTimeoutOrNull(8_000) {
+                    val userDoc = firestore.collection("users").document(uid).get().await()
+                    if (userId != uid) return@withTimeoutOrNull
+                    if (userDoc.getString("last_draw_date") == date) {
+                        loadSavedCards(userDoc)
+                        hasDrawnToday = true
+                    } else {
+                        dailyCards = List(3) { DailyCardState(index = it, card = null, isRevealed = false) }
+                        hasDrawnToday = false
+                        newDay = true
                     }
-                    hasDrawnToday = false
-                    
-                    // Günlük kartlar yenilendiğinde bildirim listesine yalnızca günde bir kez ekle.
-                    // Bu ekran birden fazla kez oluşturulabildiği için kontrolü transaction ile atomik yapıyoruz.
-                    val currentUserId = userId
-                    if (currentUserId != null && reserveDailyReadyNotification(currentUserId, currentDate)) {
-                        try {
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("DailyTarotViewModel", "Unable to load daily cards", e)
+            } finally {
+                if (dailyCards.isEmpty()) {
+                    dailyCards = List(3) { DailyCardState(index = it, card = null, isRevealed = false) }
+                }
+                isLoading = false
+            }
+            // Inbox maintenance must not hold up the cards or their loading state.
+            if (newDay && userId == uid) {
+                try {
+                    withTimeoutOrNull(6_000) {
+                        if (reserveDailyReadyNotification(uid, date)) {
                             notificationManager.saveNotificationToFirestore(
-                                userId = currentUserId,
+                                userId = uid,
                                 title = context.getString(R.string.notif_daily_ready_title),
                                 message = context.getString(R.string.notif_daily_ready_message)
                             )
-                            Log.d("DailyTarotViewModel", "Daily cards notification saved to Firestore")
-                        } catch (e: Exception) {
-                            Log.e("DailyTarotViewModel", "Error saving daily notification", e)
                         }
                     }
-                } else {
-                    // Bugün kartlar zaten çekilmiş, kaydedilen verileri yükle
-                    loadSavedCards()
-                    hasDrawnToday = true
-                    Log.d("DailyTarotViewModel", "Today's cards already drawn, loading saved state")
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e("DailyTarotViewModel", "Unable to save daily inbox notification", e)
                 }
-                
-                isLoading = false
-            } catch (e: Exception) {
-                Log.e("DailyTarotViewModel", "Error checking today's draw status", e)
-                isLoading = false
             }
         }
     }
@@ -138,10 +139,11 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     // Bu sayede race condition önlenir
     fun drawAndRevealCard(index: Int) {
         if (userId == null || isLoading) return
+        refreshJob?.cancel()
+        isLoading = true
         
         viewModelScope.launch {
             try {
-                isLoading = true
                 val currentDate = getCurrentDateString()
                 val userDoc = firestore.collection("users").document(userId!!).get().await()
                 val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
@@ -155,7 +157,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                     for (i in 0 until 3) {
                         val cardId = userDoc.getString("card_${i}_id") ?: ""
                         val isRevealed = userDoc.getBoolean("card_${i}_revealed") ?: false
-                        val card = allTarotCards.find { it.id == cardId }
+                        val card = allTarotCards().find { it.id == cardId }
                         loadedCards.add(DailyCardState(index = i, card = card, isRevealed = isRevealed))
                     }
                     dailyCards = loadedCards.sortedBy { it.index }
@@ -178,7 +180,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                 } else {
                     // Bugün çekilmemiş, yeni kartlar çek
                     Log.d("DailyTarotViewModel", "Drawing new daily cards")
-                    val randomCards = allTarotCards.shuffled().take(3)
+                    val randomCards = allTarotCards().shuffled().take(3)
                     
                     // Local state'i güncelle - tıklanan kart açık olsun
                     dailyCards = randomCards.mapIndexed { i, card ->
@@ -262,13 +264,9 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
         }
     }
     
-    private suspend fun loadSavedCards() {
+    private suspend fun loadSavedCards(userDoc: DocumentSnapshot) {
         try {
             Log.d("DailyTarotViewModel", "loadSavedCards çağrıldı")
-            val userDoc = userId?.let {
-                firestore.collection("users").document(it).get().await()
-            } ?: return
-            
             val loadedCards = mutableListOf<DailyCardState>()
             
             for (i in 0 until 3) {
@@ -277,7 +275,7 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
                 
                 Log.d("DailyTarotViewModel", "Firebase'den yüklenen kart $i: cardId=$cardId, isRevealed=$isRevealed")
                 
-                val card = allTarotCards.find { it.id == cardId }
+                val card = allTarotCards().find { it.id == cardId }
                 if (cardId.isNotEmpty() && card != null) {
                     loadedCards.add(
                         DailyCardState(
@@ -309,6 +307,8 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
             // Kartlar yüklendiğinde callback'i çağır
             onCardsLoaded?.invoke()
             
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("DailyTarotViewModel", "Error loading saved cards", e)
         }
@@ -316,37 +316,26 @@ class DailyTarotViewModel(private val context: Context) : ViewModel() {
     
     // Günlük açılım detay sayfasından gelen güncellemeleri dinlemek için
     fun refreshCards() {
-        if (userId != null) {
-            viewModelScope.launch {
-                Log.d("DailyTarotViewModel", "=== Refreshing cards ===")
-                Log.d("DailyTarotViewModel", "Current state - hasDrawnToday: $hasDrawnToday, cards count: ${dailyCards.size}")
-                
-                // Önce günlük durumu kontrol et
-                val currentDate = getCurrentDateString()
-                val userDoc = firestore.collection("users").document(userId!!).get().await()
-                val lastDrawDate = userDoc.getString("last_draw_date") ?: ""
-                
-                Log.d("DailyTarotViewModel", "Current date: $currentDate, Last draw date: $lastDrawDate")
-                
-                if (lastDrawDate == currentDate) {
-                    // Bugün kartlar çekilmiş, yükle
-                    Log.d("DailyTarotViewModel", "Today's cards already drawn, loading saved state")
-                    loadSavedCards()
+        val uid = userId ?: return
+        if (isLoading || refreshJob?.isActive == true) return
+        refreshJob = viewModelScope.launch {
+            try {
+                val userDoc = withTimeoutOrNull(8_000) {
+                    firestore.collection("users").document(uid).get().await()
+                } ?: return@launch
+                if (userId != uid) return@launch
+                if (userDoc.getString("last_draw_date") == getCurrentDateString()) {
+                    loadSavedCards(userDoc)
                     hasDrawnToday = true
-                    Log.d("DailyTarotViewModel", "Refreshed cards for today")
                 } else {
-                    // Yeni gün, kartları sıfırla
-                    Log.d("DailyTarotViewModel", "New day, resetting cards")
-                    dailyCards = List(3) { index ->
-                        DailyCardState(
-                            index = index,
-                            card = null,
-                            isRevealed = false
-                        )
-                    }.sortedBy { it.index }
+                    dailyCards = List(3) { DailyCardState(index = it, card = null, isRevealed = false) }
                     hasDrawnToday = false
-                    Log.d("DailyTarotViewModel", "Reset cards for new day")
                 }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Keep the displayed cards on transient network errors instead of crashing the screen.
+                Log.e("DailyTarotViewModel", "Unable to refresh daily cards", e)
             }
         }
     }

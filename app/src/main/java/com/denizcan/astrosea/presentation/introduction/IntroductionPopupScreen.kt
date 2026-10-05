@@ -469,8 +469,8 @@ private fun IntroTarotCards() {
     val scope = rememberCoroutineScope()
     
     // Tüm tarot kartlarını yükle
-    val allTarotCards = remember {
-        JsonLoader(context).loadTarotCards()
+    val allTarotCards by produceState<List<com.denizcan.astrosea.model.TarotCard>>(emptyList()) {
+        value = JsonLoader(context.applicationContext).loadTarotCards()
     }
     
     // 3 kart için state

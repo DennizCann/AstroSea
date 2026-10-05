@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.util.rememberResourcePainter as painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -73,6 +73,7 @@ fun ProfileScreen(
         mutableStateOf(initialDailyNotificationsEnabled)
     }
     var systemNotificationsEnabled by remember { mutableStateOf(notificationManager.checkNotificationPermission()) }
+    var dailyPopupsEnabled by remember { mutableStateOf(notificationManager.areDailyPopupsEnabled()) }
     val calendar = remember { Calendar.getInstance() }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -95,6 +96,7 @@ fun ProfileScreen(
                     selectedDailyNotificationsEnabled = storedPreference
                 }
                 systemNotificationsEnabled = notificationManager.checkNotificationPermission()
+                dailyPopupsEnabled = notificationManager.areDailyPopupsEnabled()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -359,7 +361,9 @@ fun ProfileScreen(
                 NotificationSettingsCard(
                     notificationsEnabled = selectedDailyNotificationsEnabled,
                     systemNotificationsEnabled = systemNotificationsEnabled,
-                    onNotificationsChanged = { enabled -> selectedDailyNotificationsEnabled = enabled }
+                    dailyPopupsEnabled = dailyPopupsEnabled,
+                    onNotificationsChanged = { enabled -> selectedDailyNotificationsEnabled = enabled },
+                    onOpenSystemSettings = { notificationManager.openNotificationSettings() }
                 )
 
                 // Kaydetme işlemi, üyelik durumundan önce profil ayarlarının yanında kalır.
@@ -718,7 +722,9 @@ fun ProfileScreen(
 fun NotificationSettingsCard(
     notificationsEnabled: Boolean,
     systemNotificationsEnabled: Boolean,
-    onNotificationsChanged: (Boolean) -> Unit
+    dailyPopupsEnabled: Boolean,
+    onNotificationsChanged: (Boolean) -> Unit,
+    onOpenSystemSettings: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -753,7 +759,9 @@ fun NotificationSettingsCard(
                 )
                 Text(
                     text = stringResource(
-                        if (notificationsEnabled && systemNotificationsEnabled) {
+                        if (notificationsEnabled && systemNotificationsEnabled && !dailyPopupsEnabled) {
+                            R.string.notification_settings_quiet
+                        } else if (notificationsEnabled && systemNotificationsEnabled) {
                             R.string.notification_settings_enabled
                         } else if (!notificationsEnabled) {
                             R.string.notification_settings_disabled
@@ -764,6 +772,9 @@ fun NotificationSettingsCard(
                     color = Color.White.copy(alpha = 0.72f),
                     style = MaterialTheme.typography.bodySmall
                 )
+                TextButton(onClick = onOpenSystemSettings) {
+                    Text(stringResource(R.string.notification_system_settings), color = Color(0xFFFFD700))
+                }
             }
             Switch(
                 checked = notificationsEnabled,

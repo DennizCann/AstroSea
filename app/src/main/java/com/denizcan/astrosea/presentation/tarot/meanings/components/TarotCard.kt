@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.util.rememberResourcePainter as painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.denizcan.astrosea.R
@@ -63,7 +63,7 @@ fun TarotCard(
         ) {
             if (imageResId != 0) {
                 Image(
-                    painter = painterResource(id = imageResId),
+                                painter = painterResource(id = imageResId, maxDimension = 512),
                     contentDescription = card.displayName(),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds

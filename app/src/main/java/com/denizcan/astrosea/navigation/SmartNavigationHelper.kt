@@ -27,7 +27,7 @@ class SmartNavigationHelper(
             "FİNANSAL DURUM" -> "career_reading"
             else -> Screen.GeneralReadings.route
         }
-        if (!navController.popBackStack(targetRoute, inclusive = false)) {
+        if (!navController.popBackStack(targetRoute, inclusive = false) && navController.previousBackStackEntry != null) {
             navController.popBackStack()
         }
     }

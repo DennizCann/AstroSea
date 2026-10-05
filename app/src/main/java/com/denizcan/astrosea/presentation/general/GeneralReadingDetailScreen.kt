@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.util.rememberResourcePainter as painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -124,7 +124,8 @@ fun GeneralReadingDetailScreen(
     // Reklam yöneticileri
     val rewardedAdManager = remember { RewardedAdManager(context) }
     val adRightsManager = remember { AdRightsManager() }
-    LaunchedEffect(Unit) { rewardedAdManager.preload() }
+    // Load an ad only after verified free access chooses the ad-unlock path.
+    var isOpeningReading by remember { mutableStateOf(false) }
     
     // Günlük açılım mı kontrolü
     val isDailyReading = readingType.trim() == "GÜNLÜK AÇILIM"
@@ -305,6 +306,8 @@ fun GeneralReadingDetailScreen(
                                 // Yorumunu Gör Butonu
                                 Button(
                                     onClick = { 
+                                        if (isOpeningReading) return@Button
+                                        isOpeningReading = true
                                         scope.launch {
                                             try {
                                                 val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
@@ -331,6 +334,7 @@ fun GeneralReadingDetailScreen(
                                                 } else {
                                                     val remaining = adRightsManager.getRemainingUnlocks()
                                                     if (remaining > 0) {
+                                                        rewardedAdManager.preload()
                                                         remainingAdUnlocks = remaining
                                                         adErrorMessage = null
                                                         showAdDialog = true
@@ -342,11 +346,13 @@ fun GeneralReadingDetailScreen(
                                             } catch (e: Exception) {
                                                 Log.e("GeneralReadingDetailScreen", "Yorum akışı hatası", e)
                                                 android.widget.Toast.makeText(context, context.getString(R.string.membership_unavailable), android.widget.Toast.LENGTH_LONG).show()
+                                            } finally {
+                                                isOpeningReading = false
                                             }
                                         }
                                     },
                                     modifier = Modifier.weight(1f),
-                                    enabled = viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount,
+                                    enabled = !isOpeningReading && !viewModel.isGeneratingReading && viewModel.drawnCards.count { it.isRevealed } == readingInfo.cardCount,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (viewModel.drawnCards.filter { it.isRevealed }.size == readingInfo.cardCount) 
                                             Color.Black.copy(alpha = 0.6f) 
@@ -614,6 +620,7 @@ fun GeneralReadingInterpretationScreen(
         }
     }
     
+    val paragraphs = remember(displayInterpretation) { com.denizcan.astrosea.util.readingParagraphs(displayInterpretation) }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.acilimlararkaplan),
@@ -742,9 +749,9 @@ fun GeneralReadingInterpretationScreen(
                                     .padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                item {
+                                itemsIndexed(paragraphs, key = { index, _ -> index }) { _, paragraph ->
                                     Text(
-                                        text = displayInterpretation,
+                                        text = paragraph,
                                         color = Color.White,
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
                                         fontSize = 18.sp,

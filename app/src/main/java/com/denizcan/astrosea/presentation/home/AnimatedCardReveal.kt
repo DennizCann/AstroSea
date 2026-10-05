@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import com.denizcan.astrosea.util.rememberResourcePainter as painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -72,9 +72,9 @@ fun AnimatedCardReveal(
         // Sadece kapalı kartlara tıklanabilir ve animasyon çalışmıyorsa
         if (!cardState.isRevealed && !isRevealing) {
             Log.d("AnimatedCardReveal", "🎴 Card click for card ${cardState.index}, cardKey: $cardKey")
+            isRevealing = true
             scope.launch {
-                isRevealing = true
-                
+                try {
                 // Kartı çek
                 onDrawCard()
                 
@@ -82,8 +82,10 @@ fun AnimatedCardReveal(
                 isFlipped = true
                 delay(800) // Çevirme animasyonunun tamamını bekle
                 
-                isRevealing = false
                 Log.d("AnimatedCardReveal", "🎉 Animation completed for card ${cardState.index}")
+                } finally {
+                    isRevealing = false
+                }
             }
         } else if (cardState.isRevealed && !isRevealing) {
             // Kart zaten açıksa direkt detay sayfasına git
@@ -114,7 +116,7 @@ fun AnimatedCardReveal(
                 )
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                    painter = painterResource(id = R.drawable.tarotkartiarkasikesimli, maxDimension = 512),
                     contentDescription = stringResource(R.string.cd_tarot_card),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
@@ -150,7 +152,7 @@ fun AnimatedCardReveal(
                         )
                         if (imageResId != 0) {
                             Image(
-                                painter = painterResource(id = imageResId),
+                                painter = painterResource(id = imageResId, maxDimension = 512),
                                 contentDescription = cardState.card.name,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Fit
@@ -158,7 +160,7 @@ fun AnimatedCardReveal(
                         } else {
                             // Resim bulunamadıysa varsayılan
                             Image(
-                                painter = painterResource(id = R.drawable.placeholder_card),
+                                painter = painterResource(id = R.drawable.placeholder_card, maxDimension = 512),
                                 contentDescription = stringResource(R.string.cd_card_not_found),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Fit
@@ -167,7 +169,7 @@ fun AnimatedCardReveal(
                     } else {
                         // Kart henüz çekilmemişse arka yüzü göster
                         Image(
-                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli),
+                            painter = painterResource(id = R.drawable.tarotkartiarkasikesimli, maxDimension = 512),
                             contentDescription = stringResource(R.string.cd_closed_card),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit

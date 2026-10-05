@@ -226,9 +226,22 @@ class NotificationManager(private val context: Context) {
      */
     fun checkNotificationPermission(): Boolean {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            if (manager.getNotificationChannel(com.denizcan.astrosea.notifications.DailyNotificationWorker.CHANNEL_ID)
+                    ?.importance == android.app.NotificationManager.IMPORTANCE_NONE) return false
+        }
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
             android.content.pm.PackageManager.PERMISSION_GRANTED
+    }
+
+    fun areDailyPopupsEnabled(): Boolean {
+        if (!checkNotificationPermission()) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return true
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val channel = manager.getNotificationChannel(com.denizcan.astrosea.notifications.DailyNotificationWorker.CHANNEL_ID)
+        return channel == null || channel.importance >= android.app.NotificationManager.IMPORTANCE_HIGH
     }
     
     /**
@@ -256,8 +269,19 @@ class NotificationManager(private val context: Context) {
 
     /** Android artık tekrar izin penceresi göstermiyorsa kullanıcıyı doğrudan ayarlara götürür. */
     fun openNotificationSettings() {
-        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                android.net.Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            return
+        }
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val channelExists = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            manager.getNotificationChannel(com.denizcan.astrosea.notifications.DailyNotificationWorker.CHANNEL_ID) != null
+        val useChannel = channelExists && NotificationManagerCompat.from(context).areNotificationsEnabled()
+        val action = if (useChannel) Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS else Settings.ACTION_APP_NOTIFICATION_SETTINGS
+        val intent = Intent(action).apply {
             putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            if (useChannel) putExtra(Settings.EXTRA_CHANNEL_ID, com.denizcan.astrosea.notifications.DailyNotificationWorker.CHANNEL_ID)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)

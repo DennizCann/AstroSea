@@ -1,6 +1,7 @@
 package com.denizcan.astrosea.navigation
 
 import androidx.navigation.NavController
+import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,12 +17,14 @@ class AppNavigator(
     private var locked = false
 
     fun run(block: () -> Unit) {
-        if (locked) return
+        if (locked || navController.currentBackStackEntry?.lifecycle?.currentState != Lifecycle.State.RESUMED) return
         locked = true
-        block()
-        scope.launch {
-            delay(450)
-            locked = false
+        try {
+            block()
+        } finally {
+            scope.launch {
+                try { delay(450) } finally { locked = false }
+            }
         }
     }
 
@@ -39,7 +42,8 @@ class AppNavigator(
 
     fun popBack() {
         run {
-            navController.popBackStack()
+            // Popping the last destination leaves NavHost empty (only the window background).
+            if (navController.previousBackStackEntry != null) navController.popBackStack()
         }
     }
 
