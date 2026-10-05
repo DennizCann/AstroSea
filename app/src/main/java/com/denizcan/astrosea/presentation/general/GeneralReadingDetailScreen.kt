@@ -620,7 +620,17 @@ fun GeneralReadingInterpretationScreen(
         }
     }
     
-    val paragraphs = remember(displayInterpretation) { com.denizcan.astrosea.util.readingParagraphs(displayInterpretation) }
+    val presentation = remember(displayInterpretation, viewModel.readingError) {
+        com.denizcan.astrosea.util.readingPresentation(displayInterpretation, allowCollapse = viewModel.readingError == null)
+    }
+    var detailsExpanded by androidx.compose.runtime.saveable.rememberSaveable(readingType, displayInterpretation) {
+        mutableStateOf(false)
+    }
+    val visibleBlocks = remember(presentation, detailsExpanded) {
+        if (detailsExpanded) presentation.overview + presentation.details else presentation.overview
+    }
+    val readingListState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val presentationScope = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.acilimlararkaplan),
@@ -653,6 +663,7 @@ fun GeneralReadingInterpretationScreen(
                 // Preserve the initial card area, but let it scroll away with the reading.
                 val frameHeight = maxHeight * 0.65f
                 LazyColumn(
+                    state = readingListState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -726,9 +737,9 @@ fun GeneralReadingInterpretationScreen(
                         }
                     } else {
                         // One page-level scroller; paragraphs stay lazy even for very long readings.
-                        itemsIndexed(paragraphs, key = { index, _ -> "paragraph-$index" }) { index, paragraph ->
+                        itemsIndexed(visibleBlocks, key = { index, _ -> "paragraph-$index" }) { index, block ->
                             val first = index == 0
-                            val last = index == paragraphs.lastIndex
+                            val last = index == visibleBlocks.lastIndex && !presentation.hasDetails
                             Surface(
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                                 color = Color.Black.copy(alpha = 0.6f),
@@ -740,18 +751,45 @@ fun GeneralReadingInterpretationScreen(
                                 )
                             ) {
                                 Text(
-                                    text = paragraph,
+                                    text = block.text,
                                     modifier = Modifier.padding(
                                         start = 16.dp, end = 16.dp,
                                         top = if (first) 16.dp else 4.dp,
                                         bottom = if (last) 16.dp else 4.dp
                                     ),
-                                    color = Color.White,
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 18.sp,
+                                    color = if (block.isHeading) Color(0xFFD4AF37) else Color.White,
+                                    fontFamily = FontFamily(Font(if (block.isHeading) R.font.cinzel_bold else R.font.cormorantgaramond_regular)),
+                                    fontSize = if (block.isHeading) 20.sp else 18.sp,
                                     lineHeight = 28.sp,
                                     textAlign = TextAlign.Start
                                 )
+                            }
+                        }
+                        if (presentation.hasDetails) {
+                            item(key = "reading-toggle") {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                    color = Color.Black.copy(alpha = 0.6f),
+                                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(if (detailsExpanded) R.string.reading_hide_details else R.string.reading_show_details),
+                                        modifier = Modifier
+                                            .clickable(role = androidx.compose.ui.semantics.Role.Button) {
+                                                val collapsing = detailsExpanded
+                                                detailsExpanded = !detailsExpanded
+                                                if (collapsing) presentationScope.launch {
+                                                    // Cards and spacing occupy the first two items.
+                                                    readingListState.scrollToItem(2)
+                                                }
+                                            }
+                                            .heightIn(min = 48.dp)
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        color = Color(0xFFD4AF37),
+                                        fontSize = 14.sp,
+                                        lineHeight = 20.sp
+                                    )
+                                }
                             }
                         }
                     }
