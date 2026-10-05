@@ -168,7 +168,7 @@ class NotificationManager(private val context: Context) {
     /**
      * Tüm bildirimleri okundu olarak işaretler
      */
-    suspend fun markAllNotificationsAsRead(userId: String) {
+    suspend fun markAllNotificationsAsRead(userId: String): Set<String> {
         try {
             val snapshot = firestore.collection("users")
                 .document(userId)
@@ -177,15 +177,17 @@ class NotificationManager(private val context: Context) {
                 .get()
                 .await()
             
-            val batch = firestore.batch()
-            snapshot.documents.forEach { doc ->
-                batch.update(doc.reference, "isRead", true)
+            snapshot.documents.chunked(450).forEach { documents ->
+                val batch = firestore.batch()
+                documents.forEach { doc -> batch.update(doc.reference, "isRead", true) }
+                batch.commit().await()
             }
-            batch.commit().await()
             
             Log.d(TAG, "Tüm bildirimler okundu işaretlendi: ${snapshot.size()} bildirim")
+            return snapshot.documents.map { it.id }.toSet()
         } catch (e: Exception) {
             Log.e(TAG, "Bildirimler okundu işaretlenemedi", e)
+            throw e
         }
     }
     

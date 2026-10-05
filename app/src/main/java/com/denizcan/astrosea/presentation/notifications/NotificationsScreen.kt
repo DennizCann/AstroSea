@@ -88,6 +88,7 @@ fun NotificationsScreen(
     val notifications = remember { mutableStateListOf<Notification>() }
     var unreadCount by remember { mutableStateOf(0) }
     var isLoading by remember { mutableStateOf(true) }
+    var isMarkingAllRead by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val firestore = remember { FirebaseFirestore.getInstance() }
     val auth = remember { FirebaseAuth.getInstance() }
@@ -95,6 +96,30 @@ fun NotificationsScreen(
     val context = LocalContext.current
     val notificationManager = remember { NotificationManager(context) }
     var selectedNotification by remember { mutableStateOf<Notification?>(null) }
+
+    fun markAllAsRead() {
+        if (userId == null || isMarkingAllRead || unreadCount == 0) return
+        isMarkingAllRead = true
+        scope.launch {
+            try {
+                val markedIds = kotlinx.coroutines.withTimeoutOrNull(15_000) {
+                    notificationManager.markAllNotificationsAsRead(userId)
+                } ?: error("Mark all as read timed out")
+                notifications.indices.forEach { index ->
+                    val notification = notifications[index]
+                    if (notification.id in markedIds) notifications[index] = notification.copy(isRead = true)
+                }
+                unreadCount = notifications.count { !it.isRead }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(context, context.getString(R.string.notif_mark_all_error),
+                    android.widget.Toast.LENGTH_SHORT).show()
+            } finally {
+                isMarkingAllRead = false
+            }
+        }
+    }
 
     fun markNotificationAsRead(notification: Notification) {
         if (notification.isRead || userId == null) return
@@ -177,6 +202,7 @@ fun NotificationsScreen(
                         shape = RoundedCornerShape(12.dp),
                         border = outlinedCardBorder()
                     ) {
+                        Box {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -222,8 +248,36 @@ fun NotificationsScreen(
                                 )
                             }
                         }
+                        // Overlay does not participate in sizing: keep the statistics card unchanged.
+                        Box(modifier = Modifier.matchParentSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = stringResource(R.string.notif_mark_all_short),
+                                modifier = Modifier.offset(y = (-28).dp),
+                                fontSize = 11.sp,
+                                lineHeight = 14.sp,
+                                maxLines = 1,
+                                color = if (unreadCount > 0 && !isMarkingAllRead) Color(0xFFFFD700)
+                                    else Color.White.copy(alpha = 0.35f)
+                            )
+                            IconButton(
+                                onClick = { markAllAsRead() },
+                                enabled = !isLoading && !isMarkingAllRead && unreadCount > 0 && userId != null,
+                                modifier = Modifier.size(48.dp),
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    contentColor = Color(0xFFFFD700),
+                                    disabledContentColor = Color.White.copy(alpha = 0.35f)
+                                )
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_mark_all_read),
+                                    contentDescription = stringResource(if (isMarkingAllRead) R.string.notif_marking_all_read else R.string.notif_mark_all_read),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                        }
                     }
-                    
+
                     // Bildirim listesi
                     if (notifications.isEmpty()) {
                         Box(
