@@ -638,127 +638,120 @@ fun GeneralReadingInterpretationScreen(
             },
             containerColor = Color.Transparent
         ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // Çerçeve ve Açık Kartlar
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.98f)
-                        .weight(6.5f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.acilimlarsayfasitak),
-                        contentDescription = stringResource(R.string.cd_frame),
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
-                    )
-
-                    // Açık kartların yerleşeceği alan
-                    var parentContainerSize by remember { mutableStateOf(IntSize.Zero) }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .onGloballyPositioned { coordinates ->
-                                parentContainerSize = coordinates.size
-                            }
-                    ) {
-                        // Açık kartları göster
-                        val revealedCards = viewModel.drawnCards.filter { it.isRevealed }
-                        CardLayoutContainer(
-                            readingInfo = readingInfo,
-                            drawnCardMap = revealedCards.associateBy { it.index },
-                            onDrawCard = { /* Kartlar zaten açık */ },
-                            onNavigateToCardDetail = onNavigateToCardDetail,
-                            parentSize = parentContainerSize,
-                            forceRevealed = true // Yorum ekranında kartları zorla açık göster
-                        )
-                    }
+            val readyAt = viewModel.interpretationReadyAt
+            var now by remember { mutableStateOf(System.currentTimeMillis()) }
+            LaunchedEffect(readyAt) {
+                while (readyAt != null && System.currentTimeMillis() < readyAt) {
+                    delay(400)
+                    now = System.currentTimeMillis()
                 }
-                
-                // Yorum Kutusu - Kaydırılabilir
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .weight(3.5f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                now = System.currentTimeMillis()
+            }
+            val showLoading = (readyAt != null && now < readyAt) || isWaitingForReading
+
+            BoxWithConstraints(Modifier.fillMaxSize().padding(paddingValues)) {
+                // Preserve the initial card area, but let it scroll away with the reading.
+                val frameHeight = maxHeight * 0.65f
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val readyAt = viewModel.interpretationReadyAt
-                    var now by remember { mutableStateOf(System.currentTimeMillis()) }
-                    LaunchedEffect(readyAt) {
-                        while (readyAt != null && System.currentTimeMillis() < readyAt) {
-                            delay(400)
-                            now = System.currentTimeMillis()
-                        }
-                        now = System.currentTimeMillis()
-                    }
-                    val isReady = readyAt == null || now >= readyAt
-                    val showLoading = !isReady || isWaitingForReading
-                    
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Black.copy(alpha = 0.6f)
-                        ),
-                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
-                    ) {
-                        if (showLoading) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                    item(key = "cards") {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(0.98f).height(frameHeight),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.acilimlarsayfasitak),
+                                contentDescription = stringResource(R.string.cd_frame),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.FillBounds
+                            )
+                            var parentContainerSize by remember { mutableStateOf(IntSize.Zero) }
+                            Box(
+                                modifier = Modifier.fillMaxSize().onGloballyPositioned {
+                                    parentContainerSize = it.size
+                                }
                             ) {
-                                CircularProgressIndicator(
-                                    color = Color(0xFFD4AF37),
-                                    modifier = Modifier.size(36.dp),
-                                    strokeWidth = 3.dp
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(R.string.preparing_title),
-                                    color = Color(0xFFD4AF37),
-                                    fontFamily = FontFamily(Font(R.font.cinzel_bold)),
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = androidx.compose.ui.res.stringResource(R.string.preparing_desc),
-                                    color = Color.White.copy(alpha = 0.7f),
-                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                    fontSize = 15.sp,
-                                    textAlign = TextAlign.Center
+                                val revealedCards = viewModel.drawnCards.filter { it.isRevealed }
+                                CardLayoutContainer(
+                                    readingInfo = readingInfo,
+                                    drawnCardMap = revealedCards.associateBy { it.index },
+                                    onDrawCard = { /* Cards are already revealed. */ },
+                                    onNavigateToCardDetail = onNavigateToCardDetail,
+                                    parentSize = parentContainerSize,
+                                    forceRevealed = true
                                 )
                             }
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                        }
+                    }
+                    item(key = "reading-gap") { Spacer(Modifier.height(12.dp)) }
+                    if (showLoading) {
+                        item(key = "loading") {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.6f)),
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                             ) {
-                                itemsIndexed(paragraphs, key = { index, _ -> index }) { _, paragraph ->
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 180.dp).padding(16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = Color(0xFFD4AF37),
+                                        modifier = Modifier.size(36.dp),
+                                        strokeWidth = 3.dp
+                                    )
+                                    Spacer(Modifier.height(16.dp))
                                     Text(
-                                        text = paragraph,
-                                        color = Color.White,
+                                        text = stringResource(R.string.preparing_title),
+                                        color = Color(0xFFD4AF37),
+                                        fontFamily = FontFamily(Font(R.font.cinzel_bold)),
+                                        fontSize = 20.sp,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(Modifier.height(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.preparing_desc),
+                                        color = Color.White.copy(alpha = 0.7f),
                                         fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
-                                        fontSize = 18.sp,
-                                        lineHeight = 28.sp,
-                                        textAlign = TextAlign.Start
+                                        fontSize = 15.sp,
+                                        textAlign = TextAlign.Center
                                     )
                                 }
+                            }
+                        }
+                    } else {
+                        // One page-level scroller; paragraphs stay lazy even for very long readings.
+                        itemsIndexed(paragraphs, key = { index, _ -> "paragraph-$index" }) { index, paragraph ->
+                            val first = index == 0
+                            val last = index == paragraphs.lastIndex
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                color = Color.Black.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(
+                                    topStart = if (first) 8.dp else 0.dp,
+                                    topEnd = if (first) 8.dp else 0.dp,
+                                    bottomStart = if (last) 8.dp else 0.dp,
+                                    bottomEnd = if (last) 8.dp else 0.dp
+                                )
+                            ) {
+                                Text(
+                                    text = paragraph,
+                                    modifier = Modifier.padding(
+                                        start = 16.dp, end = 16.dp,
+                                        top = if (first) 16.dp else 4.dp,
+                                        bottom = if (last) 16.dp else 4.dp
+                                    ),
+                                    color = Color.White,
+                                    fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)),
+                                    fontSize = 18.sp,
+                                    lineHeight = 28.sp,
+                                    textAlign = TextAlign.Start
+                                )
                             }
                         }
                     }
