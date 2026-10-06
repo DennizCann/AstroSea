@@ -58,7 +58,7 @@
 
     <!-- Reading detail -->
     <string name="btn_redraw">Yeniden Çek</string>
-    <string name="btn_daily_once">Günlük Açılım - Günde Bir Kez</string>
+    <string name="btn_daily_once">Günde bir kez</string>
     <string name="btn_see_interpretation">Yorumunu Gör</string>
     <string name="interpretation_loading">Yorumunuz hazırlanıyor…</string>
     <string name="preparing_title">✨ Falınız hazırlanıyor…</string>

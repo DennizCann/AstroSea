@@ -58,7 +58,7 @@
 
     <!-- Reading detail -->
     <string name="btn_redraw">Redraw</string>
-    <string name="btn_daily_once">Daily Spread – Once a Day</string>
+    <string name="btn_daily_once">Once a day</string>
     <string name="btn_see_interpretation">See Interpretation</string>
     <string name="interpretation_loading">Preparing your interpretation…</string>
     <string name="preparing_title">✨ Your reading is being prepared…</string>

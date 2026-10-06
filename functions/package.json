@@ -6,7 +6,7 @@
     "node": "22"
   },
   "scripts": {
-    "check": "node --check index.js && node --check membership.js && node --check membership-service.js && node --check beta-service.js",
+    "check": "node --check index.js && node --check membership.js && node --check membership-service.js && node --check beta-service.js && node --check reading-service.js && node --check reading-prompts.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {

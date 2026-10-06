@@ -616,7 +616,7 @@ class GeneralReadingViewModel(context: Context) : ViewModel() {
                 }
                 
                 // Çekilen kartları TarotCard listesine dönüştür
-                val tarotCards = revealedCards.mapNotNull { it.card }
+                val tarotCards = revealedCards.sortedBy { it.index }.mapNotNull { it.card }
                 
                 if (tarotCards.isEmpty()) {
                     readingError = context.getString(R.string.err_no_valid_card)

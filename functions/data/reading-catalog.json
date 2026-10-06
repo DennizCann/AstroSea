@@ -1,0 +1,1569 @@
+{
+  "formats": [
+    {
+      "id": "daily_reading",
+      "cardCount": 3,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Günlük Açılım\n\nKartlar ve Pozisyonları:\n\nDüşünce: [KART_1_ADI]\nHis: [KART_2_ADI]\nAksiyon: [KART_3_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Düşünce",
+        "His",
+        "Aksiyon"
+      ],
+      "nameEn": "DAILY SPREAD",
+      "positionsEn": [
+        "Thought",
+        "Feeling",
+        "Action"
+      ]
+    },
+    {
+      "id": "single_card_reading",
+      "cardCount": 1,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Tek Kart Açılımı\n\nKartlar ve Pozisyonları:\n\nGünün Kartı: [KART_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Günün Kartı"
+      ],
+      "nameEn": "ONE CARD SPREAD",
+      "positionsEn": [
+        "Card of the Day"
+      ]
+    },
+    {
+      "id": "yes_no_reading",
+      "cardCount": 1,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Evet/Hayır Açılımı\n\nKartlar ve Pozisyonları:\n\nCevap: [KART_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Cevap"
+      ],
+      "nameEn": "YES – NO SPREAD",
+      "positionsEn": [
+        "Answer"
+      ]
+    },
+    {
+      "id": "past_present_future",
+      "cardCount": 3,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Geçmiş, Şimdi, Gelecek\n\nKartlar ve Pozisyonları:\n\nGeçmiş: [KART_1_ADI]\nŞimdi: [KART_2_ADI]\nGelecek: [KART_3_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Geçmiş",
+        "Şimdi",
+        "Potansiyel Yönelim"
+      ],
+      "nameEn": "PAST, PRESENT, FUTURE",
+      "positionsEn": [
+        "Past",
+        "Present",
+        "Future"
+      ]
+    },
+    {
+      "id": "situation_action_result",
+      "cardCount": 3,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Durum, Aksiyon, Sonuç\n\nKartlar ve Pozisyonları:\n\nDurum: [KART_1_ADI]\nAksiyon: [KART_2_ADI]\nSonuç: [KART_3_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Durum",
+        "Aksiyon",
+        "Potansiyel Sonuç"
+      ],
+      "nameEn": "SITUATION, ACTION, OUTCOME",
+      "positionsEn": [
+        "Situation",
+        "Action",
+        "Outcome"
+      ]
+    },
+    {
+      "id": "relationship_reading",
+      "cardCount": 3,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: İlişki Açılımı\n\nKartlar ve Pozisyonları:\n\nSen: [KART_1_ADI]\nO: [KART_2_ADI]\nİlişkiniz: [KART_3_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Sen",
+        "O",
+        "İlişkiniz"
+      ],
+      "nameEn": "RELATIONSHIP SPREAD",
+      "positionsEn": [
+        "You",
+        "Them",
+        "Your Relationship"
+      ]
+    },
+    {
+      "id": "compatibility_reading",
+      "cardCount": 7,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Uyumluluk Açılımı\n\nKartlar ve Pozisyonları:\n\nDuygusal Uyumunuz: [KART_1_ADI]\nSizin İstekleriniz: [KART_2_ADI]\nPartnerinizin İstekleri: [KART_3_ADI]\nFiziksel Uyumunuz: [KART_4_ADI]\nFarklılıklar: [KART_5_ADI]\nBenzerlikler: [KART_6_ADI]\nMental Uyumunuz: [KART_7_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Duygusal Uyumunuz",
+        "Sizin İstekleriniz",
+        "Partnerinizin İstekleri",
+        "Fiziksel Uyumunuz",
+        "Farklılıklar",
+        "Benzerlikler",
+        "Mental Uyumunuz"
+      ],
+      "nameEn": "COMPATIBILITY SPREAD",
+      "positionsEn": [
+        "Your emotional compatibility",
+        "Your desires",
+        "Your partner's desires",
+        "Your physical compatibility",
+        "Differences",
+        "Similarities",
+        "Your mental compatibility"
+      ]
+    },
+    {
+      "id": "detailed_relationship_reading",
+      "cardCount": 9,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Detaylı İlişki Açılımı (3x3 Grid)\n\nKartlar ve Pozisyonları:\n\nGeçmiş Düşünceler: [KART_1_ADI]\nŞimdiki Düşünceler: [KART_2_ADI]\nPotansiyel Düşünceler: [KART_3_ADI]\nGeçmiş Duygular: [KART_4_ADI]\nŞimdiki Duygular: [KART_5_ADI]\nPotansiyel Duygular: [KART_6_ADI]\nGeçmiş Eylemler: [KART_7_ADI]\nŞimdiki Eylemler: [KART_8_ADI]\nPotansiyel Eylemler: [KART_9_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Geçmiş Düşünceler",
+        "Şimdiki Düşünceler",
+        "Potansiyel Düşünceler",
+        "Geçmiş Duygular",
+        "Şimdiki Duygular",
+        "Potansiyel Duygular",
+        "Geçmiş Eylemler",
+        "Şimdiki Eylemler",
+        "Potansiyel Eylemler"
+      ],
+      "nameEn": "DETAILED RELATIONSHIP SPREAD",
+      "positionsEn": [
+        "Past Thoughts",
+        "Present Thoughts",
+        "Future Thoughts",
+        "Past Feelings",
+        "Present Feelings",
+        "Future Feelings",
+        "Past Actions",
+        "Present Actions",
+        "Future Actions / Outcome"
+      ]
+    },
+    {
+      "id": "challenges_reading",
+      "cardCount": 7,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Mücadeleler Açılımı\n\nKartlar ve Pozisyonları:\n\nDış Etkiler: [KART_1_ADI]\nİlişkinizdeki Problemde Sizin Rolünüz: [KART_2_ADI]\nProblemde Partnerinizin Rolü: [KART_3_ADI]\nİlişkinizin Potansiyeli: [KART_4_ADI]\nSizin İçin Tavsiye: [KART_5_ADI]\nPartneriniz İçin Tavsiye: [KART_6_ADI]\nİlişkinizin Değeri: [KART_7_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Dış Etkiler",
+        "İlişkinizdeki Problemde Sizin Rolünüz",
+        "Problemde Partnerinizin Rolü",
+        "İlişkinizin Potansiyeli",
+        "Sizin İçin Tavsiye",
+        "Partneriniz İçin Tavsiye",
+        "İlişkinizin Değeri"
+      ],
+      "nameEn": "STRUGGLES SPREAD",
+      "positionsEn": [
+        "External influences",
+        "Your role in the problem",
+        "Your partner's role in the problem",
+        "Can this relationship be saved?",
+        "Advice for you",
+        "Advice for your partner",
+        "Is this relationship worth saving?"
+      ]
+    },
+    {
+      "id": "continue_or_stop_reading",
+      "cardCount": 6,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Tamam mı, Devam mı?\n\nKartlar ve Pozisyonları:\n\nİlişkinin Mevcut Durumu: [KART_1_ADI]\nDevam Etmenin Potansiyeli: [KART_2_ADI]\nBitirmenin Potansiyeli: [KART_3_ADI]\nİlişki Devam Ederse Hissedecekleriniz: [KART_4_ADI]\nGenel Tavsiye: [KART_5_ADI]\nİlişkiniz Biterse Hissedecekleriniz: [KART_6_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "İlişkinin Mevcut Durumu",
+        "Devam Etmenin Potansiyeli",
+        "Bitirmenin Potansiyeli",
+        "İlişki Devam Ederse Hissedecekleriniz",
+        "Genel Tavsiye",
+        "İlişkiniz Biterse Hissedecekleriniz"
+      ],
+      "nameEn": "STAY OR GO",
+      "positionsEn": [
+        "Current State of the Relationship",
+        "Potential of Staying",
+        "Potential of Ending",
+        "How you would feel if it continues",
+        "General advice",
+        "How you would feel if it ends"
+      ]
+    },
+    {
+      "id": "path_to_future_reading",
+      "cardCount": 5,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Geleceğine Giden Yol\n\nKartlar ve Pozisyonları:\n\nHayalinizdeki Kariyer: [KART_1_ADI]\nPotansiyel Yollar: [KART_2_ADI]\nYardımcı Olabilecek Kaynaklar: [KART_3_ADI]\nYetenekleriniz: [KART_4_ADI]\nDikkat Etmeniz Gerekenler: [KART_5_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Hayalinizdeki Kariyer",
+        "Potansiyel Yollar",
+        "Yardımcı Olabilecek Kaynaklar",
+        "Yetenekleriniz",
+        "Dikkat Etmeniz Gerekenler"
+      ],
+      "nameEn": "PATH TO YOUR FUTURE",
+      "positionsEn": [
+        "Your dream career",
+        "Potential paths",
+        "Helpful resources",
+        "Your talents",
+        "Things to watch out for"
+      ]
+    },
+    {
+      "id": "workplace_problems_reading",
+      "cardCount": 6,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: İş Yerindeki Problemler\n\nKartlar ve Pozisyonları:\n\nİşinizin Size Kazandırdıkları: [KART_1_ADI]\nSizi İşinizden Geri Çeken Etmenler: [KART_2_ADI]\nHedefiniz: [KART_3_ADI]\nİşinizdeki Engel: [KART_4_ADI]\nSizi İşinizde İleri İten Etmenler: [KART_5_ADI]\nGizli Kalmış Sebepler: [KART_6_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "İşinizin Size Kazandırdıkları",
+        "Sizi İşinizden Geri Çeken Etmenler",
+        "Hedefiniz",
+        "İşinizdeki Engel",
+        "Sizi İşinizde İleri İten Etmenler",
+        "Gizli Kalmış Sebepler"
+      ],
+      "nameEn": "PROBLEMS AT WORK",
+      "positionsEn": [
+        "What Your Job Gives You",
+        "What Holds You Back at Work",
+        "Your Goal",
+        "The Obstacle at Work",
+        "What Moves You Forward at Work",
+        "Hidden Causes"
+      ]
+    },
+    {
+      "id": "financial_situation_reading",
+      "cardCount": 6,
+      "promptTr": "Rol:\nSen, sembollerin ve arketiplerin dilini konuşan, derin bir bilgeliğe sahip bir tarot rehberisin. Danışana bir ayna tutarak, kartların barındırdığı enerjiyi ve potansiyeli dürüstçe, doğrudan ve özgüvenli bir dille yansıtırsın. Amacın kehanette bulunmak değil; mevcut durumu okumak, farkındalık yaratmak ve danışanın kendi gücünü eline almasına yardımcı olmaktır.\n\nDil, Üslup ve Cümle Akışı:\nKullandığın dil saygılı ('siz' dili), net, vurucu ve kesinlikle edebi bir akıcılığa sahip olmalıdır. Metnin mekanikleşmemesi ve tekdüzeleşmemesi en önemli kuraldır. Bu nedenle, sürekli '-yor' ekiyle biten tekrarlayıcı cümleler kurmaktan kesinlikle kaçın. Yüklemlerini çeşitlendir; geniş zaman kiplerini ('temsil eder', 'anlamına gelir', 'işaret eder', 'vurgular', 'hatırlatır'), '-dır/-dir' gibi kesinlik bildiren ekleri ve güçlü isim cümlelerini ustaca harmanla.\n\nYüzeysellikten kaçınırken, tereddütlü ifadeler (olabilir, sanırım vb.) kullanma. Kule, Kılıçların Onlusu gibi zorlayıcı kartların 'gölge' yönlerini ve barındırdıkları dönüştürücü gücü cesurca ortaya koy. Cümleleri birbirine bağlarken bağlaçlardan ve geçiş sözcüklerinden yararlanarak, 2-3 paragrafı geçmeyen, ritmi yüksek, bütüncül ve organik bir hikaye anlatımı oluştur.\n\nGörev:\nAşağıda bilgileri verilen tarot açılımını yorumlayınız.\n\nAçılım Adı: Finansal Durum\n\nKartlar ve Pozisyonları:\n\nKök Neden: [KART_1_ADI]\nKarşıt Güçler: [KART_2_ADI]\nEylem Planı: [KART_3_ADI]\nDestekleyici Güçler: [KART_4_ADI]\nYardım Kaynakları: [KART_5_ADI]\nPotansiyel Yönelim: [KART_6_ADI]\n\nTalimatlar:\n\nKart Yorumları: Açılımdaki her bir kart için, bulunduğu pozisyonun anlamını dikkate alarak ayrı bir yorum yapınız.\n\nUzunluk: Her bir kart yorumu yaklaşık 4-5 cümle uzunluğunda olmalıdır.\n\nBağlam ve Hikaye: Kartın sembolizmini danışanın mevcut durumuyla doğrudan ilişkilendir. Yorumu sıradan fiillerle bitirmek yerine, olayları birbirine bağlayan geçiş kelimeleri (örneğin; 'bununla birlikte', 'tam da bu noktada', 'özünde') kullanarak kartlar arası anlam bütünlüğü sağla.\n\nFormat: Yorumları ### [Slot Adı]: [Kart Adı] başlığı altında veriniz.\n\nGenel Yorum ve Tavsiye: Tüm kart yorumları bittikten sonra, ### Genel Yorum başlığı altında bir sonuç paragrafı oluşturunuz. Açılımdaki kartların ortak hikayesini sentezleyerek danışanın bugünkü durumuna dair genel bir bakış açısı sununuz. Son olarak, kartların rehberliğinde nazik, düşündürücü ve uygulanabilir günlük tavsiyelerde bulununuz.",
+      "positionsTr": [
+        "Kök Neden",
+        "Karşıt Güçler",
+        "Eylem Planı",
+        "Destekleyici Güçler",
+        "Yardım Kaynakları",
+        "Potansiyel Yönelim"
+      ],
+      "nameEn": "FINANCIAL SITUATION",
+      "positionsEn": [
+        "Root Cause",
+        "Opposing Forces",
+        "Action Plan",
+        "Supporting Forces",
+        "Sources of Help",
+        "Possible Outcome"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "fool",
+      "name": "The Fool",
+      "nameTr": "Deli",
+      "uprightTr": "Yeni başlangıç, macera, risk alma, spontanelik",
+      "keywords": [
+        "başlangıç",
+        "macera",
+        "risk",
+        "özgürlük",
+        "spontanelik"
+      ],
+      "uprightEn": "New beginnings, adventure, risk-taking, spontaneity",
+      "reversedEn": "Thoughtlessness, risky behavior, poor preparation, missed opportunities"
+    },
+    {
+      "id": "magician",
+      "name": "The Magician",
+      "nameTr": "Sihirbaz",
+      "uprightTr": "Güç, beceri, konsantrasyon, eylem, kararlılık",
+      "keywords": [
+        "güç",
+        "yetenek",
+        "irade",
+        "yaratıcılık",
+        "başarı"
+      ],
+      "uprightEn": "Power, skill, focus, action, determination",
+      "reversedEn": "Manipulation, poor planning, lack of skill"
+    },
+    {
+      "id": "high_priestess",
+      "name": "The High Priestess",
+      "nameTr": "Rahibe",
+      "uprightTr": "Sezgi, bilinçaltı, ilahi feminen, içsel bilgi",
+      "keywords": [
+        "sezgi",
+        "gizem",
+        "bilgelik",
+        "içgörü",
+        "pasiflik"
+      ],
+      "uprightEn": "Intuition, the subconscious, divine feminine energy, inner knowledge",
+      "reversedEn": "Suppressed intuition, hidden information coming to light"
+    },
+    {
+      "id": "empress",
+      "name": "The Empress",
+      "nameTr": "İmparatoriçe",
+      "uprightTr": "Bereket, annelik, doğurganlık, bolluk",
+      "keywords": [
+        "bereket",
+        "annelik",
+        "doğa",
+        "bolluk",
+        "yaratıcılık"
+      ],
+      "uprightEn": "Abundance, motherhood, fertility, prosperity",
+      "reversedEn": "Dependency, overprotection, creative block"
+    },
+    {
+      "id": "emperor",
+      "name": "The Emperor",
+      "nameTr": "İmparator",
+      "uprightTr": "Otorite, yapı, kontrol, babalık",
+      "keywords": [
+        "otorite",
+        "düzen",
+        "liderlik",
+        "mantık",
+        "güç"
+      ],
+      "uprightEn": "Authority, structure, control, fatherhood",
+      "reversedEn": "Domination, rigidity, loss of control"
+    },
+    {
+      "id": "hierophant",
+      "name": "The Hierophant",
+      "nameTr": "Başrahip",
+      "uprightTr": "Gelenek, öğrenme, manevi rehberlik, uyum",
+      "keywords": [
+        "gelenek",
+        "öğrenme",
+        "maneviyat",
+        "rehberlik",
+        "uyum"
+      ],
+      "uprightEn": "Tradition, learning, spiritual guidance, conformity",
+      "reversedEn": "Rebellion, questioning tradition, free thinking"
+    },
+    {
+      "id": "lovers",
+      "name": "The Lovers",
+      "nameTr": "Aşıklar",
+      "uprightTr": "Aşk, uyum, ilişkiler, değerler, seçimler",
+      "keywords": [
+        "aşk",
+        "seçim",
+        "uyum",
+        "ilişki",
+        "denge"
+      ],
+      "uprightEn": "Love, harmony, relationships, values, choices",
+      "reversedEn": "Imbalance, disharmony, poor choices"
+    },
+    {
+      "id": "chariot",
+      "name": "The Chariot",
+      "nameTr": "Savaş Arabası",
+      "uprightTr": "İrade, başarı, kararlılık, zafer",
+      "keywords": [
+        "zafer",
+        "irade",
+        "başarı",
+        "kontrol",
+        "hareket"
+      ],
+      "uprightEn": "Willpower, success, determination, victory",
+      "reversedEn": "Aggression, lack of willpower, defeat"
+    },
+    {
+      "id": "strength",
+      "name": "Strength",
+      "nameTr": "Güç",
+      "uprightTr": "İçsel güç, cesaret, sabır, merhamet",
+      "keywords": [
+        "güç",
+        "cesaret",
+        "sabır",
+        "merhamet",
+        "dayanıklılık"
+      ],
+      "uprightEn": "Inner strength, courage, patience, compassion",
+      "reversedEn": "Weakness, insecurity, self-doubt"
+    },
+    {
+      "id": "hermit",
+      "name": "The Hermit",
+      "nameTr": "Ermiş",
+      "uprightTr": "İç gözlem, yalnızlık, rehberlik, içsel arayış",
+      "keywords": [
+        "yalnızlık",
+        "bilgelik",
+        "içsel arayış",
+        "geri çekilme",
+        "düşünce"
+      ],
+      "uprightEn": "Introspection, solitude, guidance, inner search",
+      "reversedEn": "Isolation, loneliness, withdrawal"
+    },
+    {
+      "id": "wheel_of_fortune",
+      "name": "Wheel of Fortune",
+      "nameTr": "Kader Çarkı",
+      "uprightTr": "Şans, kader, dönüm noktası, fırsatlar",
+      "keywords": [
+        "değişim",
+        "kader",
+        "şans",
+        "döngüler",
+        "fırsatlar"
+      ],
+      "uprightEn": "Luck, fate, turning point, opportunities",
+      "reversedEn": "Bad luck, misfortune, resistance to fate"
+    },
+    {
+      "id": "justice",
+      "name": "Justice",
+      "nameTr": "Adalet",
+      "uprightTr": "Denge, adalet, dürüstlük, karma",
+      "keywords": [
+        "adalet",
+        "denge",
+        "dürüstlük",
+        "karma",
+        "sorumluluk"
+      ],
+      "uprightEn": "Balance, justice, honesty, karma",
+      "reversedEn": "Injustice, imbalance, unfairness"
+    },
+    {
+      "id": "hanged_man",
+      "name": "The Hanged Man",
+      "nameTr": "Asılan Adam",
+      "uprightTr": "Teslimiyet, bekleme, fedakarlık, yeni perspektif",
+      "keywords": [
+        "teslimiyet",
+        "bekleme",
+        "fedakarlık",
+        "perspektif",
+        "sabır"
+      ],
+      "uprightEn": "Surrender, waiting, sacrifice, a new perspective",
+      "reversedEn": "Resistance, futile sacrifice, procrastination"
+    },
+    {
+      "id": "death",
+      "name": "Death",
+      "nameTr": "Ölüm",
+      "uprightTr": "Dönüşüm, sonlanma, yenilenme, değişim",
+      "keywords": [
+        "dönüşüm",
+        "sonlanma",
+        "değişim",
+        "yenilenme",
+        "yeniden doğuş"
+      ],
+      "uprightEn": "Transformation, endings, renewal, change",
+      "reversedEn": "Resistance to change, stagnation, clinging to the past"
+    },
+    {
+      "id": "temperance",
+      "name": "Temperance",
+      "nameTr": "Denge",
+      "uprightTr": "Uyum, denge, ölçülülük, sabır",
+      "keywords": [
+        "uyum",
+        "denge",
+        "ölçülülük",
+        "sabır",
+        "uzlaşma"
+      ],
+      "uprightEn": "Harmony, balance, moderation, patience",
+      "reversedEn": "Imbalance, excess, disharmony"
+    },
+    {
+      "id": "devil",
+      "name": "The Devil",
+      "nameTr": "Şeytan",
+      "uprightTr": "Bağlanma, maddesellik, kısıtlanma, gölgeler",
+      "keywords": [
+        "bağlanma",
+        "bağımlılık",
+        "maddesellik",
+        "kısıtlanma",
+        "gölgeler"
+      ],
+      "uprightEn": "Attachment, materialism, restriction, shadow self",
+      "reversedEn": "Breaking free from dependency, awakening, liberation"
+    },
+    {
+      "id": "tower",
+      "name": "The Tower",
+      "nameTr": "Yıkılan Kule",
+      "uprightTr": "Ani değişim, yıkım, uyanış, aydınlanma",
+      "keywords": [
+        "yıkım",
+        "ani değişim",
+        "uyanış",
+        "aydınlanma",
+        "kaos"
+      ],
+      "uprightEn": "Sudden change, destruction, awakening, revelation",
+      "reversedEn": "Avoided disaster, delayed change, resistance"
+    },
+    {
+      "id": "star",
+      "name": "The Star",
+      "nameTr": "Yıldız",
+      "uprightTr": "Umut, ilham, iyileşme, yenilenme",
+      "keywords": [
+        "umut",
+        "ilham",
+        "iyileşme",
+        "yenilenme",
+        "yaratıcılık"
+      ],
+      "uprightEn": "Hope, inspiration, healing, renewal",
+      "reversedEn": "Hopelessness, lack of inspiration, disappointment"
+    },
+    {
+      "id": "moon",
+      "name": "The Moon",
+      "nameTr": "Ay",
+      "uprightTr": "İllüzyon, belirsizlik, bilinçaltı, korkular",
+      "keywords": [
+        "illüzyon",
+        "belirsizlik",
+        "bilinçaltı",
+        "korkular",
+        "sezgiler"
+      ],
+      "uprightEn": "Illusion, uncertainty, the subconscious, fears",
+      "reversedEn": "Overcoming fears, gaining clarity, seeing through illusions"
+    },
+    {
+      "id": "sun",
+      "name": "The Sun",
+      "nameTr": "Güneş",
+      "uprightTr": "Neşe, başarı, canlılık, aydınlanma",
+      "keywords": [
+        "neşe",
+        "başarı",
+        "canlılık",
+        "aydınlanma",
+        "mutluluk"
+      ],
+      "uprightEn": "Joy, success, vitality, enlightenment",
+      "reversedEn": "Delayed success, excessive optimism, disappointment"
+    },
+    {
+      "id": "judgement",
+      "name": "Judgement",
+      "nameTr": "Mahkeme",
+      "uprightTr": "Yargılama, hesaplaşma, uyanış, yeniden doğuş",
+      "keywords": [
+        "hesaplaşma",
+        "uyanış",
+        "yeniden doğuş",
+        "farkındalık",
+        "çağrı"
+      ],
+      "uprightEn": "Judgement, reckoning, awakening, rebirth",
+      "reversedEn": "Regret, indecision, self-judgement"
+    },
+    {
+      "id": "world",
+      "name": "The World",
+      "nameTr": "Dünya",
+      "uprightTr": "Tamamlanma, bütünlük, başarı, seyahat",
+      "keywords": [
+        "tamamlanma",
+        "bütünlük",
+        "başarı",
+        "seyahat",
+        "tatmin"
+      ],
+      "uprightEn": "Completion, wholeness, success, travel",
+      "reversedEn": "Unfinished business, delays, disappointment"
+    },
+    {
+      "id": "ace_of_cups",
+      "name": "Ace of Cups",
+      "nameTr": "Kupa Ası",
+      "uprightTr": "Yeni duygusal başlangıçlar, aşk, şefkat, yaratıcılık, duygusal tatmin",
+      "keywords": [
+        "yeni başlangıçlar",
+        "aşk",
+        "şefkat",
+        "yaratıcılık",
+        "duygusal tatmin",
+        "mutluluk"
+      ],
+      "uprightEn": "New emotional beginnings, love, compassion, creativity, emotional fulfillment",
+      "reversedEn": "Emotional loss, obstacles, instability, creative block"
+    },
+    {
+      "id": "two_of_cups",
+      "name": "Two of Cups",
+      "nameTr": "Kupa İkilisi",
+      "uprightTr": "Ortaklık, uyum, aşk, denge, bağ kurma",
+      "keywords": [
+        "ortaklık",
+        "uyum",
+        "aşk",
+        "denge",
+        "birlik",
+        "iletişim",
+        "işbirliği"
+      ],
+      "uprightEn": "Partnership, harmony, love, balance, connection",
+      "reversedEn": "Communication breakdown, imbalance, disharmony, separation"
+    },
+    {
+      "id": "three_of_cups",
+      "name": "Three of Cups",
+      "nameTr": "Kupa Üçlüsü",
+      "uprightTr": "Kutlama, sosyallik, dostluk, neşe, birlik",
+      "keywords": [
+        "kutlama",
+        "sosyalleşme",
+        "dostluk",
+        "neşe",
+        "topluluk",
+        "birliktelik",
+        "eğlence"
+      ],
+      "uprightEn": "Celebration, sociability, friendship, joy, togetherness",
+      "reversedEn": "Excess, gossip, social isolation, disappointment"
+    },
+    {
+      "id": "four_of_cups",
+      "name": "Four of Cups",
+      "nameTr": "Kupa Dörtlüsü",
+      "uprightTr": "Durağanlık, ilgisizlik, tatminsizlik, meditasyon, içe dönüş",
+      "keywords": [
+        "durağanlık",
+        "ilgisizlik",
+        "tatminsizlik",
+        "içe kapanma",
+        "meditasyon",
+        "yansıtma",
+        "fırsat kaçırma"
+      ],
+      "uprightEn": "Stagnation, apathy, dissatisfaction, meditation, introspection",
+      "reversedEn": "Rediscovery, new opportunities, taking action, acceptance"
+    },
+    {
+      "id": "five_of_cups",
+      "name": "Five of Cups",
+      "nameTr": "Kupa Beşlisi",
+      "uprightTr": "Kayıp, pişmanlık, hayal kırıklığı, üzüntü, yas",
+      "keywords": [
+        "kayıp",
+        "pişmanlık",
+        "hayal kırıklığı",
+        "üzüntü",
+        "yas",
+        "geçmişe takılma",
+        "kabullenmeme"
+      ],
+      "uprightEn": "Loss, regret, disappointment, sadness, grief",
+      "reversedEn": "Acceptance, healing, progress, hope, new beginning"
+    },
+    {
+      "id": "six_of_cups",
+      "name": "Six of Cups",
+      "nameTr": "Kupa Altılısı",
+      "uprightTr": "Nostalji, masumiyet, geçmişten gelen mutluluk, yardımseverlik",
+      "keywords": [
+        "nostalji",
+        "masumiyet",
+        "geçmişten gelen mutluluk",
+        "yardımseverlik",
+        "cömertlik",
+        "çocukluk",
+        "hediye"
+      ],
+      "uprightEn": "Nostalgia, innocence, happiness from the past, kindness",
+      "reversedEn": "Moving on from the past, progress, independence, freedom"
+    },
+    {
+      "id": "seven_of_cups",
+      "name": "Seven of Cups",
+      "nameTr": "Kupa Yedilisi",
+      "uprightTr": "Hayal dünyası, seçenek bolluğu, kararsızlık, yanılsama",
+      "keywords": [
+        "hayal dünyası",
+        "seçenek bolluğu",
+        "kararsızlık",
+        "yanılsama",
+        "gerçeklikten uzaklaşma",
+        "hayalperestlik",
+        "odaklanma zorluğu"
+      ],
+      "uprightEn": "Fantasy, many choices, indecision, illusion",
+      "reversedEn": "Clarity, realism, determination, focus"
+    },
+    {
+      "id": "eight_of_cups",
+      "name": "Eight of Cups",
+      "nameTr": "Kupa Sekizlisi",
+      "uprightTr": "Uzaklaşma, terk etme, yeni arayışlar, ruhsal yolculuk",
+      "keywords": [
+        "uzaklaşma",
+        "terk etme",
+        "yeni arayışlar",
+        "ruhsal yolculuk",
+        "içsel huzur",
+        "anlamlı yaşam",
+        "konfor alanından çıkma"
+      ],
+      "uprightEn": "Walking away, leaving behind, a new search, spiritual journey",
+      "reversedEn": "Return, indecision, emptiness, stagnation"
+    },
+    {
+      "id": "nine_of_cups",
+      "name": "Nine of Cups",
+      "nameTr": "Kupa Dokuzlusu",
+      "uprightTr": "Dileklerin gerçekleşmesi, memnuniyet, refah, duygusal tatmin",
+      "keywords": [
+        "dileklerin gerçekleşmesi",
+        "memnuniyet",
+        "refah",
+        "duygusal tatmin",
+        "bolluk",
+        "mutluluk",
+        "şükran"
+      ],
+      "uprightEn": "Wishes fulfilled, satisfaction, prosperity, emotional fulfillment",
+      "reversedEn": "Dissatisfaction, greed, self-indulgence, empty wishes"
+    },
+    {
+      "id": "ten_of_cups",
+      "name": "Ten of Cups",
+      "nameTr": "Kupa Onlusu",
+      "uprightTr": "Mutlu aile, kalıcı mutluluk, uyum, tamamlanmış duygusal birliktelik",
+      "keywords": [
+        "mutlu aile",
+        "kalıcı mutluluk",
+        "uyum",
+        "duygusal birliktelik",
+        "aile bağları",
+        "duygusal güvenlik",
+        "aidiyet"
+      ],
+      "uprightEn": "Happy family, lasting happiness, harmony, complete emotional union",
+      "reversedEn": "Broken family bonds, disharmony, loss, relationship difficulties"
+    },
+    {
+      "id": "page_of_cups",
+      "name": "Page of Cups",
+      "nameTr": "Kupa Prensi",
+      "uprightTr": "Duygusal merak, yaratıcı hayal gücü, romantizm, yeni duygusal fırsatlar",
+      "keywords": [
+        "duygusal merak",
+        "yaratıcı hayal gücü",
+        "romantizm",
+        "duygusal fırsatlar",
+        "kalp açıklığı",
+        "duygusal ifade",
+        "sanatsal eğilimler"
+      ],
+      "uprightEn": "Emotional curiosity, creative imagination, romance, new emotional opportunities",
+      "reversedEn": "Emotional immaturity, disappointment, emotional block, creative stagnation"
+    },
+    {
+      "id": "knight_of_cups",
+      "name": "Knight of Cups",
+      "nameTr": "Kupa Şövalyesi",
+      "uprightTr": "Romantik arayış, duygusal maceraperestlik, çekicilik, kalbi takip etme",
+      "keywords": [
+        "romantik arayış",
+        "duygusal maceraperestlik",
+        "çekicilik",
+        "kalbi takip etme",
+        "aşk",
+        "coşku",
+        "duygusal deneyimler"
+      ],
+      "uprightEn": "Romantic pursuit, emotional adventure, charm, following the heart",
+      "reversedEn": "Excessive emotion, disappointment, manipulation, emotional imbalance"
+    },
+    {
+      "id": "queen_of_cups",
+      "name": "Queen of Cups",
+      "nameTr": "Kupa Kraliçesi",
+      "uprightTr": "Duygusal derinlik, şefkat, sezgisellik, anlayış",
+      "keywords": [
+        "duygusal derinlik",
+        "şefkat",
+        "sezgisellik",
+        "anlayış",
+        "empati",
+        "duygusal zeka",
+        "duygusal destek"
+      ],
+      "uprightEn": "Emotional depth, compassion, intuition, understanding",
+      "reversedEn": "Emotional manipulation, dependency, emotional confusion, imbalance"
+    },
+    {
+      "id": "king_of_cups",
+      "name": "King of Cups",
+      "nameTr": "Kupa Kralı",
+      "uprightTr": "Duygusal kontrol, şefkatli liderlik, denge, duygusal olgunluk",
+      "keywords": [
+        "duygusal kontrol",
+        "şefkatli liderlik",
+        "denge",
+        "duygusal olgunluk",
+        "duygusal zeka",
+        "istikrar",
+        "rehberlik"
+      ],
+      "uprightEn": "Emotional control, compassionate leadership, balance, emotional maturity",
+      "reversedEn": "Emotional manipulation, coldness, imbalance, loss of control"
+    },
+    {
+      "id": "ace_of_swords",
+      "name": "Ace of Swords",
+      "nameTr": "Kılıç Ası",
+      "uprightTr": "Yeni fikirler, netlik, güç, zihinsel başlangıçlar, keskin zeka",
+      "keywords": [
+        "yeni fikirler",
+        "netlik",
+        "güç",
+        "zihinsel başlangıçlar",
+        "keskin zeka",
+        "doğruluk",
+        "kararlılık"
+      ],
+      "uprightEn": "New ideas, clarity, power, mental beginnings, sharp intellect",
+      "reversedEn": "Confusion, cruelty, mental chaos, misplaced anger, mental block"
+    },
+    {
+      "id": "two_of_swords",
+      "name": "Two of Swords",
+      "nameTr": "Kılıç İkilisi",
+      "uprightTr": "Karar verme, çıkmaz, denge kurma, duygulardan arınmış düşünme, tarafsızlık",
+      "keywords": [
+        "karar verme",
+        "çıkmaz",
+        "denge",
+        "tarafsızlık",
+        "mantık",
+        "ikileme",
+        "zihinsel çatışma"
+      ],
+      "uprightEn": "Decision-making, stalemate, finding balance, detached thought, impartiality",
+      "reversedEn": "Indecision, confusion, uncertainty, tension, deadlock"
+    },
+    {
+      "id": "three_of_swords",
+      "name": "Three of Swords",
+      "nameTr": "Kılıç Üçlüsü",
+      "uprightTr": "Kalp kırıklığı, üzüntü, acı, ihanet, ayrılık, hüzün",
+      "keywords": [
+        "kalp kırıklığı",
+        "üzüntü",
+        "acı",
+        "ihanet",
+        "ayrılık",
+        "hüzün",
+        "duygusal zorluk"
+      ],
+      "uprightEn": "Heartbreak, sorrow, pain, betrayal, separation, grief",
+      "reversedEn": "Healing, forgiveness, easing pain, emotional relief"
+    },
+    {
+      "id": "four_of_swords",
+      "name": "Four of Swords",
+      "nameTr": "Kılıç Dörtlüsü",
+      "uprightTr": "Dinlenme, yenilenme, iyileşme, meditasyon, geri çekilme",
+      "keywords": [
+        "dinlenme",
+        "yenilenme",
+        "iyileşme",
+        "meditasyon",
+        "geri çekilme",
+        "mola",
+        "enerji toplama"
+      ],
+      "uprightEn": "Rest, renewal, healing, meditation, retreat",
+      "reversedEn": "Restlessness, tension, activity, insomnia, return"
+    },
+    {
+      "id": "five_of_swords",
+      "name": "Five of Swords",
+      "nameTr": "Kılıç Beşlisi",
+      "uprightTr": "Çatışma, tartışma, rekabet, kayıp, zorbalık, uzlaşmazlık",
+      "keywords": [
+        "çatışma",
+        "tartışma",
+        "rekabet",
+        "kayıp",
+        "zorbalık",
+        "uzlaşmazlık",
+        "güç mücadelesi"
+      ],
+      "uprightEn": "Conflict, arguments, competition, loss, bullying, irreconcilability",
+      "reversedEn": "Reconciliation, forgiveness, peace, communication, starting again"
+    },
+    {
+      "id": "six_of_swords",
+      "name": "Six of Swords",
+      "nameTr": "Kılıç Altılısı",
+      "uprightTr": "Geçiş, değişim, uzaklaşma, iyileşme yolculuğu, problemleri geride bırakma",
+      "keywords": [
+        "geçiş",
+        "değişim",
+        "uzaklaşma",
+        "iyileşme",
+        "yolculuk",
+        "problemleri geride bırakma",
+        "yeni başlangıçlar"
+      ],
+      "uprightEn": "Transition, change, moving away, a healing journey, leaving problems behind",
+      "reversedEn": "Obstacles, stagnation, resistance, being stuck in the past"
+    },
+    {
+      "id": "seven_of_swords",
+      "name": "Seven of Swords",
+      "nameTr": "Kılıç Yedilisi",
+      "uprightTr": "Aldatma, hile, kaçış, strateji, bencillik, gizli planlar",
+      "keywords": [
+        "aldatma",
+        "hile",
+        "kaçış",
+        "strateji",
+        "bencillik",
+        "gizli planlar",
+        "dürüst olmama"
+      ],
+      "uprightEn": "Deception, trickery, escape, strategy, selfishness, secret plans",
+      "reversedEn": "Confession, guilt, exposure, honesty, confrontation"
+    },
+    {
+      "id": "eight_of_swords",
+      "name": "Eight of Swords",
+      "nameTr": "Kılıç Sekizlisi",
+      "uprightTr": "Kısıtlanma, engellenme, kendini sınırlama, kurban zihniyeti, çaresizlik",
+      "keywords": [
+        "kısıtlanma",
+        "engellenme",
+        "kendini sınırlama",
+        "kurban zihniyeti",
+        "çaresizlik",
+        "zihinsel engeller",
+        "sınırlamalar"
+      ],
+      "uprightEn": "Restriction, blockage, self-limitation, victim mindset, helplessness",
+      "reversedEn": "Freedom, self-rescue, overcoming obstacles, new perspectives"
+    },
+    {
+      "id": "nine_of_swords",
+      "name": "Nine of Swords",
+      "nameTr": "Kılıç Dokuzlusu",
+      "uprightTr": "Kaygı, endişe, korku, uykusuzluk, kabuslar, stres, suçluluk",
+      "keywords": [
+        "kaygı",
+        "endişe",
+        "korku",
+        "uykusuzluk",
+        "kabuslar",
+        "stres",
+        "suçluluk",
+        "zihinsel zorlanma"
+      ],
+      "uprightEn": "Anxiety, worry, fear, insomnia, nightmares, stress, guilt",
+      "reversedEn": "Hope, healing, overcoming anxiety, relief, facing reality"
+    },
+    {
+      "id": "ten_of_swords",
+      "name": "Ten of Swords",
+      "nameTr": "Kılıç Onlusu",
+      "uprightTr": "Son, yıkım, ihanet, kayıp, acı, tamamlanma, yeni başlangıçlar",
+      "keywords": [
+        "son",
+        "yıkım",
+        "ihanet",
+        "kayıp",
+        "acı",
+        "tamamlanma",
+        "yeni başlangıçlar",
+        "dibe vurma"
+      ],
+      "uprightEn": "Endings, destruction, betrayal, loss, pain, completion, new beginnings",
+      "reversedEn": "Healing, resilience, rebirth, progress, awakening"
+    },
+    {
+      "id": "page_of_swords",
+      "name": "Page of Swords",
+      "nameTr": "Kılıç Prensi",
+      "uprightTr": "Merak, keskin zeka, araştırma, yeni fikirler, tetikte olma, uyanıklık",
+      "keywords": [
+        "merak",
+        "keskin zeka",
+        "araştırma",
+        "yeni fikirler",
+        "tetikte olma",
+        "uyanıklık",
+        "zihinsel enerji"
+      ],
+      "uprightEn": "Curiosity, sharp intellect, research, new ideas, alertness, vigilance",
+      "reversedEn": "Haste, carelessness, rumors, gossip, a sharp tongue"
+    },
+    {
+      "id": "knight_of_swords",
+      "name": "Knight of Swords",
+      "nameTr": "Kılıç Şövalyesi",
+      "uprightTr": "Hızlı hareket, kararlılık, cesaret, aksiyon, hırs, doğrudan yaklaşım",
+      "keywords": [
+        "hızlı hareket",
+        "kararlılık",
+        "cesaret",
+        "aksiyon",
+        "hırs",
+        "doğrudan yaklaşım",
+        "zihinsel hız"
+      ],
+      "uprightEn": "Swift action, determination, courage, ambition, direct approach",
+      "reversedEn": "Thoughtlessness, haste, aggression, irrationality, impulsiveness"
+    },
+    {
+      "id": "queen_of_swords",
+      "name": "Queen of Swords",
+      "nameTr": "Kılıç Kraliçesi",
+      "uprightTr": "Bağımsızlık, netlik, doğrudan iletişim, dürüstlük, keskin zeka, analitik düşünce",
+      "keywords": [
+        "bağımsızlık",
+        "netlik",
+        "doğrudan iletişim",
+        "dürüstlük",
+        "keskin zeka",
+        "analitik düşünce",
+        "duygulardan arınmışlık"
+      ],
+      "uprightEn": "Independence, clarity, direct communication, honesty, sharp intellect, analytical thought",
+      "reversedEn": "Cruelty, coldness, isolation, oppression, manipulation"
+    },
+    {
+      "id": "king_of_swords",
+      "name": "King of Swords",
+      "nameTr": "Kılıç Kralı",
+      "uprightTr": "Mantık, otorite, liderlik, doğruluk, dürüstlük, etik, netlik, adalet",
+      "keywords": [
+        "mantık",
+        "otorite",
+        "liderlik",
+        "doğruluk",
+        "dürüstlük",
+        "etik",
+        "netlik",
+        "adalet",
+        "zihinsel otoriterlik"
+      ],
+      "uprightEn": "Logic, authority, leadership, truth, honesty, ethics, clarity, justice",
+      "reversedEn": "Manipulation, cruelty, bullying, irrationality, harsh criticism"
+    },
+    {
+      "id": "ace_of_wands",
+      "name": "Ace of Wands",
+      "nameTr": "Değnek Ası",
+      "uprightTr": "Yaratıcılık, ilham, yeni başlangıçlar, enerji, tutku, potansiyel",
+      "keywords": [
+        "yaratıcılık",
+        "ilham",
+        "yeni başlangıçlar",
+        "enerji",
+        "tutku",
+        "potansiyel",
+        "coşku",
+        "girişim"
+      ],
+      "uprightEn": "Creativity, inspiration, new beginnings, energy, passion, potential",
+      "reversedEn": "Obstacles, delay, creative block, impulsiveness, lack of motivation"
+    },
+    {
+      "id": "two_of_wands",
+      "name": "Two of Wands",
+      "nameTr": "Değnek İkilisi",
+      "uprightTr": "Planlama, karar verme, vizyon, keşif, ufuklarını genişletme, güç",
+      "keywords": [
+        "planlama",
+        "karar verme",
+        "vizyon",
+        "keşif",
+        "ufuklarını genişletme",
+        "güç",
+        "dünya görüşü"
+      ],
+      "uprightEn": "Planning, decision-making, vision, exploration, expanding horizons, power",
+      "reversedEn": "Fear, lack of courage, indecision, pressure, obstacles"
+    },
+    {
+      "id": "three_of_wands",
+      "name": "Three of Wands",
+      "nameTr": "Değnek Üçlüsü",
+      "uprightTr": "İlerleme, genişleme, fırsatlar, liderlik, keşif, ticaret, uzun vadeli vizyon",
+      "keywords": [
+        "ilerleme",
+        "genişleme",
+        "fırsatlar",
+        "liderlik",
+        "keşif",
+        "ticaret",
+        "uzun vadeli vizyon",
+        "başarı"
+      ],
+      "uprightEn": "Progress, expansion, opportunities, leadership, exploration, trade, long-term vision",
+      "reversedEn": "Delays, disappointment, obstacles, lack of cooperation, negative outcomes"
+    },
+    {
+      "id": "four_of_wands",
+      "name": "Four of Wands",
+      "nameTr": "Değnek Dörtlüsü",
+      "uprightTr": "Kutlama, ev, harmoni, evlilik, başarı, topluluk, sevinç, istikrar",
+      "keywords": [
+        "kutlama",
+        "ev",
+        "harmoni",
+        "evlilik",
+        "başarı",
+        "topluluk",
+        "sevinç",
+        "istikrar",
+        "aidiyet"
+      ],
+      "uprightEn": "Celebration, home, harmony, marriage, success, community, joy, stability",
+      "reversedEn": "Transition, postponement, disharmony, instability, chaos"
+    },
+    {
+      "id": "five_of_wands",
+      "name": "Five of Wands",
+      "nameTr": "Değnek Beşlisi",
+      "uprightTr": "Rekabet, çatışma, mücadele, tartışma, çekişme, zorluklar, çeşitlilik",
+      "keywords": [
+        "rekabet",
+        "çatışma",
+        "mücadele",
+        "tartışma",
+        "çekişme",
+        "zorluklar",
+        "çeşitlilik",
+        "canlılık"
+      ],
+      "uprightEn": "Competition, conflict, struggle, arguments, rivalry, challenges, diversity",
+      "reversedEn": "Inner conflict, unnecessary struggle, avoidance, compromise, resolution"
+    },
+    {
+      "id": "six_of_wands",
+      "name": "Six of Wands",
+      "nameTr": "Değnek Altılısı",
+      "uprightTr": "Zafer, başarı, tanınma, gurur, özgüven, ilerleme, ödül",
+      "keywords": [
+        "zafer",
+        "başarı",
+        "tanınma",
+        "gurur",
+        "özgüven",
+        "ilerleme",
+        "ödül",
+        "onur"
+      ],
+      "uprightEn": "Victory, success, recognition, pride, confidence, progress, reward",
+      "reversedEn": "Arrogance, overconfidence, disappointment, delayed success, humiliation"
+    },
+    {
+      "id": "seven_of_wands",
+      "name": "Seven of Wands",
+      "nameTr": "Değnek Yedilisi",
+      "uprightTr": "Savunma, meydan okuma, azim, rekabet, kararlılık, direniş, cesaret",
+      "keywords": [
+        "savunma",
+        "meydan okuma",
+        "azim",
+        "rekabet",
+        "kararlılık",
+        "direniş",
+        "cesaret",
+        "prensip"
+      ],
+      "uprightEn": "Defense, challenge, perseverance, competition, determination, resistance, courage",
+      "reversedEn": "Giving up, lack of confidence, pressure, bullying, exhaustion"
+    },
+    {
+      "id": "eight_of_wands",
+      "name": "Eight of Wands",
+      "nameTr": "Değnek Sekizlisi",
+      "uprightTr": "Hızlı hareket, ilerleme, heyecan, seyahat, haberler, yeni gelişmeler, hız",
+      "keywords": [
+        "hızlı hareket",
+        "ilerleme",
+        "heyecan",
+        "seyahat",
+        "haberler",
+        "yeni gelişmeler",
+        "hız",
+        "enerji"
+      ],
+      "uprightEn": "Swift movement, progress, excitement, travel, news, new developments, speed",
+      "reversedEn": "Delays, obstacles, inner conflicts, disappointment, sudden stop"
+    },
+    {
+      "id": "nine_of_wands",
+      "name": "Nine of Wands",
+      "nameTr": "Değnek Dokuzlusu",
+      "uprightTr": "Dayanıklılık, sebat, direnç, son savunma, hazırlık, azim, koruma",
+      "keywords": [
+        "dayanıklılık",
+        "sebat",
+        "direnç",
+        "son savunma",
+        "hazırlık",
+        "azim",
+        "koruma",
+        "güç"
+      ],
+      "uprightEn": "Resilience, persistence, resistance, final defense, readiness, perseverance, protection",
+      "reversedEn": "Exhaustion, surrender, weakness, paranoia, insecurity, fear"
+    },
+    {
+      "id": "ten_of_wands",
+      "name": "Ten of Wands",
+      "nameTr": "Değnek Onlusu",
+      "uprightTr": "Yükler, sorumluluklar, baskı, stres, başarı, azim, tükenmişlik",
+      "keywords": [
+        "yükler",
+        "sorumluluklar",
+        "baskı",
+        "stres",
+        "başarı",
+        "azim",
+        "tükenmişlik",
+        "rahatlama ihtiyacı"
+      ],
+      "uprightEn": "Burdens, responsibilities, pressure, stress, achievement, perseverance, burnout",
+      "reversedEn": "Letting go of burdens, relief, avoiding responsibility, apathy, stress"
+    },
+    {
+      "id": "page_of_wands",
+      "name": "Page of Wands",
+      "nameTr": "Değnek Prensi",
+      "uprightTr": "Keşif, heyecan, özgürlük, macera, yeni fikirler, ilham, olasılıklar",
+      "keywords": [
+        "keşif",
+        "heyecan",
+        "özgürlük",
+        "macera",
+        "yeni fikirler",
+        "ilham",
+        "olasılıklar",
+        "yaratıcılık"
+      ],
+      "uprightEn": "Exploration, excitement, freedom, adventure, new ideas, inspiration, possibilities",
+      "reversedEn": "Delays, lack of direction, disappointment, stagnation, indecision"
+    },
+    {
+      "id": "knight_of_wands",
+      "name": "Knight of Wands",
+      "nameTr": "Değnek Şövalyesi",
+      "uprightTr": "Enerji, tutku, hareket, macera, dürtüsellik, heyecan, cesaret, seyahat",
+      "keywords": [
+        "enerji",
+        "tutku",
+        "hareket",
+        "macera",
+        "dürtüsellik",
+        "heyecan",
+        "cesaret",
+        "seyahat",
+        "dinamizm"
+      ],
+      "uprightEn": "Energy, passion, movement, adventure, impulsiveness, excitement, courage, travel",
+      "reversedEn": "Anger, haste, impatience, delays, disappointment, aggression"
+    },
+    {
+      "id": "queen_of_wands",
+      "name": "Queen of Wands",
+      "nameTr": "Değnek Kraliçesi",
+      "uprightTr": "Özgüven, çekicilik, karizma, bağımsızlık, yaratıcılık, tutku, canlılık, liderlik",
+      "keywords": [
+        "özgüven",
+        "çekicilik",
+        "karizma",
+        "bağımsızlık",
+        "yaratıcılık",
+        "tutku",
+        "canlılık",
+        "liderlik",
+        "pozitiflik"
+      ],
+      "uprightEn": "Confidence, attractiveness, charisma, independence, creativity, passion, vitality, leadership",
+      "reversedEn": "Jealousy, introversion, insecurity, dependency, bullying, manipulation"
+    },
+    {
+      "id": "king_of_wands",
+      "name": "King of Wands",
+      "nameTr": "Değnek Kralı",
+      "uprightTr": "Liderlik, vizyon, girişimcilik, onur, güven, karizma, yaratıcılık, cesaret",
+      "keywords": [
+        "liderlik",
+        "vizyon",
+        "girişimcilik",
+        "onur",
+        "güven",
+        "karizma",
+        "yaratıcılık",
+        "cesaret",
+        "ilham vericilik"
+      ],
+      "uprightEn": "Leadership, vision, entrepreneurship, honor, confidence, charisma, creativity, courage",
+      "reversedEn": "Arrogance, ruthlessness, bullying, stubbornness, domination, impatience"
+    },
+    {
+      "id": "ace_of_pentacles",
+      "name": "Ace of Pentacles",
+      "nameTr": "Tılsım Ası",
+      "uprightTr": "Yeni maddi fırsatlar, refah, bolluk, başlangıç, yatırım, güvenlik",
+      "keywords": [
+        "yeni fırsatlar",
+        "refah",
+        "bolluk",
+        "maddi başlangıç",
+        "yatırım",
+        "güvenlik",
+        "pratiklik",
+        "gerçeklik"
+      ],
+      "uprightEn": "New material opportunities, prosperity, abundance, beginnings, investment, security",
+      "reversedEn": "Missed opportunities, financial loss, delay, material instability"
+    },
+    {
+      "id": "two_of_pentacles",
+      "name": "Two of Pentacles",
+      "nameTr": "Tılsım İkilisi",
+      "uprightTr": "Denge, esneklik, çok yönlülük, adaptasyon, değişim yönetimi, önceliklendirme",
+      "keywords": [
+        "denge",
+        "esneklik",
+        "çok yönlülük",
+        "adaptasyon",
+        "değişim yönetimi",
+        "önceliklendirme",
+        "kaynak yönetimi"
+      ],
+      "uprightEn": "Balance, flexibility, versatility, adaptation, managing change, prioritization",
+      "reversedEn": "Imbalance, disorder, overload, stress, poor management"
+    },
+    {
+      "id": "three_of_pentacles",
+      "name": "Three of Pentacles",
+      "nameTr": "Tılsım Üçlüsü",
+      "uprightTr": "İşbirliği, takım çalışması, ustalık, planlama, yetkinlik, kalite, profesyonellik",
+      "keywords": [
+        "işbirliği",
+        "takım çalışması",
+        "ustalık",
+        "planlama",
+        "yetkinlik",
+        "kalite",
+        "profesyonellik",
+        "başarı"
+      ],
+      "uprightEn": "Collaboration, teamwork, craftsmanship, planning, competence, quality, professionalism",
+      "reversedEn": "Poor quality, team disharmony, competition, ego conflicts, inadequate planning"
+    },
+    {
+      "id": "four_of_pentacles",
+      "name": "Four of Pentacles",
+      "nameTr": "Tılsım Dörtlüsü",
+      "uprightTr": "Güvenlik, tutuculuk, koruma, tasarruf, maddi istikrar, kontrol, düzen",
+      "keywords": [
+        "güvenlik",
+        "tutuculuk",
+        "koruma",
+        "tasarruf",
+        "maddi istikrar",
+        "kontrol",
+        "düzen",
+        "kazanımlar"
+      ],
+      "uprightEn": "Security, conservatism, protection, saving, material stability, control, order",
+      "reversedEn": "Stinginess, excessive control, rigidity, restriction, financial anxiety"
+    },
+    {
+      "id": "five_of_pentacles",
+      "name": "Five of Pentacles",
+      "nameTr": "Tılsım Beşlisi",
+      "uprightTr": "Maddi zorluk, yoksulluk, dışlanma, yalnızlık, sağlık sorunları, ruhsal fakir",
+      "keywords": [
+        "maddi zorluk",
+        "yoksulluk",
+        "dışlanma",
+        "yalnızlık",
+        "sağlık sorunları",
+        "ruhsal fakir",
+        "mücadele"
+      ],
+      "uprightEn": "Financial hardship, poverty, exclusion, loneliness, health problems, spiritual poverty",
+      "reversedEn": "Recovery, accepting help, spiritual richness, financial improvement, hope"
+    },
+    {
+      "id": "six_of_pentacles",
+      "name": "Six of Pentacles",
+      "nameTr": "Tılsım Altılısı",
+      "uprightTr": "Cömertlik, yardım etme, bağış, paylaşım, borç, destek, denge",
+      "keywords": [
+        "cömertlik",
+        "yardım etme",
+        "bağış",
+        "paylaşım",
+        "borç",
+        "destek",
+        "denge",
+        "cömertlik"
+      ],
+      "uprightEn": "Generosity, helping, giving, sharing, debt, support, balance",
+      "reversedEn": "Self-interest, debt, inequality, arrogance, help given for show"
+    },
+    {
+      "id": "seven_of_pentacles",
+      "name": "Seven of Pentacles",
+      "nameTr": "Tılsım Yedilisi",
+      "uprightTr": "Sabır, değerlendirme, yatırım, çaba, uzun vadeli başarı, hasat zamanı",
+      "keywords": [
+        "sabır",
+        "değerlendirme",
+        "yatırım",
+        "çaba",
+        "uzun vadeli başarı",
+        "hasat zamanı",
+        "bekleme"
+      ],
+      "uprightEn": "Patience, assessment, investment, effort, long-term success, time to harvest",
+      "reversedEn": "Delay, disappointment, inefficiency, poor investment, low return"
+    },
+    {
+      "id": "eight_of_pentacles",
+      "name": "Eight of Pentacles",
+      "nameTr": "Tılsım Sekizlisi",
+      "uprightTr": "Çalışkanlık, ayrıntılara dikkat, zanaat, ustalık, mükemmelleştirme, öğrenme",
+      "keywords": [
+        "çalışkanlık",
+        "ayrıntılara dikkat",
+        "zanaat",
+        "ustalık",
+        "mükemmelleştirme",
+        "öğrenme",
+        "disiplin"
+      ],
+      "uprightEn": "Diligence, attention to detail, craftsmanship, mastery, refinement, learning",
+      "reversedEn": "Perfectionism, meaningless work, poor quality, laziness, lack of motivation"
+    },
+    {
+      "id": "nine_of_pentacles",
+      "name": "Nine of Pentacles",
+      "nameTr": "Tılsım Dokuzlusu",
+      "uprightTr": "Lüks, refah, kendine güven, bağımsızlık, öz-disiplin, maddi başarı",
+      "keywords": [
+        "lüks",
+        "refah",
+        "kendine güven",
+        "bağımsızlık",
+        "öz-disiplin",
+        "maddi başarı",
+        "zenginlik",
+        "denge"
+      ],
+      "uprightEn": "Luxury, prosperity, self-confidence, independence, self-discipline, material success",
+      "reversedEn": "Showiness, wastefulness, financial dependency, insecurity, false appearances"
+    },
+    {
+      "id": "ten_of_pentacles",
+      "name": "Ten of Pentacles",
+      "nameTr": "Tılsım Onlusu",
+      "uprightTr": "Aile serveti, kalıcı refah, miras, gelenek, güvenlik, köklülük, tamamlanma",
+      "keywords": [
+        "aile serveti",
+        "kalıcı refah",
+        "miras",
+        "gelenek",
+        "güvenlik",
+        "köklülük",
+        "tamamlanma",
+        "sürdürülebilirlik"
+      ],
+      "uprightEn": "Family wealth, lasting prosperity, inheritance, tradition, security, roots, completion",
+      "reversedEn": "Family problems, loss, financial failure, inheritance disputes, temporary gain"
+    },
+    {
+      "id": "page_of_pentacles",
+      "name": "Page of Pentacles",
+      "nameTr": "Tılsım Prensi",
+      "uprightTr": "Öğrenme, keşif, akademik başarı, yeni fırsatlar, çalışkanlık, pratiklik",
+      "keywords": [
+        "öğrenme",
+        "keşif",
+        "akademik başarı",
+        "yeni fırsatlar",
+        "çalışkanlık",
+        "pratiklik",
+        "merak",
+        "eğitim"
+      ],
+      "uprightEn": "Learning, exploration, academic success, new opportunities, diligence, practicality",
+      "reversedEn": "Lack of direction, distraction, missed opportunities, laziness, wastefulness"
+    },
+    {
+      "id": "knight_of_pentacles",
+      "name": "Knight of Pentacles",
+      "nameTr": "Tılsım Şövalyesi",
+      "uprightTr": "Güvenilirlik, çalışkanlık, sorumluluk, sabır, metodiklik, azim, pratiklik",
+      "keywords": [
+        "güvenilirlik",
+        "çalışkanlık",
+        "sorumluluk",
+        "sabır",
+        "metodiklik",
+        "azim",
+        "pratiklik",
+        "istikrar"
+      ],
+      "uprightEn": "Reliability, diligence, responsibility, patience, method, perseverance, practicality",
+      "reversedEn": "Laziness, obsession, boredom, attachment to routine, resistance to change"
+    },
+    {
+      "id": "queen_of_pentacles",
+      "name": "Queen of Pentacles",
+      "nameTr": "Tılsım Kraliçesi",
+      "uprightTr": "Besleyicilik, cömertlik, maddi güvenlik, pratiklik, bolluk, topraklanma, ev odaklılık",
+      "keywords": [
+        "besleyicilik",
+        "cömertlik",
+        "maddi güvenlik",
+        "pratiklik",
+        "bolluk",
+        "topraklanma",
+        "ev odaklılık",
+        "denge"
+      ],
+      "uprightEn": "Nurturing, generosity, material security, practicality, abundance, groundedness, home focus",
+      "reversedEn": "Overprotection, jealousy, insecurity, material dependency, self-neglect"
+    },
+    {
+      "id": "king_of_pentacles",
+      "name": "King of Pentacles",
+      "nameTr": "Tılsım Kralı",
+      "uprightTr": "Varlık, güç, güvenlik, liderlik, pratiklik, finansal zeka, istikrar, bolluğa erişim",
+      "keywords": [
+        "varlık",
+        "güç",
+        "güvenlik",
+        "liderlik",
+        "pratiklik",
+        "finansal zeka",
+        "istikrar",
+        "bolluk",
+        "saygınlık"
+      ],
+      "uprightEn": "Wealth, power, security, leadership, practicality, financial intelligence, stability, abundance",
+      "reversedEn": "Materialism, rigidity, stubbornness, cruelty, greed, abuse of power"
+    }
+  ]
+}
