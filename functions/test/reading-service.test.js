@@ -5,7 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const catalog = require("../data/reading-catalog.json");
 const { SETTINGS, prepareReading, completeReading, requestReading } = require("../reading-service");
-const { ENGLISH_BASE_PROMPT } = require("../reading-prompts");
+const { ENGLISH_BASE_PROMPT, ENGLISH_YES_NO_PROMPT } = require("../reading-prompts");
 const request = (format = catalog.formats[0], language = "tr") => ({
   schemaVersion: 2, spreadId: format.id, language,
   cardIds: catalog.cards.slice(0, format.cardCount).map(card => card.id),
@@ -23,7 +23,8 @@ test("all 13 spreads and both languages preserve card position order and prompts
     catalog.cards.slice(0, format.cardCount).forEach((card, index) => {
       assert.ok(prepared.prompt.includes(`${positions[index]}: ${language === "tr" ? card.nameTr : card.name}`));
     });
-    assert.ok(language === "tr" ? prepared.prompt.includes("### Genel Yorum") : prepared.prompt.startsWith(ENGLISH_BASE_PROMPT));
+    assert.ok(language === "tr" ? prepared.prompt.includes("### Genel Yorum") :
+      prepared.prompt.startsWith(format.id === "yes_no_reading" ? ENGLISH_YES_NO_PROMPT : ENGLISH_BASE_PROMPT));
   }
 });
 

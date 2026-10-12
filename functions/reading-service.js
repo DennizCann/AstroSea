@@ -1,7 +1,7 @@
 "use strict";
 
 const catalog = require("./data/reading-catalog.json");
-const { ENGLISH_BASE_PROMPT, SYSTEM_MESSAGES } = require("./reading-prompts");
+const { ENGLISH_BASE_PROMPT, ENGLISH_YES_NO_PROMPT, SYSTEM_MESSAGES } = require("./reading-prompts");
 const formats = new Map(catalog.formats.map(format => [format.id, format]));
 const cards = new Map(catalog.cards.map(card => [card.id, card]));
 
@@ -49,7 +49,8 @@ function buildPrompt(format, selected, language) {
   const positions = selected.map((card, i) => `${format.positionsEn[i]}: ${card.name}`).join("\n");
   // Preserve the existing language-specific references; changing their meaning is a separate task.
   const details = selected.map((card, i) => `${format.positionsEn[i]}: ${card.name}\nUpright meaning: ${card.uprightEn}\nReversed meaning: ${card.reversedEn}`).join("\n\n");
-  return `${ENGLISH_BASE_PROMPT}\n\nSpread Name: ${format.nameEn}\n\nCards and Positions:\n${positions}\n\n--- Card Reference ---\n${details}\n\n[IMPORTANT: Write the entire reading ONLY in English. Translate all headings into English. Do not copy Turkish phrasing.]`;
+  const instructions = format.id === "yes_no_reading" ? ENGLISH_YES_NO_PROMPT : ENGLISH_BASE_PROMPT;
+  return `${instructions}\n\nSpread Name: ${format.nameEn}\n\nCards and Positions:\n${positions}\n\n--- Card Reference ---\n${details}\n\n[IMPORTANT: Write the entire reading ONLY in English. Translate all headings into English. Do not copy Turkish phrasing.]`;
 }
 
 function completeReading(payload) {

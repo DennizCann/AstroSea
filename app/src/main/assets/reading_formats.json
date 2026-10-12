@@ -60,7 +60,7 @@
           "description": "Sorunuzun cevabı ve rehberlik"
         }
       ],
-      "basePrompt": "Görev:\nAşağıda bilgileri verilen tarot açılımını sistem mesajındaki ton ve gerçekçilik kurallarına göre yorumla.\n\nAçılım Adı: Evet/Hayır Açılımı\n\nKartlar ve Pozisyonları:\n\nCevap: [KART_ADI]\n\nTalimatlar:\n- Her kartı açılımdaki pozisyonuna göre ayrı ayrı yorumla.\n- Her kart yorumu yaklaşık 4-5 cümle uzunluğunda olsun.\n- Kartın anlamını pozisyonuyla ilişkilendir; kartlar arasındaki bağlantıları açılımın bütünü içinde ele al.\n- Her kart yorumunu ### [Slot Adı]: [Kart Adı] başlığı altında ver.\n- Kart yorumlarından sonra ### Genel Yorum başlığı altında kartların ortak mesajını bir sonuç paragrafında birleştir ve uygulanabilir günlük bir öneri ekle.",
+      "basePrompt": "Görev:\nAşağıdaki Evet/Hayır açılımını sistem mesajındaki ton ve gerçekçilik kurallarına göre kısa ve cevap odaklı yorumla.\n\nAçılım Adı: Evet/Hayır Açılımı\n\nKartlar ve Pozisyonları:\nCevap: [KART_ADI]\n\nTalimatlar:\n- Yanıta ### Cevap: [Kart Adı] başlığıyla başla. Bu bölümde kartın cevabı neden desteklediğini 2-3 kısa cümleyle açıkla.\n- Ardından ### Genel Yorum başlığını kullan. Bu bölüme Evet, Hayır veya Şimdilik belirsiz ifadesiyle başla. Kartın işaret ettiği eğilime göre seçim yap; gerçek bir sonucu garanti etme.\n- Genel Yorum toplam en fazla 2 kısa cümle olsun: doğrudan cevap ve varsa tek bir koşul.\n- Kart bölümündeki gerekçeyi Genel Yorum bölümünde tekrarlama. Uzun hikâye, genel motivasyon konuşması veya çok adımlı tavsiye yazma.\n- Kullanıcının sorusunu veya yaşadıklarını uydurma; kartın işaret ettiği eğilimi yorumla.\n- Yanıtı yalnızca Türkçe yaz.",
       "focusAreas": [
         "karar verme",
         "net cevaplar",

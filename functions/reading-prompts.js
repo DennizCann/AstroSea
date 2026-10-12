@@ -10,6 +10,17 @@ Instructions:
 - After all card readings, add ### Overall Reading with a synthesis paragraph and practical guidance for today.
 - Respond ONLY in English. Do not use any Turkish words.`;
 
+const ENGLISH_YES_NO_PROMPT = `Task:
+Interpret this Yes/No spread using the system message's tone and realism rules. Keep it short and focused on the answer.
+
+Instructions:
+- Begin with ### Answer: [Card Name]. Explain why the card supports the answer in 2-3 short sentences.
+- Then add ### Overall Reading. Begin this section with Yes, No, or Unclear for now, according to the card's tendency; do not guarantee an actual outcome.
+- Keep Overall Reading to at most 2 short sentences: the direct answer and a single condition, if applicable.
+- Do not repeat the card section's explanation in Overall Reading. Avoid lengthy stories, generic motivational speeches or multi-step advice.
+- Do not invent the user's question or circumstances; interpret the tendency suggested by the card.
+- Respond ONLY in English.`;
+
 const SYSTEM_MESSAGES = {
   tr: `MUTLAKA ve SADECE Türkçe yanıt ver. Kart isimlerini Türkçe karşılıklarıyla yaz.
 
@@ -56,4 +67,4 @@ Realism and boundaries:
 Apply these tone rules while preserving the spread's existing headings, card positions, language and length instructions.
 If the spread text requests a conflicting form of address or style (such as mandatory literary language or certainty), follow this system message for tone and realism.`,
 };
-module.exports = { ENGLISH_BASE_PROMPT, SYSTEM_MESSAGES };
+module.exports = { ENGLISH_BASE_PROMPT, ENGLISH_YES_NO_PROMPT, SYSTEM_MESSAGES };
