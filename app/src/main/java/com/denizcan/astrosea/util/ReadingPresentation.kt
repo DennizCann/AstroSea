@@ -11,6 +11,7 @@ data class ReadingPresentation(
 }
 
 private val markdownHeading = Regex("^\\s{0,3}#{1,6}\\s*(\\S.*?)\\s*$")
+private val markdownBold = Regex("\\*\\*([^*]+)\\*\\*")
 private val summaryTitles = setOf("genel yorum", "genel yorum ve tavsiye", "overall reading")
 
 private fun cleanHeading(text: String): String =
@@ -24,7 +25,8 @@ fun readingPresentation(text: String, allowCollapse: Boolean = true): ReadingPre
     val blocks = mutableListOf<ReadingBlock>()
     val body = StringBuilder()
     fun flushBody() {
-        blocks += readingParagraphs(body.toString()).map { ReadingBlock(it) }
+        val displayBody = markdownBold.replace(body.toString()) { it.groupValues[1] }
+        blocks += readingParagraphs(displayBody).map { ReadingBlock(it) }
         body.clear()
     }
     text.replace("\r\n", "\n").lineSequence().forEach { line ->
@@ -40,7 +42,7 @@ fun readingPresentation(text: String, allowCollapse: Boolean = true): ReadingPre
     flushBody()
 
     val full = ReadingPresentation(blocks)
-    if (!allowCollapse || blocks.firstOrNull()?.isHeading != true) return full
+    if (!allowCollapse) return full
     val headings = blocks.indices.filter { blocks[it].isHeading }
     val summaries = headings.filter { isSummary(blocks[it].text) }
     if (summaries.size != 1) return full
@@ -49,5 +51,10 @@ fun readingPresentation(text: String, allowCollapse: Boolean = true): ReadingPre
     if (summary == 0 || summary != headings.last() || summary == blocks.lastIndex) return full
     if (headings.zipWithNext().any { (a, b) -> b == a + 1 }) return full
     if (headings.filter { it < summary }.any { ':' !in blocks[it].text }) return full
-    return ReadingPresentation(overview = blocks.drop(summary), details = blocks.take(summary))
+    val firstCardHeading = headings.first()
+    // Keep any introduction visible with the summary; only card sections are collapsed.
+    return ReadingPresentation(
+        overview = blocks.take(firstCardHeading) + blocks.drop(summary),
+        details = blocks.subList(firstCardHeading, summary)
+    )
 }

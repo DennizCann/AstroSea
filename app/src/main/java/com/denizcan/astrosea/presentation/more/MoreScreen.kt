@@ -21,7 +21,8 @@ import androidx.compose.ui.res.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToPremium: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -48,6 +49,19 @@ fun MoreScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                OutlinedButton(
+                    onClick = onNavigateToPremium,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.6f),
+                        contentColor = Color(0xFFFFD700)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.membership_and_plans),
+                        fontFamily = FontFamily(Font(R.font.cinzel_regular))
+                    )
+                }
                 Text(
                     text = stringResource(R.string.more_coming_heading),
                     color = Color.White,
@@ -70,4 +84,4 @@ fun MoreScreen(
             }
         }
     }
-} 
+}

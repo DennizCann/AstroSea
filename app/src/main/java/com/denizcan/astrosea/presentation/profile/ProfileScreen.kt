@@ -59,6 +59,7 @@ import kotlinx.coroutines.tasks.await
 @Composable
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToPremium: () -> Unit,
     onAccountDeleted: () -> Unit = onNavigateBack,
     viewModel: ProfileViewModel = viewModel()
 ) {
@@ -419,7 +420,11 @@ fun ProfileScreen(
 
                 // Premium Üyelik Bilgileri
                 Spacer(modifier = Modifier.height(16.dp))
-                PremiumStatusCard(state.membership, onRefresh = { viewModel.refreshMembership() })
+                PremiumStatusCard(
+                    state.membership,
+                    onRefresh = { viewModel.refreshMembership() },
+                    onNavigateToPremium = onNavigateToPremium
+                )
 
                 // KVKK / Gizlilik Politikası Linki
                 Spacer(modifier = Modifier.height(16.dp))
@@ -939,7 +944,8 @@ fun ProfileDateField(
 @Composable
 fun PremiumStatusCard(
     membership: com.denizcan.astrosea.billing.MembershipState,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onNavigateToPremium: () -> Unit
 ) {
     val context = LocalContext.current
     val textStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily(Font(R.font.cormorantgaramond_regular)))
@@ -957,6 +963,9 @@ fun PremiumStatusCard(
                 TextButton(onClick = onRefresh) { Text(stringResource(R.string.membership_refresh)) }
             } else if (!membership.hasAccess) {
                 Text(stringResource(R.string.standard_member), color = Color.White, style = textStyle)
+                TextButton(onClick = onNavigateToPremium) {
+                    Text(stringResource(R.string.btn_upgrade_premium), color = Color(0xFFFFD700))
+                }
             }
             membership.activeLevels.forEach { level ->
                 val label = when {

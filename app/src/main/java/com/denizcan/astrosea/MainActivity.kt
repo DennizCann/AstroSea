@@ -652,6 +652,7 @@ class MainActivity : ComponentActivity() {
                         ProfileScreen(
                             viewModel = sharedProfileViewModel,
                             onNavigateBack = { appNavigator.popBack() },
+                            onNavigateToPremium = { appNavigator.navigate(Screen.Premium.route) },
                             onAccountDeleted = {
                                 navController.navigate(Screen.Auth.route) {
                                     popUpTo(0) { inclusive = true }
@@ -743,7 +744,8 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("more") {
                         MoreScreen(
-                            onNavigateBack = { appNavigator.popBack() }
+                            onNavigateBack = { appNavigator.popBack() },
+                            onNavigateToPremium = { appNavigator.navigate(Screen.Premium.route) }
                         )
                     }
                     composable(Screen.GeneralReadings.route) {

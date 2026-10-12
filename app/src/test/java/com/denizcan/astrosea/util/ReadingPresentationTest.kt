@@ -44,12 +44,27 @@ class ReadingPresentationTest {
         }
     }
 
-    @Test fun preambleAndErrorFallbackRemainVisible() {
-        assertFalse(readingPresentation("Hata açıklaması\n" + turkish).hasDetails)
-        val result = readingPresentation(turkish, allowCollapse = false)
+    @Test fun introductionRemainsVisibleWhileCardsCollapse() {
+        val result = readingPresentation("**Bugün zihnin ve duyguların karşı karşıya.**\n\n" + turkish)
+        assertTrue(result.hasDetails)
+        assertEquals(listOf("Bugün zihnin ve duyguların karşı karşıya.", "Genel Yorum", "Ortak hikâye ve tavsiye."),
+            result.overview.map { it.text })
+        assertEquals("Düşünce: Güneş", result.details.first().text)
+        assertEquals(7, (result.overview + result.details).size)
+    }
+
+    @Test fun errorFallbackNeverHidesCardsEvenWithIntroduction() {
+        val result = readingPresentation("Hata açıklaması\n" + turkish, allowCollapse = false)
         assertFalse(result.hasDetails)
-        assertEquals("Düşünce: Güneş", result.overview.first().text)
-        assertTrue(result.overview.first().isHeading)
+        assertEquals("Hata açıklaması", result.overview.first().text)
+        assertTrue(result.overview.any { it.isHeading && it.text == "Düşünce: Güneş" })
+    }
+
+    @Test fun boldMarkersAreRemovedFromBodiesWithoutRemovingLiteralStars() {
+        val result = readingPresentation("### You: Sun\nA **clear** message; 2 * 3 = 6.\n### Overall Reading\n**Trust yourself.**")
+        assertEquals("A clear message; 2 * 3 = 6.", result.details.last().text)
+        assertEquals("Trust yourself.", result.overview.last().text)
+        assertEquals("Plain bold text.", readingPresentation("**Plain bold text.**").overview.single().text)
     }
 
     @Test fun summaryAlreadyFirstAndPlainTextStayInOrder() {
