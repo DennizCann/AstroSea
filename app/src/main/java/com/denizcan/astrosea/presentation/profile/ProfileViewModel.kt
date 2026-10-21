@@ -11,6 +11,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import androidx.lifecycle.viewModelScope
+import com.denizcan.astrosea.billing.MembershipRepository
+import com.denizcan.astrosea.billing.MembershipState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -26,17 +29,15 @@ class ProfileViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            com.denizcan.astrosea.billing.MembershipRepository.state.collect { membership ->
-                val current = if (membership.uid == auth.currentUser?.uid) membership else com.denizcan.astrosea.billing.MembershipState()
-                profileState = profileState.copy(membership = current,
-                    profileData = profileState.profileData.copy(isPremium = current.hasAccess))
+            MembershipRepository.state.collect { membership ->
+                profileState = profileState.withMembershipFor(auth.currentUser?.uid, membership)
             }
         }
         authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user != null) {
                 Log.d("ProfileViewModel", "Auth state changed: User ${user.uid} logged in")
-                profileState = ProfileState()
+                profileState = ProfileState().withMembershipFor(user.uid, MembershipRepository.state.value)
                 refreshMembership()
                 loadProfile(user.uid)
                 startListeningToProfileChanges(user.uid)
@@ -248,8 +249,23 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun refreshMembership() {
+        val userId = auth.currentUser?.uid ?: return
         viewModelScope.launch {
-            runCatching { com.denizcan.astrosea.billing.MembershipRepository.refresh() }
+            try {
+                val membership = MembershipRepository.refresh()
+                // StateFlow does not emit equal values. Reapply a successful refresh
+                // even when the server returns the same cached membership.
+                if (auth.currentUser?.uid == userId) {
+                    profileState = profileState.withMembershipFor(userId, membership)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                if (auth.currentUser?.uid == userId) {
+                    profileState = profileState.withMembershipFor(userId, MembershipRepository.state.value)
+                }
+                Log.w("ProfileViewModel", "Membership refresh could not be completed")
+            }
         }
     }
     val isPremium: Boolean get() = profileState.membership.hasAccess
@@ -265,3 +281,9 @@ data class ProfileState(
     val isEditing: Boolean = false,
     val membership: com.denizcan.astrosea.billing.MembershipState = com.denizcan.astrosea.billing.MembershipState()
 )
+
+/** Keep only the current account's server-verified membership when rebuilding profile UI. */
+internal fun ProfileState.withMembershipFor(userId: String?, candidate: MembershipState): ProfileState {
+    val current = candidate.takeIf { userId != null && it.uid == userId } ?: MembershipState(userId)
+    return copy(membership = current, profileData = profileData.copy(isPremium = current.hasAccess))
+}

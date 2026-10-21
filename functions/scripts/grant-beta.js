@@ -4,12 +4,14 @@
 // list, or obtain explicit approval for the specific verified account.
 // Never run for anonymous accounts. No purchases are performed.
 const { isDeepStrictEqual } = require("node:util");
-const { validUid } = require("../membership");
+const { validUid, normalizeProfile, membershipView } = require("../membership");
 const uid = process.argv[2];
+const reviewLifetime = process.argv[3] === "--approved-review-lifetime";
+const accessLevelId = reviewLifetime ? "premium" : "beta_premium";
 const createProfile = process.argv[4] === "--create-profile";
-if (!validUid(uid) || process.argv[3] !== "--approved-30-days"
+if (!validUid(uid) || (!reviewLifetime && process.argv[3] !== "--approved-30-days")
     || (process.argv[4] && !createProfile) || process.argv.length > 5) {
-  throw new Error("Usage: node functions/scripts/grant-beta.js VERIFIED_MATCHED_UID --approved-30-days");
+  throw new Error("Usage: grant-beta.js VERIFIED_UID --approved-30-days|--approved-review-lifetime [--create-profile]");
 }
 const project = "astrosea-3de22";
 let stage = "authentication";
@@ -31,11 +33,21 @@ async function main() {
   const users = (await auth.post(`/projects/${project}/accounts:lookup`, { localId: [uid] }, options())).body.users;
   assert(users?.length === 1 && users[0].localId === uid && users[0].emailVerified === true
     && users[0].disabled !== true, "Account must exist, be verified and enabled");
+  if (reviewLifetime) {
+    assert(users[0].email?.toLowerCase() === "reviewastrosea@gmail.com",
+      "Lifetime review access is approved only for the dedicated review account");
+  }
   const db = new Client({ urlPrefix: "https://firestore.googleapis.com", apiVersion: "v1" });
   const parentPath = `/projects/${project}/databases/(default)/documents/users/${uid}`;
   const parent = (await db.get(parentPath, options())).body;
   assert(parent?.fields && parent.fields.membershipDeletionPending?.booleanValue !== true,
     "Existing profile required; deletion must not be pending");
+  if (reviewLifetime) {
+    assert(parent.fields.kvkk_accepted?.booleanValue === true &&
+      ["name", "surname", "birthDate", "birthTime", "country", "city"]
+        .every(field => parent.fields[field]?.stringValue?.trim()),
+      "Review profile setup and consent must be complete");
+  }
   const { accessSecretVersion } = require("firebase-tools/lib/gcp/secretManager");
   const key = await accessSecretVersion(project, "ADAPTY_SECRET_KEY", "latest");
   const headers = { Authorization: `Api-Key ${key}`, "adapty-customer-user-id": uid, "Content-Type": "application/json" };
@@ -62,27 +74,34 @@ async function main() {
     });
     before = await provider("profile/");
   }
-  const current = before.access_levels.find(x => x.access_level_id === "beta_premium");
+  const current = before.access_levels.find(x => x.access_level_id === accessLevelId);
   const now = Date.now();
-  if (current && Date.parse(current.expires_at) > now + 29.9 * 86400000) {
-    console.log("SKIP: approximately 30 days of beta access already present; not extended");
+  if (current && (reviewLifetime
+    ? current.expires_at === null && (!current.starts_at || Date.parse(current.starts_at) <= now)
+    : Date.parse(current.expires_at) > now + 29.9 * 86400000)) {
+    console.log(reviewLifetime ? "SKIP: lifetime review Premium already active" :
+      "SKIP: approximately 30 days of beta access already present; not extended");
     return;
   }
   const startsAt = new Date(now).toISOString();
-  const expiresAt = new Date(now + 30 * 86400000).toISOString();
-  stage = "approved beta grant";
+  const expiresAt = reviewLifetime ? null : new Date(now + 30 * 86400000).toISOString();
+  stage = reviewLifetime ? "approved lifetime review grant" : "approved beta grant";
   await provider("purchase/profile/grant/access-level/", {
-    access_level_id: "beta_premium", starts_at: startsAt, expires_at: expiresAt,
+    access_level_id: accessLevelId, starts_at: startsAt, expires_at: expiresAt,
   });
   stage = "grant verification";
   const after = await provider("profile/");
-  const beta = after.access_levels.find(x => x.access_level_id === "beta_premium");
-  assert(beta && Math.abs(Date.parse(beta.expires_at) - Date.parse(expiresAt)) < 1000,
-    "Unexpected beta expiry");
+  const level = after.access_levels.find(x => x.access_level_id === accessLevelId);
+  assert(level && (reviewLifetime ? level.expires_at === null :
+    Math.abs(Date.parse(level.expires_at) - Date.parse(expiresAt)) < 1000), "Unexpected expiry");
+  assert(membershipView(normalizeProfile({ data: after }, uid)).hasPremiumAccess,
+    "Backend must recognize the granted access");
   assert(isDeepStrictEqual(before.subscriptions, after.subscriptions), "Subscription data changed; inspect before continuing");
-  assert(isDeepStrictEqual(before.access_levels.filter(x => x.access_level_id !== "beta_premium"),
-    after.access_levels.filter(x => x.access_level_id !== "beta_premium")), "Other access changed; inspect");
+  assert(isDeepStrictEqual(before.access_levels.filter(x => x.access_level_id !== accessLevelId),
+    after.access_levels.filter(x => x.access_level_id !== accessLevelId)), "Other access changed; inspect");
+  assert(before.total_revenue_usd === after.total_revenue_usd, "Revenue changed; inspect");
   assert(isDeepStrictEqual(parent, (await db.get(parentPath, options())).body), "Public profile changed; inspect");
-  console.log(JSON.stringify({ granted: "beta_premium", startsAt, expiresAt, days: 30, subscriptionsUnchanged: true }));
+  console.log(JSON.stringify({ uid, granted: accessLevelId, startsAt, expiresAt,
+    days: reviewLifetime ? null : 30, subscriptionsUnchanged: true, revenueUnchanged: true }));
 }
 main().catch(() => { console.error(`STOP: beta operation failed at ${stage}. Inspect state before retry; no blind retries.`); process.exitCode = 1; });

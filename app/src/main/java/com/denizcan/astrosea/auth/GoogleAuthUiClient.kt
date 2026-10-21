@@ -105,9 +105,12 @@ class GoogleAuthUiClient(
             }
         }
 
-        val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
+        if (googleIdToken.isNullOrBlank()) {
+            return SignInResult(data = null, errorMessage = "Google did not return an ID token")
+        }
         
         return try {
+            val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
             val user = auth.signInWithCredential(googleCredentials).await().user
             
             var isFirstTimeUser = false
@@ -243,12 +246,20 @@ class GoogleAuthUiClient(
             .build()
     }
 
-    fun getFallbackSignInIntent(): Intent {
+    suspend fun prepareAccountPicker(): Intent {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(com.denizcan.astrosea.R.string.default_web_client_id))
             .requestEmail()
             .build()
-        return GoogleSignIn.getClient(context, gso).signInIntent
+        val client = GoogleSignIn.getClient(context, gso)
+        // Clear the SDK selection only; preserve the Firebase session and device accounts.
+        client.signOut().await()
+        return client.signInIntent
+    }
+
+    fun getSignInErrorStatus(intent: Intent?): Int? {
+        if (intent == null) return null
+        return (GoogleSignIn.getSignedInAccountFromIntent(intent).exception as? ApiException)?.statusCode
     }
 }
 
@@ -263,4 +274,4 @@ data class UserData(
     val userId: String,
     val username: String?,
     val email: String?
-) 
+)

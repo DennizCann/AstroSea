@@ -55,6 +55,9 @@ data class SubscriptionProduct(
     val adaptyProduct: AdaptyPaywallProduct? = null
 )
 
+internal fun List<SubscriptionProduct>.inDisplayOrder(): List<SubscriptionProduct> =
+    sortedBy { it.durationDays }
+
 sealed class BillingState {
     object Idle : BillingState()
     object Loading : BillingState()
@@ -63,10 +66,12 @@ sealed class BillingState {
     data class ProductsLoaded(val products: List<SubscriptionProduct>) : BillingState()
     data class PurchaseSuccess(val productId: String) : BillingState()
     data class PurchaseCancelled(val message: String) : BillingState()
-    data class Error(val message: String) : BillingState()
+    data class Error(val message: String, val productLoadFailure: Boolean = false) : BillingState()
 }
 
 class BillingManager(private val context: Context) {
+    private val localizedContext: Context
+        get() = com.denizcan.astrosea.util.LanguageManager.wrap(context)
 
     companion object {
         private const val TAG = "BillingManager"
@@ -91,32 +96,35 @@ class BillingManager(private val context: Context) {
         get() = listOf(
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_WEEKLY,
-            name = context.getString(R.string.prem_plan_weekly_short),
-            price = "₺49.99",
-            duration = context.getString(R.string.prem_duration_week),
+            name = localizedContext.getString(R.string.prem_plan_weekly_short),
+            price = "US$0.99",
+            duration = localizedContext.getString(R.string.prem_duration_week),
             durationDays = BillingConfig.DURATION_WEEKLY,
             isPopular = false
         ),
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_MONTHLY,
-            name = context.getString(R.string.prem_plan_monthly_short),
-            price = "₺99.99",
-            duration = context.getString(R.string.prem_duration_month),
+            name = localizedContext.getString(R.string.prem_plan_monthly_short),
+            price = "US$3.49",
+            duration = localizedContext.getString(R.string.prem_duration_month),
             durationDays = BillingConfig.DURATION_MONTHLY,
             isPopular = true
         ),
         SubscriptionProduct(
             productId = BillingConfig.PRODUCT_YEARLY,
-            name = context.getString(R.string.prem_plan_yearly_short),
-            price = "₺599.99",
-            duration = context.getString(R.string.prem_duration_year),
+            name = localizedContext.getString(R.string.prem_plan_yearly_short),
+            price = "US$29.99",
+            duration = localizedContext.getString(R.string.prem_duration_year),
             durationDays = BillingConfig.DURATION_YEARLY,
-            pricePerMonth = context.getString(R.string.prem_price_monthly_fallback),
+            pricePerMonth = localizedContext.getString(R.string.prem_price_monthly_fallback),
             isPopular = false
         )
     )
 
     fun startConnection() {
+        // One catalog request at a time; never retain purchasable products after a failed reload.
+        if (_billingState.value is BillingState.Loading) return
+        adaptyProducts = emptyList()
         if (BillingConfig.TEST_MODE) {
             Log.d(TAG, "TEST MODU: Adapty bağlantısı simüle ediliyor")
             _billingState.value = BillingState.Connected
@@ -125,6 +133,16 @@ class BillingManager(private val context: Context) {
         }
 
         _billingState.value = BillingState.Loading
+
+        val billingService = android.content.Intent("com.android.vending.billing.InAppBillingService.BIND")
+            .setPackage("com.android.vending")
+        if (context.packageManager.queryIntentServices(billingService, 0).isEmpty()) {
+            Log.w(TAG, "No Google Play Billing service installed on this device")
+            _billingState.value = BillingState.Error(
+                localizedContext.getString(R.string.prem_billing_service_unavailable), productLoadFailure = true
+            )
+            return
+        }
 
         // Adapty üzerinden paywall ve ürünleri çek
         Adapty.getPaywall(BillingConfig.PLACEMENT_ID) { result ->
@@ -136,7 +154,7 @@ class BillingManager(private val context: Context) {
                 }
                 is AdaptyResult.Error -> {
                     Log.e(TAG, "Adapty paywall hatası: ${result.error.message}")
-                    _billingState.value = BillingState.Error(context.getString(R.string.prem_products_load_failed))
+                    _billingState.value = BillingState.Error(localizedContext.getString(R.string.prem_products_load_failed), productLoadFailure = true)
                 }
             }
         }
@@ -147,15 +165,21 @@ class BillingManager(private val context: Context) {
             when (result) {
                 is AdaptyResult.Success -> {
                     adaptyProducts = result.value
+                    if (adaptyProducts.isEmpty()) {
+                        _billingState.value = BillingState.Error(
+                            localizedContext.getString(R.string.prem_products_load_failed), productLoadFailure = true
+                        )
+                        return@getPaywallProducts
+                    }
                     
                     val products = adaptyProducts.map { adaptyProduct ->
                         val subscriptionDetails = adaptyProduct.subscriptionDetails
                         val periodUnit = subscriptionDetails?.subscriptionPeriod?.unit
                         
                         val (duration, durationDays, isPopular) = when (periodUnit) {
-                            AdaptyPeriodUnit.WEEK -> Triple(context.getString(R.string.prem_duration_week), 7, false)
-                            AdaptyPeriodUnit.MONTH -> Triple(context.getString(R.string.prem_duration_month), 30, true)
-                            AdaptyPeriodUnit.YEAR -> Triple(context.getString(R.string.prem_duration_year), 365, false)
+                            AdaptyPeriodUnit.WEEK -> Triple(localizedContext.getString(R.string.prem_duration_week), 7, false)
+                            AdaptyPeriodUnit.MONTH -> Triple(localizedContext.getString(R.string.prem_duration_month), 30, true)
+                            AdaptyPeriodUnit.YEAR -> Triple(localizedContext.getString(R.string.prem_duration_year), 365, false)
                             else -> Triple("", 30, false)
                         }
                         
@@ -172,11 +196,11 @@ class BillingManager(private val context: Context) {
                     }
 
                     Log.d(TAG, "Adapty ürünleri yüklendi: ${products.size} adet")
-                    _billingState.value = BillingState.ProductsLoaded(products)
+                    _billingState.value = BillingState.ProductsLoaded(products.inDisplayOrder())
                 }
                 is AdaptyResult.Error -> {
                     Log.e(TAG, "Adapty ürün yükleme hatası: ${result.error.message}")
-                    _billingState.value = BillingState.Error(context.getString(R.string.prem_products_load_failed))
+                    _billingState.value = BillingState.Error(localizedContext.getString(R.string.prem_products_load_failed), productLoadFailure = true)
                 }
             }
         }
@@ -185,7 +209,7 @@ class BillingManager(private val context: Context) {
     fun launchPurchaseFlow(activity: Activity, productId: String) {
         val product = adaptyProducts.find { it.vendorProductId == productId }
         if (product == null) {
-            _billingState.value = BillingState.Error(context.getString(R.string.prem_product_not_found, productId))
+            _billingState.value = BillingState.Error(localizedContext.getString(R.string.prem_product_not_found, productId))
             return
         }
         scope.launch {
@@ -198,13 +222,13 @@ class BillingManager(private val context: Context) {
                 _billingState.value = when (result) {
                     is AdaptyResult.Success -> when (result.value) {
                         is AdaptyPurchaseResult.Success -> BillingState.PurchaseSuccess(productId)
-                        is AdaptyPurchaseResult.UserCanceled -> BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_cancelled))
-                        is AdaptyPurchaseResult.Pending -> BillingState.PurchaseCancelled(context.getString(R.string.prem_purchase_pending))
+                        is AdaptyPurchaseResult.UserCanceled -> BillingState.PurchaseCancelled(localizedContext.getString(R.string.prem_purchase_cancelled))
+                        is AdaptyPurchaseResult.Pending -> BillingState.PurchaseCancelled(localizedContext.getString(R.string.prem_purchase_pending))
                     }
-                    is AdaptyResult.Error -> BillingState.Error(context.getString(R.string.prem_restore_failed))
+                    is AdaptyResult.Error -> BillingState.Error(localizedContext.getString(R.string.prem_restore_failed))
                 }
             } catch (error: Exception) {
-                _billingState.value = BillingState.Error(context.getString(R.string.membership_unavailable))
+                _billingState.value = BillingState.Error(localizedContext.getString(R.string.membership_unavailable))
             }
         }
     }
@@ -227,11 +251,11 @@ class BillingManager(private val context: Context) {
                 when (result) {
                     is AdaptyResult.Success -> onResult(MembershipRepository.refresh().hasAccess)
                     is AdaptyResult.Error -> {
-                        _billingState.value = BillingState.Error(context.getString(R.string.prem_restore_failed))
+                        _billingState.value = BillingState.Error(localizedContext.getString(R.string.prem_restore_failed))
                     }
                 }
             } catch (error: Exception) {
-                _billingState.value = BillingState.Error(context.getString(R.string.membership_unavailable))
+                _billingState.value = BillingState.Error(localizedContext.getString(R.string.membership_unavailable))
             }
         }
     }
@@ -246,7 +270,7 @@ class BillingManager(private val context: Context) {
             val formatter = NumberFormat.getCurrencyInstance(Locale.getDefault()).apply {
                 currency = Currency.getInstance(product.price.currencyCode)
             }
-            context.getString(R.string.prem_monthly_equivalent, formatter.format(monthly))
+            localizedContext.getString(R.string.prem_monthly_equivalent, formatter.format(monthly))
         }.getOrNull()
     }
 }

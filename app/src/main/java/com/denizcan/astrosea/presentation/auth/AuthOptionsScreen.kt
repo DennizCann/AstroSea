@@ -35,7 +35,8 @@ import androidx.compose.foundation.layout.heightIn
 fun AuthOptionsScreen(
     onNavigateToSignIn: () -> Unit,
     onNavigateToSignUp: () -> Unit,
-    onGoogleSignIn: () -> Unit
+    onGoogleSignIn: () -> Unit,
+    googleSignInInProgress: Boolean = false
 ) {
     // Responsive değerler
     val logoSize = responsiveSize(compact = 220.dp, medium = 280.dp, expanded = 340.dp)
@@ -170,6 +171,7 @@ fun AuthOptionsScreen(
                     // Sadece Google butonu
                     IconButton(
                         onClick = onGoogleSignIn,
+                        enabled = !googleSignInInProgress,
                         modifier = Modifier
                             .size(56.dp)
                             .background(
@@ -177,7 +179,13 @@ fun AuthOptionsScreen(
                                 shape = CircleShape
                             )
                     ) {
-                        Image(
+                        if (googleSignInInProgress) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(28.dp),
+                                color = Color(0xFF4A148C),
+                                strokeWidth = 2.dp
+                            )
+                        } else Image(
                             painter = painterResource(id = R.drawable.google_icon),
                             contentDescription = stringResource(R.string.auth_google_sign_in_cd),
                             modifier = Modifier
@@ -337,4 +345,4 @@ private fun AuthOptionsScreenPreview() {
             }
         }
     }
-} 
+}

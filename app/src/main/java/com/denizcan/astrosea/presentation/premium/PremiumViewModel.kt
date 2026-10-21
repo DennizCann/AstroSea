@@ -25,13 +25,20 @@ data class PremiumUiState(
     val isPurchasing: Boolean = false,
     val purchaseSuccess: Boolean = false,
     val errorMessage: String? = null,
+    val productLoadError: String? = null,
     val showConfirmDialog: Boolean = false,
     val isTestMode: Boolean = BillingConfig.TEST_MODE
-)
+) {
+    val canContinue: Boolean
+        get() = !isPurchasing && (hasPremiumAccess ||
+            (!isLoading && products.getOrNull(selectedProductIndex) != null))
+}
 
 class PremiumViewModel(
     private val context: Context
 ) : ViewModel() {
+    private val localizedContext: Context
+        get() = com.denizcan.astrosea.util.LanguageManager.wrap(context)
     
     companion object {
         private const val TAG = "PremiumViewModel"
@@ -51,7 +58,8 @@ class PremiumViewModel(
         }
         viewModelScope.launch { runCatching { com.denizcan.astrosea.billing.MembershipRepository.refresh() } }
         observeBillingState()
-        loadProducts()
+        // An automatic prompt has already checked prices; do not clear that ready catalog.
+        if (billingManager.billingState.value !is BillingState.ProductsLoaded) loadProducts()
     }
     
     private fun observeBillingState() {
@@ -59,7 +67,10 @@ class PremiumViewModel(
             billingManager.billingState.collect { state ->
                 when (state) {
                     is BillingState.Loading -> {
-                        _uiState.value = _uiState.value.copy(isLoading = true)
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = true, products = emptyList(),
+                            errorMessage = null, productLoadError = null, showConfirmDialog = false
+                        )
                     }
                     is BillingState.Connected -> {
                         Log.d(TAG, "Billing bağlantısı kuruldu")
@@ -71,7 +82,9 @@ class PremiumViewModel(
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             products = state.products,
-                            selectedProductIndex = monthlyPlanIndex
+                            selectedProductIndex = monthlyPlanIndex,
+                            errorMessage = null,
+                            productLoadError = null
                         )
                     }
                     is BillingState.PurchaseSuccess -> {
@@ -88,7 +101,10 @@ class PremiumViewModel(
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             isPurchasing = false,
-                            errorMessage = state.message
+                            errorMessage = if (state.productLoadFailure) null else state.message,
+                            productLoadError = if (state.productLoadFailure) state.message else _uiState.value.productLoadError,
+                            products = if (state.productLoadFailure) emptyList() else _uiState.value.products,
+                            showConfirmDialog = false
                         )
                     }
                     else -> {}
@@ -97,7 +113,7 @@ class PremiumViewModel(
         }
     }
     
-    private fun loadProducts() {
+    fun loadProducts() {
         _uiState.value = _uiState.value.copy(isLoading = true)
         billingManager.startConnection()
     }
@@ -110,16 +126,21 @@ class PremiumViewModel(
      * Satın alma onay dialogunu göster
      */
     fun showPurchaseConfirmation() {
-        if (_uiState.value.isPurchasing) return
+        if (!_uiState.value.canContinue) return
         _uiState.value = _uiState.value.copy(isPurchasing = true)
         viewModelScope.launch {
             try {
                 val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
+                if (!membership.hasAccess && _uiState.value.products.getOrNull(_uiState.value.selectedProductIndex) == null) {
+                    _uiState.value = _uiState.value.copy(isPurchasing = false,
+                        errorMessage = localizedContext.getString(R.string.prem_products_load_failed))
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(isPurchasing = false,
                     purchaseSuccess = membership.hasAccess, showConfirmDialog = !membership.hasAccess)
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(isPurchasing = false,
-                    errorMessage = context.getString(R.string.membership_unavailable))
+                    errorMessage = localizedContext.getString(R.string.membership_unavailable))
             }
         }
     }
@@ -137,7 +158,7 @@ class PremiumViewModel(
     fun startPurchase(activity: Activity) {
         val selectedProduct = _uiState.value.products.getOrNull(_uiState.value.selectedProductIndex)
         if (selectedProduct == null) {
-            _uiState.value = _uiState.value.copy(errorMessage = context.getString(R.string.prem_select_plan))
+            _uiState.value = _uiState.value.copy(errorMessage = localizedContext.getString(R.string.prem_select_plan))
             return
         }
         
@@ -156,7 +177,7 @@ class PremiumViewModel(
                 }
             } catch (error: Exception) {
                 _uiState.value = _uiState.value.copy(isPurchasing = false,
-                    errorMessage = context.getString(R.string.membership_unavailable))
+                    errorMessage = localizedContext.getString(R.string.membership_unavailable))
             }
         }
     }
@@ -171,7 +192,7 @@ class PremiumViewModel(
                 if (userId == null) {
                     _uiState.value = _uiState.value.copy(
                         isPurchasing = false,
-                        errorMessage = context.getString(R.string.prem_no_session)
+                        errorMessage = localizedContext.getString(R.string.prem_no_session)
                     )
                     return@launch
                 }
@@ -180,7 +201,7 @@ class PremiumViewModel(
                 if (!membership.hasAccess) {
                     _uiState.value = _uiState.value.copy(
                         isPurchasing = false,
-                        errorMessage = context.getString(R.string.membership_pending)
+                        errorMessage = localizedContext.getString(R.string.membership_pending)
                     )
                     return@launch
                 }
@@ -193,7 +214,7 @@ class PremiumViewModel(
                 Log.e(TAG, "Premium kaydetme hatası", e)
                 _uiState.value = _uiState.value.copy(
                     isPurchasing = false,
-                    errorMessage = context.getString(R.string.membership_pending)
+                    errorMessage = localizedContext.getString(R.string.membership_pending)
                 )
             }
         }
@@ -212,7 +233,7 @@ class PremiumViewModel(
                         val membership = com.denizcan.astrosea.billing.MembershipRepository.refresh()
                         if (!membership.hasAccess) {
                             _uiState.value = _uiState.value.copy(isLoading = false,
-                                errorMessage = context.getString(R.string.membership_pending))
+                                errorMessage = localizedContext.getString(R.string.membership_pending))
                             return@launch
                         }
                         _uiState.value = _uiState.value.copy(
@@ -223,14 +244,14 @@ class PremiumViewModel(
                         Log.e(TAG, "Restore kaydetme hatası", e)
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            errorMessage = context.getString(R.string.prem_restore_failed)
+                            errorMessage = localizedContext.getString(R.string.prem_restore_failed)
                         )
                     }
                 }
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = context.getString(R.string.prem_nothing_to_restore)
+                    errorMessage = localizedContext.getString(R.string.prem_nothing_to_restore)
                 )
             }
         }

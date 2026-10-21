@@ -52,11 +52,11 @@
 
     <!-- Premium reminder messages -->
     <string name="notif_premium_instant_title">Discover More with Premium! ✨</string>
-    <string name="notif_premium_instant_message">Unlock all tarot readings and get a complete look into your future!</string>
-    <string name="notif_premium_24hour_title">An Unlimited Tarot Experience Awaits You! 🔮</string>
-    <string name="notif_premium_24hour_message">With a premium membership, read the full interpretation of your daily spreads and do unlimited spreads!</string>
+    <string name="notif_premium_instant_message">Get up to 25 AI tarot interpretations per day without watching ads.</string>
+    <string name="notif_premium_24hour_title">More Tarot Insights with Premium! 🔮</string>
+    <string name="notif_premium_24hour_message">Access up to 25 AI tarot interpretations per day without watching ads.</string>
     <string name="notif_premium_5day_title">Don\'t Miss Out on Premium! 💫</string>
-    <string name="notif_premium_5day_message">Detailed AI interpretations, unlimited spreads, and much more with a premium membership!</string>
+    <string name="notif_premium_5day_message">Enjoy up to 25 AI tarot interpretations per day without ads with Premium.</string>
     <string name="notif_premium_weekly_title">Upgrade to AstroSea Premium! ⭐</string>
     <string name="notif_premium_weekly_message">Complete your tarot experience! Access all features with Premium.</string>
     <string name="notif_premium_default_title">Premium Membership Offer! ✨</string>

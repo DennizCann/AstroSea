@@ -6,7 +6,7 @@
 
     <!-- Home -->
     <string name="home_welcome">Welcome, </string>
-    <string name="home_daily_reading">Daily Spread</string>
+    <string name="home_daily_reading">Tap for Daily Reading</string>
     <string name="home_all_meanings">All Meanings</string>
     <string name="home_relationship_readings">Relationship Spreads</string>
     <string name="home_general_readings">General Spreads</string>
@@ -70,7 +70,7 @@
 
     <!-- Ad dialog -->
     <string name="ad_dialog_title">🎬 Watch an Ad, Unlock Your Reading</string>
-    <string name="ad_dialog_text">Watch a short ad to unlock the AI interpretation of this spread for free.\n\nRemaining today: %1$d/%2$d</string>
+    <string name="ad_dialog_text">Watch a short ad to unlock the interpretation of this spread for free.\n\nRemaining today: %1$d/%2$d</string>
     <string name="btn_watch_ad">Watch Ad</string>
     <string name="btn_premium_instead">Ad-free: Go Premium</string>
     <string name="ad_not_available">The ad is not ready yet. Please try again in a moment.</string>
@@ -79,9 +79,9 @@
     <!-- Premium dialog -->
     <string name="premium_dialog_title">🌟 Premium Feature</string>
     <string name="premium_limit_title">You Are Out of Ad Credits for Today</string>
-    <string name="premium_ai_title">AI-Powered Tarot Interpretation</string>
-    <string name="premium_limit_text">You can unlock up to %1$d interpretations per day by watching ads, and you have used today\'s credits.\n\nGo Premium for up to 25 AI interpretations per day without ads.</string>
-    <string name="premium_ai_text">You can access personalized AI tarot interpretations with a Premium membership or by watching an ad.</string>
+    <string name="premium_ai_title">Detailed Tarot Interpretation</string>
+    <string name="premium_limit_text">You can unlock up to %1$d interpretations per day by watching ads, and you have used today\'s credits.\n\nGo Premium for up to 25 interpretations per day without ads.</string>
+    <string name="premium_ai_text">You can access personalized tarot interpretations with a Premium membership or by watching an ad.</string>
     <string name="btn_go_premium">Go Premium</string>
     <string name="btn_later">Later</string>
 
@@ -129,4 +129,5 @@
     <string name="cancel_dialog_text">Are you sure you want to cancel your premium membership?\n\nAfter this, your access to premium features will end.</string>
     <string name="btn_cancel_confirm">Cancel</string>
     <string name="btn_dismiss">Keep</string>
+    <string name="auth_google_sign_in_failed">Sign-in could not be completed. Check your connection and try again.</string>
 </resources>

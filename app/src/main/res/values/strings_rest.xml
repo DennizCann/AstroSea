@@ -40,7 +40,7 @@
 
     <!-- Premium screen -->
     <string name="prem_upgrade_title">Upgrade to Premium</string>
-    <string name="prem_upgrade_subtitle">Unlock AI-powered personalized tarot interpretations and an ad-free experience</string>
+    <string name="prem_upgrade_subtitle">Unlock detailed, personalized tarot interpretations and an ad-free experience</string>
     <string name="prem_choose_plan">Choose Your Plan</string>
     <string name="prem_processing">Processing…</string>
     <string name="prem_go_to_payment">Continue to Payment</string>
@@ -54,11 +54,9 @@
     <string name="prem_privacy_policy">Privacy Policy</string>
     <string name="prem_buy">Buy</string>
     <string name="prem_popular">Popular</string>
-    <string name="prem_feature_1">AI-powered personalized tarot interpretations</string>
-    <string name="prem_feature_2">Up to 25 AI interpretations per day</string>
-    <string name="prem_feature_3">Ad-free access to AI interpretations</string>
-    <string name="prem_feature_4">Ad-free experience</string>
-    <string name="prem_feature_5">Priority access to new Premium features</string>
+    <string name="prem_feature_1">Detailed, personalized tarot interpretations</string>
+    <string name="prem_feature_2">Up to 25 interpretations per day</string>
+    <string name="prem_feature_3">Ad-free access to interpretations</string>
     <string name="prem_feature_6">Manage your subscription securely with Google Play</string>
     <string name="prem_select_plan">Please select a plan</string>
     <string name="prem_no_session">User session not found</string>
@@ -66,6 +64,8 @@
     <string name="prem_restore_failed">Could not save restore</string>
     <string name="prem_nothing_to_restore">No purchases found to restore</string>
     <string name="prem_products_load_failed">Could not load products</string>
+    <string name="prem_billing_service_unavailable">Google Play payments are unavailable on this device. Use a device or emulator with the Google Play Store.</string>
+    <string name="prem_retry_products">Try again</string>
     <string name="prem_product_not_found">Product not found: %1$s</string>
     <string name="prem_purchase_cancelled">Purchase cancelled</string>
     <string name="prem_purchase_pending">Purchase is pending</string>
@@ -74,7 +74,7 @@
     <string name="prem_plan_weekly_short">Weekly</string>
     <string name="prem_plan_monthly_short">Monthly</string>
     <string name="prem_plan_yearly_short">Yearly</string>
-    <string name="prem_price_monthly_fallback">₺50 / month</string>
+    <string name="prem_price_monthly_fallback">Equivalent to US$2.50 / month</string>
     <string name="prem_monthly_equivalent">Equivalent to %1$s / month</string>
     <string name="prem_duration_week">/week</string>
     <string name="prem_duration_month">/month</string>

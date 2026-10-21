@@ -19,7 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun AuthScreen(
     onNavigateToHome: () -> Unit,
-    onGoogleSignIn: () -> Unit
+    onGoogleSignIn: () -> Unit,
+    googleSignInInProgress: Boolean = false
 ) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
@@ -41,7 +42,8 @@ fun AuthScreen(
                 AuthOptionsScreen(
                     onNavigateToSignUp = { navController.navigate("sign_up") },
                     onNavigateToSignIn = { navController.navigate("sign_in") },
-                    onGoogleSignIn = onGoogleSignIn
+                    onGoogleSignIn = onGoogleSignIn,
+                    googleSignInInProgress = googleSignInInProgress
                 )
             }
 

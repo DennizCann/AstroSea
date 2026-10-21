@@ -52,11 +52,11 @@
 
     <!-- Premium hatırlatma mesajları -->
     <string name="notif_premium_instant_title">Premium ile Daha Fazlasını Keşfet! ✨</string>
-    <string name="notif_premium_instant_message">Tüm tarot yorumlarının kilidini aç ve geleceğine tam bir bakış at!</string>
-    <string name="notif_premium_24hour_title">Sınırsız Tarot Deneyimi Seni Bekliyor! 🔮</string>
-    <string name="notif_premium_24hour_message">Premium üyelikle günlük açılımlarının tam yorumunu oku, sınırsız açılım yap!</string>
+    <string name="notif_premium_instant_message">Günde 25 adede kadar yapay zeka destekli tarot yorumuna reklam izlemeden eriş.</string>
+    <string name="notif_premium_24hour_title">Premium ile Daha Fazla Tarot Yorumu! 🔮</string>
+    <string name="notif_premium_24hour_message">Günde 25 adede kadar yapay zeka destekli tarot yorumuna reklam izlemeden eriş.</string>
     <string name="notif_premium_5day_title">Premium Fırsatını Kaçırma! 💫</string>
-    <string name="notif_premium_5day_message">Detaylı AI yorumları, sınırsız açılımlar ve daha fazlası premium üyelikte!</string>
+    <string name="notif_premium_5day_message">Premium üyelikle günde 25 adede kadar yapay zeka destekli tarot yorumuna reklamsız eriş.</string>
     <string name="notif_premium_weekly_title">AstroSea Premium\'a Geç! ⭐</string>
     <string name="notif_premium_weekly_message">Tarot deneyimini tamamla! Premium ile tüm özelliklere eriş.</string>
     <string name="notif_premium_default_title">Premium Üyelik Fırsatı! ✨</string>

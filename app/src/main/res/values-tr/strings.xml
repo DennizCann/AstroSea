@@ -6,7 +6,7 @@
 
     <!-- Home -->
     <string name="home_welcome">Hoş Geldin, </string>
-    <string name="home_daily_reading">Günlük Açılım</string>
+    <string name="home_daily_reading">Günlük Açılıma Dokun</string>
     <string name="home_all_meanings">Tüm Anlamlar</string>
     <string name="home_relationship_readings">İlişki Açılımları</string>
     <string name="home_general_readings">Genel Açılımlar</string>
@@ -70,7 +70,7 @@
 
     <!-- Ad dialog -->
     <string name="ad_dialog_title">🎬 Reklam İzle, Yorumunu Aç</string>
-    <string name="ad_dialog_text">Kısa bir reklam izleyerek bu açılımın yapay zeka yorumunu ücretsiz açabilirsiniz.\n\nBugün kalan hakkınız: %1$d/%2$d</string>
+    <string name="ad_dialog_text">Kısa bir reklam izleyerek bu açılımın yorumunu ücretsiz açabilirsiniz.\n\nBugün kalan hakkınız: %1$d/%2$d</string>
     <string name="btn_watch_ad">Reklam İzle</string>
     <string name="btn_premium_instead">Reklamsız: Premium\'a Geç</string>
     <string name="ad_not_available">Reklam henüz hazır değil. Lütfen biraz sonra tekrar deneyin.</string>
@@ -79,9 +79,9 @@
     <!-- Premium dialog -->
     <string name="premium_dialog_title">🌟 Premium Özellik</string>
     <string name="premium_limit_title">Bugünlük Reklam Hakkınız Bitti</string>
-    <string name="premium_ai_title">AI Destekli Tarot Yorumu</string>
-    <string name="premium_limit_text">Reklam izleyerek günde en fazla %1$d yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üyelikle günde 25 AI yorumuna reklamsız erişebilirsiniz.</string>
-    <string name="premium_ai_text">Yapay zeka destekli kişiselleştirilmiş tarot yorumlarına Premium üyelikle ya da reklam izleyerek erişebilirsiniz.</string>
+    <string name="premium_ai_title">Detaylı Tarot Yorumu</string>
+    <string name="premium_limit_text">Reklam izleyerek günde en fazla %1$d yorum açabilirsiniz ve bugünkü haklarınızı kullandınız.\n\nPremium üyelikle günde 25 yoruma reklamsız erişebilirsiniz.</string>
+    <string name="premium_ai_text">Kişiselleştirilmiş tarot yorumlarına Premium üyelikle ya da reklam izleyerek erişebilirsiniz.</string>
     <string name="btn_go_premium">Premium\'a Geç</string>
     <string name="btn_later">Daha Sonra</string>
 
@@ -129,4 +129,5 @@
     <string name="cancel_dialog_text">Premium üyeliğinizi iptal etmek istediğinizden emin misiniz?\n\nBu işlem sonrasında premium özelliklere erişiminiz sona erecektir.</string>
     <string name="btn_cancel_confirm">İptal Et</string>
     <string name="btn_dismiss">Vazgeç</string>
+    <string name="auth_google_sign_in_failed">Giriş tamamlanamadı. Bağlantınızı kontrol edip tekrar deneyin.</string>
 </resources>

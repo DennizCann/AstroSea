@@ -90,7 +90,8 @@ fun GeneralReadingDetailScreen(
     readingType: String,
     onNavigateBack: () -> Unit,
     onNavigateToCardDetail: (String) -> Unit,
-    onNavigateToPremium: () -> Unit = {}  // Premium ekranına yönlendirme
+    onNavigateToPremium: () -> Unit = {},  // Premium ekranına yönlendirme
+    onReadingViewed: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -139,9 +140,8 @@ fun GeneralReadingDetailScreen(
         if (isDailyReading) {
             Log.d("GeneralReadingDetailScreen", "Günlük açılım için DailyTarotViewModel set ediliyor")
             viewModel.setDailyTarotViewModel(dailyTarotViewModel)
-        } else {
-            viewModel.loadReadingState(readingType)
         }
+        viewModel.loadReadingState(readingType)
     }
     
     val slots = com.denizcan.astrosea.util.ReadingTexts.slotNames(readingType)
@@ -161,6 +161,7 @@ fun GeneralReadingDetailScreen(
         "interpretation" -> {
             GeneralReadingInterpretationScreen(
                 readingType = readingType,
+                onReadingViewed = onReadingViewed,
                 onNavigateBack = {
                     currentScreen = "detail"
                 },
@@ -289,7 +290,7 @@ fun GeneralReadingDetailScreen(
                                 Button(
                                     onClick = { viewModel.resetAndDrawNew(readingType) },
                                     modifier = Modifier.weight(1f),
-                                    enabled = !isDailyReading,
+                                    enabled = !isDailyReading && !isOpeningReading && !viewModel.isGeneratingReading,
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (isDailyReading) Color.Gray.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.6f)
                                     ),
@@ -322,7 +323,7 @@ fun GeneralReadingDetailScreen(
                                                 
                                                 // Bu açılım için yorum zaten üretilmişse (reklam/premium ile
                                                 // daha önce açılmış) doğrudan göster - tekrar hak istemez
-                                                if (viewModel.generatedReading != null) {
+                                                if (viewModel.restoreSavedReading(readingType)) {
                                                     currentScreen = "interpretation"
                                                     return@launch
                                                 }
@@ -571,7 +572,8 @@ fun GeneralReadingDetailScreen(
 fun GeneralReadingInterpretationScreen(
     readingType: String,
     onNavigateBack: () -> Unit,
-    onNavigateToCardDetail: (String) -> Unit = {}
+    onNavigateToCardDetail: (String) -> Unit = {},
+    onReadingViewed: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val viewModel: GeneralReadingViewModel = viewModel(
@@ -658,6 +660,12 @@ fun GeneralReadingInterpretationScreen(
                 now = System.currentTimeMillis()
             }
             val showLoading = (readyAt != null && now < readyAt) || isWaitingForReading
+            val latestOnReadingViewed by rememberUpdatedState(onReadingViewed)
+            LaunchedEffect(showLoading, viewModel.generatedReading, viewModel.readingError) {
+                if (!showLoading && viewModel.readingError == null && !viewModel.generatedReading.isNullOrBlank()) {
+                    latestOnReadingViewed()
+                }
+            }
 
             BoxWithConstraints(Modifier.fillMaxSize().padding(paddingValues)) {
                 // Preserve the initial card area, but let it scroll away with the reading.

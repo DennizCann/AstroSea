@@ -23,6 +23,7 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 
 class GeneralReadingViewModel(context: Context) : ViewModel() {
     private val context = com.denizcan.astrosea.util.LanguageManager.wrap(context.applicationContext)
@@ -666,10 +667,22 @@ class GeneralReadingViewModel(context: Context) : ViewModel() {
         return "reading_" + readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
     }
     
-    private suspend fun loadSavedInterpretation(readingType: String): String? {
-        if (userId == null) return null
+    // Run before the ad/quota gate, not only after an ad has already been watched.
+    suspend fun restoreSavedReading(readingType: String): Boolean {
+        val requestedUid = userId ?: return false
+        if (!generatedReading.isNullOrBlank()) return true
+        val saved = loadSavedInterpretation(readingType, failOnError = true) ?: return false
+        check(userId == requestedUid) { "Account changed while loading reading" }
+        generatedReading = saved
+        readingError = null
+        return true
+    }
+
+    private suspend fun loadSavedInterpretation(readingType: String, failOnError: Boolean = false): String? {
+        val requestedUid = userId ?: return null
         return try {
-            val userDoc = firestore.collection("users").document(userId!!).get().await()
+            val userDoc = firestore.collection("users").document(requestedUid).get().await()
+            check(userId == requestedUid) { "Account changed while loading reading" }
             if (readingType.trim() == "GÜNLÜK AÇILIM") {
                 // Günlük açılımın yorumu sadece aynı gün geçerli
                 val savedDate = userDoc.getString("daily_interpretation_date")
@@ -686,8 +699,12 @@ class GeneralReadingViewModel(context: Context) : ViewModel() {
                 }
                 text
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("GeneralReadingViewModel", "Kayıtlı yorum yüklenirken hata", e)
+            // An unavailable saved reading must not be mistaken for a new paid/ad unlock.
+            if (failOnError) throw e
             null
         }
     }

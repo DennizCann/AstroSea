@@ -963,8 +963,15 @@ fun PremiumStatusCard(
                 TextButton(onClick = onRefresh) { Text(stringResource(R.string.membership_refresh)) }
             } else if (!membership.hasAccess) {
                 Text(stringResource(R.string.standard_member), color = Color.White, style = textStyle)
-                TextButton(onClick = onNavigateToPremium) {
-                    Text(stringResource(R.string.btn_upgrade_premium), color = Color(0xFFFFD700))
+                Button(
+                    onClick = onNavigateToPremium,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFD4AF37).copy(alpha = 0.9f),
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text(stringResource(R.string.btn_upgrade_premium))
                 }
             }
             membership.activeLevels.forEach { level ->

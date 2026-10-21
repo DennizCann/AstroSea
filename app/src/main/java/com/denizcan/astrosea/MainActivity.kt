@@ -10,6 +10,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.Lifecycle
+import kotlinx.coroutines.flow.first
+import com.denizcan.astrosea.billing.BillingState
+import com.denizcan.astrosea.billing.MembershipRepository
+import com.denizcan.astrosea.billing.PremiumPromptPolicy
+import com.denizcan.astrosea.billing.PremiumPromptStore
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,7 +34,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.lifecycleScope
 import com.denizcan.astrosea.presentation.profile.ProfileViewModel
@@ -156,7 +162,17 @@ class MainActivity : ComponentActivity() {
             var startupAttempt by remember { mutableIntStateOf(0) }
             var startupFailed by remember { mutableStateOf(false) }
             val scope = rememberCoroutineScope()
-            var fallbackTried by remember { mutableStateOf(false) }
+            var googleSignInInProgress by remember { mutableStateOf(false) }
+            var pendingPremiumPromptUid by rememberSaveable { mutableStateOf<String?>(null) }
+            val premiumPromptStore = remember { PremiumPromptStore(context) }
+
+            fun showGoogleSignInError() {
+                android.widget.Toast.makeText(
+                    context,
+                    context.getString(R.string.auth_google_sign_in_failed),
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
             
             // KVKK Dialog state
             var showKvkkDialog by remember { mutableStateOf(false) }
@@ -168,86 +184,56 @@ class MainActivity : ComponentActivity() {
                 onResult = { result ->
                     if (result.resultCode == RESULT_OK && result.data != null) {
                         scope.launch {
-                            val signInResult = googleAuthUiClient.signInWithIntent(result.data!!)
-                            if (signInResult.data != null) {
-                                // Google Sign-In başarılı, profil kontrolü yap
-                                val profileVM = ProfileCompletionViewModel()
-                                val completionStatus = profileVM.checkProfileCompletion()
-                                
-                                val destination = when (completionStatus) {
-                                    ProfileCompletionStatus.COMPLETE -> Screen.Home.route
-                                    ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
-                                    ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
-                                    ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
-                                    else -> Screen.Home.route
-                                }
-                                
-                                // KVKK kontrolü
-                                if (!signInResult.kvkkAccepted) {
-                                    // KVKK kabul edilmemiş, dialog göster
-                                    pendingNavDestination = destination
-                                    pendingUserId = signInResult.data.userId
-                                    showKvkkDialog = true
-                                } else {
-                                    // KVKK zaten kabul edilmiş, devam et
-                                    navController.navigate(destination) {
-                                        popUpTo(0) { inclusive = true }
+                            try {
+                                val completed = withTimeoutOrNull(20_000) {
+                                    val signInResult = googleAuthUiClient.signInWithIntent(result.data!!)
+                                    val user = signInResult.data
+                                    if (user == null) {
+                                        Log.e("GoogleSignIn", "Sign-in failed: ${signInResult.errorMessage}")
+                                        return@withTimeoutOrNull false
                                     }
-                                }
-                            } else {
-                                Log.e("GoogleSignIn", "Giriş başarısız (fallback): ${signInResult.errorMessage}")
-                            }
-                        }
-                    }
-                }
-            )
-
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartIntentSenderForResult(),
-                onResult = { result ->
-                    if (result.resultCode == RESULT_OK && result.data != null) {
-                        scope.launch {
-                            val signInResult = googleAuthUiClient.signInWithIntent(result.data!!)
-                            if (signInResult.data != null) {
-                                // Google Sign-In başarılı, profil kontrolü yap
-                                val profileVM = ProfileCompletionViewModel()
-                                val completionStatus = profileVM.checkProfileCompletion()
-                                
-                                val destination = when (completionStatus) {
-                                    ProfileCompletionStatus.COMPLETE -> Screen.Home.route
-                                    ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
-                                    ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
-                                    ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
-                                    else -> Screen.Home.route
-                                }
-                                
-                                // KVKK kontrolü
-                                if (!signInResult.kvkkAccepted) {
-                                    // KVKK kabul edilmemiş, dialog göster
-                                    pendingNavDestination = destination
-                                    pendingUserId = signInResult.data.userId
-                                    showKvkkDialog = true
-                                } else {
-                                    // KVKK zaten kabul edilmiş, devam et
-                                    navController.navigate(destination) {
-                                        popUpTo(0) { inclusive = true }
+                                    Log.d("GoogleSignIn", "Checking profile after sign-in")
+                                    val completionStatus = ProfileCompletionViewModel().checkProfileCompletion()
+                                    val destination = when (completionStatus) {
+                                        ProfileCompletionStatus.COMPLETE -> Screen.Home.route
+                                        ProfileCompletionStatus.INCOMPLETE_NAME -> Screen.ProfileCompletion1.route
+                                        ProfileCompletionStatus.INCOMPLETE_BIRTH -> Screen.ProfileCompletion2.route
+                                        ProfileCompletionStatus.INCOMPLETE_LOCATION -> Screen.ProfileCompletion3.route
+                                        else -> return@withTimeoutOrNull false
                                     }
+                                    Log.d("GoogleSignIn", "Profile checked; consent required: ${!signInResult.kvkkAccepted}")
+                                    if (!signInResult.kvkkAccepted) {
+                                        pendingNavDestination = destination
+                                        pendingUserId = user.userId
+                                        showKvkkDialog = true
+                                    } else {
+                                        navController.navigate(destination) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    }
+                                    true
                                 }
-                            } else {
-                                Log.e("GoogleSignIn", "Giriş başarısız (one tap): ${signInResult.errorMessage}")
-                                if (!fallbackTried) {
-                                    fallbackTried = true
-                                    val fallbackIntent = googleAuthUiClient.getFallbackSignInIntent()
-                                    googleLauncher.launch(fallbackIntent)
+                                if (completed != true) {
+                                    Log.w("GoogleSignIn", "Sign-in or profile check failed/timed out")
+                                    showGoogleSignInError()
                                 }
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                Log.e("GoogleSignIn", "Sign-in processing failed", e)
+                                showGoogleSignInError()
+                            } finally {
+                                googleSignInInProgress = false
                             }
                         }
                     } else {
-                        // RESULT_CANCELED veya data null ise: fallback dene (bir kere)
-                        if (!fallbackTried) {
-                            fallbackTried = true
-                            val fallbackIntent = googleAuthUiClient.getFallbackSignInIntent()
-                            googleLauncher.launch(fallbackIntent)
+                        googleSignInInProgress = false
+                        val errorStatus = googleAuthUiClient.getSignInErrorStatus(result.data)
+                        Log.d("GoogleSignIn", "Account picker closed; result=${result.resultCode}, status=$errorStatus")
+                        // Cancellation must not open a second sign-in window.
+                        if (result.resultCode == RESULT_OK ||
+                            (errorStatus != null && errorStatus != 12501)) {
+                            showGoogleSignInError()
                         }
                     }
                 }
@@ -367,6 +353,7 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(Screen.Auth.route) {
                         AuthScreen(
+                            googleSignInInProgress = googleSignInInProgress,
                             onNavigateToHome = {
                                 // Başarılı giriş sonrası profil tamamlama kontrolü
                                 scope.launch {
@@ -387,19 +374,28 @@ class MainActivity : ComponentActivity() {
                                 }
                             },
                             onGoogleSignIn = {
-                                scope.launch {
-                                    Log.d("GoogleAuth", "UI: Google sign-in requested")
-                                    val signInIntentSender = googleAuthUiClient.signIn()
-                                    if (signInIntentSender != null) {
-                                        Log.d("GoogleAuth", "UI: Launching One Tap intent sender")
-                                        launcher.launch(
-                                            IntentSenderRequest.Builder(signInIntentSender).build()
-                                        )
-                                    } else {
-                                        // One Tap uygun kimlik bulamadı, GoogleSignIn fallback'ını başlat
-                                        Log.w("GoogleAuth", "UI: One Tap not available, launching GoogleSignIn fallback")
-                                        val fallbackIntent = googleAuthUiClient.getFallbackSignInIntent()
-                                        googleLauncher.launch(fallbackIntent)
+                                if (!googleSignInInProgress && !showKvkkDialog) {
+                                    googleSignInInProgress = true
+                                    scope.launch {
+                                        try {
+                                            Log.d("GoogleAuth", "UI: opening account picker")
+                                            val signInIntent = withTimeoutOrNull(10_000) {
+                                                googleAuthUiClient.prepareAccountPicker()
+                                            }
+                                            if (signInIntent != null) {
+                                                googleLauncher.launch(signInIntent)
+                                            } else {
+                                                googleSignInInProgress = false
+                                                showGoogleSignInError()
+                                            }
+                                        } catch (e: CancellationException) {
+                                            googleSignInInProgress = false
+                                            throw e
+                                        } catch (e: Exception) {
+                                            googleSignInInProgress = false
+                                            Log.e("GoogleSignIn", "Could not open account picker", e)
+                                            showGoogleSignInError()
+                                        }
                                     }
                                 }
                             }
@@ -579,7 +575,47 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     
-                    composable(Screen.Home.route) {
+                    composable(Screen.Home.route) { homeEntry ->
+                        val homeLifecycle by homeEntry.lifecycle.currentStateFlow.collectAsState()
+                        LaunchedEffect(pendingPremiumPromptUid, homeLifecycle) {
+                            val uid = pendingPremiumPromptUid ?: return@LaunchedEffect
+                            if (homeLifecycle != Lifecycle.State.RESUMED) return@LaunchedEffect
+                            try {
+                                if (FirebaseAuth.getInstance().currentUser?.uid != uid ||
+                                    !PremiumPromptPolicy.cooldownPassed(premiumPromptStore.history(uid), System.currentTimeMillis())) {
+                                    return@LaunchedEffect
+                                }
+                                val ready = withTimeoutOrNull(10_000) {
+                                    val membership = MembershipRepository.refresh()
+                                    if (!membership.verified || membership.uid != uid || membership.hasAccess) {
+                                        return@withTimeoutOrNull false
+                                    }
+                                    val billing = BillingManager.getInstance(context)
+                                    if (billing.billingState.value !is BillingState.ProductsLoaded) billing.startConnection()
+                                    val catalog = billing.billingState.first {
+                                        it is BillingState.ProductsLoaded || it is BillingState.Error
+                                    }
+                                    val hasPrices = catalog is BillingState.ProductsLoaded &&
+                                        catalog.products.isNotEmpty() &&
+                                        catalog.products.all { it.price.isNotBlank() && it.adaptyProduct != null }
+                                    PremiumPromptPolicy.canShow(uid, MembershipRepository.state.value, hasPrices,
+                                        premiumPromptStore.history(uid), System.currentTimeMillis())
+                                } == true
+                                if (ready && FirebaseAuth.getInstance().currentUser?.uid == uid &&
+                                    homeEntry.lifecycle.currentState == Lifecycle.State.RESUMED &&
+                                    navController.currentDestination?.route == Screen.Home.route) {
+                                    premiumPromptStore.recordShown(uid)
+                                    navController.navigate(Screen.Premium.route) { launchSingleTop = true }
+                                }
+                            } catch (error: CancellationException) {
+                                throw error
+                            } catch (error: Exception) {
+                                // A marketing prompt must never interrupt normal use on failure.
+                                Log.d("PremiumPrompt", "Automatic prompt skipped")
+                            } finally {
+                                if (pendingPremiumPromptUid == uid) pendingPremiumPromptUid = null
+                            }
+                        }
                         HomeScreen(
                             viewModel = sharedProfileViewModel,
                             onNavigateToProfile = {
@@ -773,6 +809,9 @@ class MainActivity : ComponentActivity() {
                         val readingType = backStackEntry.arguments?.getString("readingType") ?: ""
                         GeneralReadingDetailScreen(
                             readingType = readingType,
+                            onReadingViewed = {
+                                pendingPremiumPromptUid = FirebaseAuth.getInstance().currentUser?.uid
+                            },
                             onNavigateBack = {
                                 appNavigator.run {
                                     smartNavigation.navigateBackFromDetail(readingType)
@@ -793,8 +832,14 @@ class MainActivity : ComponentActivity() {
                     }
                     
                     composable(Screen.Premium.route) {
+                        LaunchedEffect(Unit) {
+                            FirebaseAuth.getInstance().currentUser?.uid?.let(premiumPromptStore::recordShown)
+                        }
                         com.denizcan.astrosea.presentation.premium.PremiumScreen(
-                            onNavigateBack = { appNavigator.popBack() },
+                            onNavigateBack = {
+                                FirebaseAuth.getInstance().currentUser?.uid?.let(premiumPromptStore::recordDismissed)
+                                appNavigator.popBack()
+                            },
                             // Satın alma, kullanıcıyı ödeme akışını başlattığı ekrana döndürür.
                             // Böylece yorum talep eden kullanıcı açılım sayfasında kalır.
                             onPurchaseComplete = { appNavigator.popBack() }

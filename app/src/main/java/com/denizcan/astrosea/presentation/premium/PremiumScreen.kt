@@ -1,6 +1,7 @@
 package com.denizcan.astrosea.presentation.premium
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,6 +45,7 @@ fun PremiumScreen(
     onNavigateBack: () -> Unit,
     onPurchaseComplete: () -> Unit = {}
 ) {
+    BackHandler(onBack = onNavigateBack)
     val context = LocalContext.current
     val viewModel: PremiumViewModel = viewModel(
         factory = PremiumViewModel.Factory(context)
@@ -196,6 +198,17 @@ fun PremiumScreen(
                         modifier = Modifier.padding(32.dp)
                     )
                 } else {
+                    uiState.productLoadError?.let { message ->
+                        Text(
+                            text = message,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                        )
+                        TextButton(onClick = { viewModel.loadProducts() }) {
+                            Text(stringResource(R.string.prem_retry_products), color = Color(0xFFD4AF37))
+                        }
+                    }
                     // Pricing Cards
                     uiState.products.forEachIndexed { index, product ->
                         PricingCard(
@@ -215,7 +228,7 @@ fun PremiumScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
-                    enabled = !uiState.isLoading && !uiState.isPurchasing,
+                    enabled = uiState.canContinue,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Transparent,
                         disabledContainerColor = Color.Transparent
@@ -228,7 +241,7 @@ fun PremiumScreen(
                             .fillMaxSize()
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    colors = if (uiState.isPurchasing) {
+                                    colors = if (!uiState.canContinue) {
                                         listOf(
                                             Color(0xFF4A148C).copy(alpha = 0.5f),
                                             Color(0xFF6A1B9A).copy(alpha = 0.5f),
@@ -527,8 +540,6 @@ private fun PremiumFeaturesList() {
         stringResource(R.string.prem_feature_1),
         stringResource(R.string.prem_feature_2),
         stringResource(R.string.prem_feature_3),
-        stringResource(R.string.prem_feature_4),
-        stringResource(R.string.prem_feature_5),
         stringResource(R.string.prem_feature_6)
     )
     
@@ -744,7 +755,7 @@ private fun PricingCardPreview() {
             product = SubscriptionProduct(
                 productId = "monthly",
                 name = "Aylık",
-                price = "₺99.99",
+                price = "US$3.49",
                 duration = "/ay",
                 durationDays = 30,
                 pricePerMonth = null,
@@ -758,10 +769,10 @@ private fun PricingCardPreview() {
             product = SubscriptionProduct(
                 productId = "yearly",
                 name = "Yıllık",
-                price = "₺599.99",
+                price = "US$29.99",
                 duration = "/yıl",
                 durationDays = 365,
-                pricePerMonth = "Aylık ₺50",
+                pricePerMonth = stringResource(R.string.prem_price_monthly_fallback),
                 isPopular = false
             ),
             isSelected = false,
@@ -777,7 +788,7 @@ private fun PurchaseConfirmDialogPreview() {
         product = SubscriptionProduct(
             productId = "monthly",
             name = "Aylık Premium",
-            price = "₺99.99",
+            price = "US$3.49",
             duration = "/ay",
             durationDays = 30,
             isPopular = true
@@ -794,14 +805,14 @@ private fun PremiumScreenContentPreview() {
         SubscriptionProduct(
             productId = "weekly",
             name = "Haftalık",
-            price = "₺49.99",
+            price = "US$0.99",
             duration = "/hafta",
             durationDays = 7
         ),
         SubscriptionProduct(
             productId = "monthly",
             name = "Aylık",
-            price = "₺99.99",
+            price = "US$3.49",
             duration = "/ay",
             durationDays = 30,
             isPopular = true
@@ -809,10 +820,10 @@ private fun PremiumScreenContentPreview() {
         SubscriptionProduct(
             productId = "yearly",
             name = "Yıllık",
-            price = "₺599.99",
+            price = "US$29.99",
             duration = "/yıl",
             durationDays = 365,
-            pricePerMonth = "Aylık ₺50"
+            pricePerMonth = stringResource(R.string.prem_price_monthly_fallback)
         )
     )
     
@@ -853,7 +864,7 @@ private fun PremiumScreenContentPreview() {
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Sınırsız Tarot Açılımları ve Özel İçeriklere Erişin",
+                text = stringResource(R.string.prem_upgrade_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
