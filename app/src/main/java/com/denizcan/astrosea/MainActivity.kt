@@ -109,6 +109,11 @@ class MainActivity : ComponentActivity() {
         
         enableEdgeToEdge()
 
+        lifecycleScope.launch {
+            lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
+            com.denizcan.astrosea.ads.AdConsentManager.gatherConsent(this@MainActivity)
+        }
+
         // Sistem çubuklarını şeffaf yap
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT

@@ -130,4 +130,6 @@
     <string name="btn_cancel_confirm">Cancel</string>
     <string name="btn_dismiss">Keep</string>
     <string name="auth_google_sign_in_failed">Sign-in could not be completed. Check your connection and try again.</string>
+    <string name="ad_privacy_options">Ad privacy choices</string>
+    <string name="ad_privacy_options_failed">Privacy choices could not be loaded. Please try again.</string>
 </resources>

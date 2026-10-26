@@ -40,6 +40,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.denizcan.astrosea.billing.BillingConfig
+import com.denizcan.astrosea.ads.AdConsentManager
 import java.util.Calendar
 import com.denizcan.astrosea.presentation.components.WheelDatePickerDialog
 import com.denizcan.astrosea.util.responsiveSize
@@ -452,6 +453,23 @@ fun ProfileScreen(
                             color = Color.White.copy(alpha = 0.8f),
                             style = MaterialTheme.typography.bodyMedium
                         )
+                    }
+                }
+
+                if (AdConsentManager.privacyOptionsRequired) {
+                    TextButton(
+                        onClick = {
+                            (context as? android.app.Activity)?.let { activity ->
+                                AdConsentManager.showPrivacyOptions(activity) { success ->
+                                    if (!success) {
+                                        Toast.makeText(context, R.string.ad_privacy_options_failed, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.ad_privacy_options), color = Color.White)
                     }
                 }
 

@@ -4,9 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.adapty.Adapty
 import com.adapty.models.AdaptyConfig
-import com.denizcan.astrosea.ads.AdConfig
 import com.denizcan.astrosea.billing.BillingConfig
-import com.google.android.gms.ads.MobileAds
 
 class AstroSeaApplication : Application() {
 
@@ -22,16 +20,7 @@ class AstroSeaApplication : Application() {
         super.onCreate()
         com.denizcan.astrosea.util.LanguageManager.init(this)
 
-        // AdMob'u başlat (test modunda reklamlar simüle edildiği için gerek yok)
-        if (!AdConfig.TEST_MODE) {
-            try {
-                MobileAds.initialize(this) {
-                    Log.d(TAG, "AdMob başlatıldı")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "AdMob başlatılamadı", e)
-            }
-        }
+        // AdMob, Activity içindeki UMP izin kontrolünden sonra başlatılır.
 
         if (BillingConfig.TEST_MODE) {
             Log.d(TAG, "Debug test modu — Adapty başlatılmadı")

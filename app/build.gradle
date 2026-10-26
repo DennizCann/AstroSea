@@ -17,6 +17,7 @@ android {
         versionName "1.0.27"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [admobAppId: "ca-app-pub-8919976378865435~8641792715"]
         
     }
 
@@ -34,10 +35,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "BILLING_TEST_MODE", "false"
+            buildConfigField "boolean", "ADS_TEST_MODE", "false"
         }
         debug {
             signingConfig signingConfigs.debug
             buildConfigField "boolean", "BILLING_TEST_MODE", "false"
+            buildConfigField "boolean", "ADS_TEST_MODE", "true"
         }
     }
     compileOptions {
@@ -130,5 +133,6 @@ dependencies {
 
     // Google AdMob - ödüllü reklamlar
     implementation 'com.google.android.gms:play-services-ads:23.6.0'
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
 
 }

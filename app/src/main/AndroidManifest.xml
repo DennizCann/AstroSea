@@ -26,10 +26,13 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="daily_tarot_channel" />
 
-        <!-- AdMob Uygulama ID - TODO: Yayın öncesi gerçek AdMob App ID ile değiştirilecek (şu an Google test ID) -->
+        <!-- AstroSea AdMob uygulama kimliği; reklam istekleri izin akışından sonra başlar. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${admobAppId}" />
+        <meta-data
+            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
+            android:value="true" />
             
         <activity
             android:name=".MainActivity"

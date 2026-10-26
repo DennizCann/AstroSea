@@ -130,4 +130,6 @@
     <string name="btn_cancel_confirm">İptal Et</string>
     <string name="btn_dismiss">Vazgeç</string>
     <string name="auth_google_sign_in_failed">Giriş tamamlanamadı. Bağlantınızı kontrol edip tekrar deneyin.</string>
+    <string name="ad_privacy_options">Reklam gizlilik tercihleri</string>
+    <string name="ad_privacy_options_failed">Gizlilik tercihleri yüklenemedi. Lütfen tekrar deneyin.</string>
 </resources>
