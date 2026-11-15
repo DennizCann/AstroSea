@@ -660,6 +660,8 @@ fun GeneralReadingInterpretationScreen(
                 now = System.currentTimeMillis()
             }
             val showLoading = (readyAt != null && now < readyAt) || isWaitingForReading
+            val reportableReading = viewModel.generatedReading
+                ?.takeIf { !showLoading && viewModel.readingError == null && it.isNotBlank() }
             val latestOnReadingViewed by rememberUpdatedState(onReadingViewed)
             LaunchedEffect(showLoading, viewModel.generatedReading, viewModel.readingError) {
                 if (!showLoading && viewModel.readingError == null && !viewModel.generatedReading.isNullOrBlank()) {
@@ -798,6 +800,11 @@ fun GeneralReadingInterpretationScreen(
                                         lineHeight = 20.sp
                                     )
                                 }
+                            }
+                        }
+                        if (reportableReading != null) {
+                            item(key = "report-reading") {
+                                ReadingReportAction(reportableReading, viewModel::reportReading)
                             }
                         }
                     }

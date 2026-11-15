@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.functions.FirebaseFunctions
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
@@ -667,6 +668,15 @@ class GeneralReadingViewModel(context: Context) : ViewModel() {
         return "reading_" + readingType.trim().replace(" ", "_").replace("–", "_").replace("-", "_")
     }
     
+    suspend fun reportReading(reading: String) {
+        check(userId != null && generatedReading == reading && readingError == null)
+        val result = FirebaseFunctions.getInstance("europe-west1")
+            .getHttpsCallable("reportTarotReading")
+            .call(mapOf("reading" to reading))
+            .await()
+        check((result.getData() as? Map<*, *>)?.get("reported") == true)
+    }
+
     // Run before the ad/quota gate, not only after an ad has already been watched.
     suspend fun restoreSavedReading(readingType: String): Boolean {
         val requestedUid = userId ?: return false

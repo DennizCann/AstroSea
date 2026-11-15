@@ -1,4 +1,13 @@
 <resources>
     <string name="reading_show_details">Read more</string>
     <string name="reading_hide_details">Show less</string>
+    <string name="reading_report">Report reading</string>
+    <string name="reading_report_title">Report an inappropriate reading?</string>
+    <string name="reading_report_description">AstroSea will receive this reading for review.</string>
+    <string name="reading_report_send">Send report</string>
+    <string name="reading_report_cancel">Cancel</string>
+    <string name="reading_report_sending">Sending…</string>
+    <string name="reading_report_sent">Report sent</string>
+    <string name="reading_report_failed">Couldn’t send the report. Please try again.</string>
+    <string name="reading_report_limit">Daily report limit reached. Try again tomorrow.</string>
 </resources>

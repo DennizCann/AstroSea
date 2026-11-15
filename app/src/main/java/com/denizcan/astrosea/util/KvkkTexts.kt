@@ -60,7 +60,7 @@ object KvkkTexts {
     private const val TURKISH_TEXT = """
 ASTROSEA KİŞİSEL VERİLERİN KORUNMASI VE İŞLENMESİ AYDINLATMA METNİ
 
-Son Güncelleme Tarihi: 26.10.2026
+Son Güncelleme Tarihi: 15.11.2026
 
 1. Veri Sorumlusu Kimdir?
 
@@ -140,9 +140,13 @@ Kanun'un 11. maddesi uyarınca, veri sorumlusu olan Geliştirici'ye başvurarak 
 
 • Kanun'da öngörülen şartlar çerçevesinde kişisel verilerinizin silinmesini veya yok edilmesini isteme.
 
-Reklam Gizlilik Tercihleri
+Uygunsuz Yorum Bildirimleri
 
-İsteğe bağlı ödüllü reklamlar Google AdMob ile sunulur. Google; IP adresi, cihaz/reklam tanımlayıcıları, reklam etkileşimleri ve tanılama verilerini bölgenize ve gizlilik tercihlerinize göre işleyebilir. AstroSea profil bilgilerinizi ve tarot yorumlarınızı reklam isteklerine eklemez. Gerekli bölgelerde Google UMP izin ekranı gösterilir. Tercihlerinizi, gerekli olduğunda Profil sayfasındaki "Reklam gizlilik tercihleri" bağlantısından değiştirebilirsiniz. Bu metnin kabulü reklam kişiselleştirmesine izin verdiğiniz anlamına gelmez. Ayrıntılar: https://policies.google.com/technologies/ads
+Uygunsuz bir yorumu bildirirseniz, yorum metni ve gönderim tarihi inceleme amacıyla Firebase’de hesabınıza bağlı olarak saklanır. Hesabınız silindiğinde bu kayıtlar da silinir.
+
+Google AdMob ve Reklam Gizlilik Tercihleri
+
+Ödüllü reklamları göstermek için Google AdMob kullanılır. Google; IP adresi, cihaz/reklam tanımlayıcıları, reklam etkileşimleri ve tanılama verilerini bölgenize ve gizlilik tercihlerinize göre işleyebilir. AstroSea profil bilgilerinizi ve tarot yorumlarınızı reklam isteklerine eklemez. Gerekli bölgelerde Google UMP izin ekranı gösterilir. Tercihlerinizi, gerekli olduğunda Profil sayfasındaki "Reklam gizlilik tercihleri" bağlantısından değiştirebilirsiniz. Bu metnin kabulü reklam kişiselleştirmesine izin verdiğiniz anlamına gelmez. Ayrıntılar: https://policies.google.com/technologies/ads
 
 7. İletişim ve Başvuru
 
@@ -156,7 +160,7 @@ Talebiniz, niteliğine göre en kısa sürede ve en geç 30 (otuz) gün içinde 
     private const val ENGLISH_TEXT = """
 ASTROSEA PRIVACY POLICY AND CLARIFICATION TEXT
 
-Last Updated: October 26, 2026
+Last Updated: November 15, 2026
 
 1. Who is the Data Controller?
 
@@ -236,9 +240,13 @@ In accordance with Article 11 of the Law, you can exercise the following rights 
 
 • To request the deletion or destruction of your personal data within the framework of the conditions stipulated in the Law.
 
-Ad Privacy Choices
+Inappropriate Reading Reports
 
-Optional rewarded ads are provided by Google AdMob. Google may process IP addresses, device/advertising identifiers, ad interactions and diagnostics depending on your region and privacy choices. AstroSea does not add your profile information or tarot interpretations to ad requests. A Google UMP consent form is shown where required. You can change your choices through "Ad privacy choices" on the Profile page when required. Accepting this policy does not mean consenting to personalised advertising. Details: https://policies.google.com/technologies/ads
+If you report an inappropriate reading, its text and submission date are stored in Firebase with your account for review and deleted with your account.
+
+Google AdMob and Ad Privacy Choices
+
+AstroSea uses Google AdMob to deliver optional rewarded ads. Google may process IP addresses, device/advertising identifiers, ad interactions and diagnostics depending on your region and privacy choices. AstroSea does not add your profile information or tarot interpretations to ad requests. A Google UMP consent form is shown where required. You can change your choices through "Ad privacy choices" on the Profile page when required. Accepting this policy does not mean consenting to personalised advertising. Details: https://policies.google.com/technologies/ads
 
 7. Contact and Application
 
