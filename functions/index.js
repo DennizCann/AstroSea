@@ -8,7 +8,6 @@ const { authorized, parseWebhook, readingLimit } = require("./membership");
 const { createMembershipService } = require("./membership-service");
 const { createBetaService } = require("./beta-service");
 const { prepareReading, requestReading } = require("./reading-service");
-const { createReadingReportHandler } = require("./reading-report");
 
 initializeApp();
 
@@ -166,11 +165,6 @@ exports.generateTarotReading = onCall(
       throw new HttpsError("unavailable", "Interpretation service is temporarily unavailable.");
     }
   }
-);
-
-exports.reportTarotReading = onCall(
-  { timeoutSeconds: 20, memory: "256MiB", maxInstances: 2 },
-  createReadingReportHandler(db)
 );
 
 /**

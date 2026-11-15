@@ -25,7 +25,6 @@ function harness(providerError) {
     "./membership": { readingLimit: () => 3 },
     "./membership-service": { createMembershipService: () => ({ refresh: async () => ({ hasPremiumAccess: false }) }) },
     "./beta-service": { createBetaService: () => ({}) },
-    "./reading-report": { createReadingReportHandler: () => async () => ({ reported: true }) },
     "./reading-service": { prepareReading: readingService.prepareReading, requestReading: async () => {
       state.providerCalls++;
       if (providerError) throw Object.assign(new Error("Simulated"), { code: providerError });
